@@ -88,9 +88,10 @@ export function AIOContent({
 
     while ((codeMatch = codePattern.exec(text)) !== null) {
       const placeholder = `__CODE_${codeIdx}__`;
+      const innerText = codeMatch[1];
       codeMatches.push({
         placeholder,
-        element: <code key={`${keyPrefix}-code-${codeIdx}`} className="bg-gray-100 px-1 py-0.5 rounded text-sm font-mono">{codeMatch[1]}</code>
+        element: <code key={`${keyPrefix}-code-${codeIdx}`} className="bg-gray-100 px-1 py-0.5 rounded text-sm font-mono">{highlightBrandName(innerText, `${keyPrefix}-code-${codeIdx}`)}</code>
       });
       processed = processed.replace(codeMatch[0], placeholder);
       codeIdx++;
@@ -104,9 +105,10 @@ export function AIOContent({
 
     while ((boldMatch = boldRegex.exec(processed)) !== null) {
       const placeholder = `__BOLD_${boldIdx}__`;
+      const innerText = boldMatch[1] || boldMatch[2];
       boldMatches.push({
         placeholder,
-        element: <strong key={`${keyPrefix}-bold-${boldIdx}`} className="font-semibold">{boldMatch[1] || boldMatch[2]}</strong>
+        element: <strong key={`${keyPrefix}-bold-${boldIdx}`} className="font-semibold">{highlightBrandName(innerText, `${keyPrefix}-bold-${boldIdx}`)}</strong>
       });
       processed = processed.replace(boldMatch[0], placeholder);
       boldIdx++;
