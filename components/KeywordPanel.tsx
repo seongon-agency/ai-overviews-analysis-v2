@@ -10,6 +10,7 @@ interface KeywordPanelProps {
   aioMarkdown: string | null;
   references: Reference[];
   brandDomain?: string;
+  brandName?: string;
   onClose: () => void;
 }
 
@@ -18,6 +19,7 @@ export function KeywordPanel({
   aioMarkdown,
   references,
   brandDomain,
+  brandName,
   onClose
 }: KeywordPanelProps) {
   const [highlightedCitation, setHighlightedCitation] = useState<number | null>(null);
@@ -74,6 +76,7 @@ export function KeywordPanel({
                   highlightedCitation={highlightedCitation}
                   onCitationHover={setHighlightedCitation}
                   onCitationClick={handleCitationClick}
+                  brandName={brandName}
                 />
               </div>
             </div>

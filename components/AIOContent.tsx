@@ -11,6 +11,7 @@ interface AIOContentProps {
   highlightedCitation: number | null;
   onCitationHover: (num: number | null) => void;
   onCitationClick: (num: number) => void;
+  brandName?: string;
 }
 
 export function AIOContent({
@@ -18,13 +19,45 @@ export function AIOContent({
   references,
   highlightedCitation,
   onCitationHover,
-  onCitationClick
+  onCitationClick,
+  brandName
 }: AIOContentProps) {
   // Parse markdown with citation matching
   const segments = useMemo(
     () => parseMarkdownWithCitations(markdown, references),
     [markdown, references]
   );
+
+  // Highlight brand name in text (case-insensitive, word boundary)
+  const highlightBrandName = (text: string, keyPrefix: string): React.ReactNode => {
+    if (!brandName || brandName.length < 2) {
+      return text;
+    }
+
+    // Escape special regex characters in brand name
+    const escapedBrand = brandName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    // Create case-insensitive regex with word boundaries
+    const brandRegex = new RegExp(`(${escapedBrand})`, 'gi');
+
+    const parts = text.split(brandRegex);
+    if (parts.length === 1) {
+      return text; // No matches
+    }
+
+    return parts.map((part, idx) => {
+      if (part.toLowerCase() === brandName.toLowerCase()) {
+        return (
+          <mark
+            key={`${keyPrefix}-brand-${idx}`}
+            className="bg-yellow-200 text-yellow-900 px-0.5 rounded font-medium"
+          >
+            {part}
+          </mark>
+        );
+      }
+      return part;
+    });
+  };
 
   // Render inline formatting (bold, italic, code, links)
   const renderInlineFormatting = (text: string, keyPrefix: string): React.ReactNode => {
@@ -84,7 +117,8 @@ export function AIOContent({
     // Now split by placeholders and reconstruct
     const allMatches = [...codeMatches, ...boldMatches];
     if (allMatches.length === 0) {
-      return text;
+      // No formatting, just highlight brand name
+      return highlightBrandName(text, keyPrefix);
     }
 
     // Create regex to split by all placeholders
@@ -95,7 +129,8 @@ export function AIOContent({
     const result: React.ReactNode[] = [];
     textParts.forEach((part, idx) => {
       if (part) {
-        result.push(<span key={`${keyPrefix}-text-${idx}`}>{part}</span>);
+        // Highlight brand name in text parts
+        result.push(<span key={`${keyPrefix}-text-${idx}`}>{highlightBrandName(part, `${keyPrefix}-text-${idx}`)}</span>);
       }
       if (placeholders[idx]) {
         const match = allMatches.find(m => m.placeholder === placeholders[idx]);

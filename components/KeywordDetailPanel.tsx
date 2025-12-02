@@ -366,6 +366,7 @@ export function KeywordDetailPanel({
                               highlightedCitation={highlightedCitation}
                               onCitationHover={setHighlightedCitation}
                               onCitationClick={handleCitationClick}
+                              brandName={brandName}
                             />
                           </div>
                         </div>
