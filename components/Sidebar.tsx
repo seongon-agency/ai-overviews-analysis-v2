@@ -12,7 +12,6 @@ import {
   FolderOpen,
   Plus,
   Search,
-  Settings,
   ChevronRight,
   Loader2,
   X
@@ -166,13 +165,6 @@ export function Sidebar({ currentProjectId }: SidebarProps) {
             </div>
           </nav>
 
-          {/* Footer */}
-          <div className="border-t p-4">
-            <Button variant="ghost" className="w-full justify-start gap-3 text-muted-foreground" size="sm">
-              <Settings className="h-4 w-4" />
-              Settings
-            </Button>
-          </div>
         </div>
       </aside>
 
