@@ -8,52 +8,107 @@ export function escapeRegex(str: string): string {
 }
 
 /**
- * Normalize text for brand matching:
- * - Lowercase
- * - Trim whitespace
+ * Clean markdown by removing citation links and URLs
+ * This extracts only the readable text content for brand mention detection
+ * Matches the Python clean_markdown_citations function
  */
-function normalizeForMatching(text: string): string {
-  return text.toLowerCase().trim();
+export function cleanMarkdownForTextAnalysis(md: string): string {
+  if (!md) return '';
+
+  let cleaned = md;
+
+  // 1) Remove citation-style links: [[label]](url) - e.g., [[1]](http://...)
+  cleaned = cleaned.replace(/\s*\[\[[^\[\]]+\]\]\s*\([^)]+\)/g, '');
+
+  // 2) Turn [text](url) into just "text", but keep images ![alt](url) intact first
+  // First, temporarily protect images
+  const imageMatches: string[] = [];
+  cleaned = cleaned.replace(/!\[([^\]]*)\]\([^)]+\)/g, (match) => {
+    imageMatches.push(match);
+    return `__IMAGE_${imageMatches.length - 1}__`;
+  });
+
+  // Now convert links to just their text
+  cleaned = cleaned.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1');
+
+  // Remove the image placeholders (we don't want image alt text for brand matching)
+  cleaned = cleaned.replace(/__IMAGE_\d+__/g, '');
+
+  // 3) Remove any remaining URLs (http/https)
+  cleaned = cleaned.replace(/https?:\/\/[^\s)]+/g, '');
+
+  // 4) Clean up whitespace
+  cleaned = cleaned.replace(/[ \t]+/g, ' ');
+  cleaned = cleaned.replace(/\s+([.,;:!?])/g, '$1');
+
+  // 5) Trim each line and overall
+  cleaned = cleaned.split('\n').map(line => line.trim()).join('\n');
+
+  return cleaned.trim();
 }
 
 /**
- * Check if a brand name appears in text (case-insensitive)
- * Uses simple substring matching after normalizing both strings to lowercase.
+ * Check if a brand name appears in text as a whole word (case-insensitive)
+ * Uses word boundary matching to avoid false positives like "Nova" in "innovation"
  * This is the SINGLE SOURCE OF TRUTH for brand mention detection.
  */
 export function brandMatchesText(brandName: string, text: string): boolean {
   if (!brandName || !text || brandName.length < 2) return false;
 
-  const normalizedBrand = normalizeForMatching(brandName);
-  const normalizedText = normalizeForMatching(text);
+  const escaped = escapeRegex(brandName);
 
-  // Simple case-insensitive substring match
-  return normalizedText.includes(normalizedBrand);
+  // Use word boundary matching (case-insensitive)
+  // \b works for ASCII word boundaries
+  try {
+    const pattern = new RegExp(`\\b${escaped}\\b`, 'i');
+    return pattern.test(text);
+  } catch {
+    // Fallback to simple includes if regex fails
+    return text.toLowerCase().includes(brandName.toLowerCase());
+  }
 }
 
 /**
  * Find all occurrences of brand name in text and return their positions
+ * Uses word boundary matching to only find whole word matches
  * Used for highlighting brand mentions in UI
  */
 export function findBrandMentions(brandName: string, text: string): { start: number; end: number; match: string }[] {
   if (!brandName || !text || brandName.length < 2) return [];
 
   const results: { start: number; end: number; match: string }[] = [];
-  const normalizedBrand = brandName.toLowerCase();
-  const normalizedText = text.toLowerCase();
 
-  let pos = 0;
-  while (pos < normalizedText.length) {
-    const foundAt = normalizedText.indexOf(normalizedBrand, pos);
-    if (foundAt === -1) break;
+  try {
+    const escaped = escapeRegex(brandName);
+    // Use word boundary regex with global flag to find all matches
+    const pattern = new RegExp(`\\b(${escaped})\\b`, 'gi');
 
-    results.push({
-      start: foundAt,
-      end: foundAt + brandName.length,
-      match: text.substring(foundAt, foundAt + brandName.length) // Original case from text
-    });
+    let match;
+    while ((match = pattern.exec(text)) !== null) {
+      results.push({
+        start: match.index,
+        end: match.index + match[1].length,
+        match: match[1] // The actual matched text with original case
+      });
+    }
+  } catch {
+    // Fallback to simple indexOf if regex fails
+    const normalizedBrand = brandName.toLowerCase();
+    const normalizedText = text.toLowerCase();
 
-    pos = foundAt + 1; // Move past this match to find overlapping matches
+    let pos = 0;
+    while (pos < normalizedText.length) {
+      const foundAt = normalizedText.indexOf(normalizedBrand, pos);
+      if (foundAt === -1) break;
+
+      results.push({
+        start: foundAt,
+        end: foundAt + brandName.length,
+        match: text.substring(foundAt, foundAt + brandName.length)
+      });
+
+      pos = foundAt + 1;
+    }
   }
 
   return results;
@@ -100,13 +155,13 @@ export function splitTextByBrand(brandName: string, text: string): { text: strin
 export function brandMatchesDomain(brandDomain: string, domain: string, url?: string): boolean {
   if (!brandDomain) return false;
 
-  const normalizedBrandDomain = normalizeForMatching(brandDomain);
+  const normalizedBrandDomain = brandDomain.toLowerCase().trim();
 
-  if (domain && normalizeForMatching(domain).includes(normalizedBrandDomain)) {
+  if (domain && domain.toLowerCase().includes(normalizedBrandDomain)) {
     return true;
   }
 
-  if (url && normalizeForMatching(url).includes(normalizedBrandDomain)) {
+  if (url && url.toLowerCase().includes(normalizedBrandDomain)) {
     return true;
   }
 
@@ -138,13 +193,17 @@ export function findBrandInReferences(
 
 /**
  * Check if brand is mentioned in AIO markdown text (not as citation, but in content)
+ * Cleans the markdown first to remove citation URLs that might contain brand names
  */
 export function isBrandMentionedInText(
   aioMarkdown: string | null,
   brandName: string
 ): boolean {
   if (!aioMarkdown || !brandName) return false;
-  return brandMatchesText(brandName, aioMarkdown);
+
+  // Clean the markdown to remove citations and URLs before checking
+  const cleanedText = cleanMarkdownForTextAnalysis(aioMarkdown);
+  return brandMatchesText(brandName, cleanedText);
 }
 
 /**
