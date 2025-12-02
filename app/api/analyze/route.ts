@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getProject, getProjectKeywords } from '@/lib/database';
+import { getProject, getProjectKeywords, getSessionKeywords } from '@/lib/database';
 import { analyzeKeywords, keywordsToCSV, competitorsToCSV } from '@/lib/analysis';
 
 // POST /api/analyze - Run analysis on project keywords
+// Can optionally specify sessionId to analyze a specific session instead of latest
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { projectId, brandName, brandDomain } = body;
+    const { projectId, brandName, brandDomain, sessionId } = body;
 
     // Validation
     if (!projectId || typeof projectId !== 'number') {
@@ -39,8 +40,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Get keywords from database
-    const keywords = await getProjectKeywords(projectId);
+    // Get keywords from database - use specific session if provided, otherwise latest
+    const keywords = sessionId
+      ? await getSessionKeywords(sessionId)
+      : await getProjectKeywords(projectId);
 
     if (keywords.length === 0) {
       return NextResponse.json(
@@ -66,7 +69,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// GET /api/analyze?projectId=X&brandName=Y&brandDomain=Z&format=csv
+// GET /api/analyze?projectId=X&brandName=Y&brandDomain=Z&format=csv&sessionId=Z
 // Export analysis as CSV
 export async function GET(request: NextRequest) {
   try {
@@ -76,6 +79,8 @@ export async function GET(request: NextRequest) {
     const brandDomain = searchParams.get('brandDomain') || '';
     const format = searchParams.get('format') || 'json';
     const type = searchParams.get('type') || 'keywords'; // 'keywords' or 'competitors'
+    const sessionIdParam = searchParams.get('sessionId');
+    const sessionId = sessionIdParam ? parseInt(sessionIdParam, 10) : null;
 
     // Validation
     if (isNaN(projectId)) {
@@ -101,7 +106,10 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const keywords = await getProjectKeywords(projectId);
+    // Get keywords - use specific session if provided, otherwise latest
+    const keywords = sessionId
+      ? await getSessionKeywords(sessionId)
+      : await getProjectKeywords(projectId);
     if (keywords.length === 0) {
       return NextResponse.json(
         { success: false, error: 'No keywords found in project' },

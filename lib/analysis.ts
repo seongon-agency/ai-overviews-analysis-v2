@@ -356,11 +356,15 @@ export function analyzeKeywords(
   }
 
   // Check brand mentions in markdown text
+  // IMPORTANT: Use cleaned markdown to avoid false positives from URLs containing brand names
   for (const kw of aioKeywords) {
     if (!kw.aioMarkdown) continue;
 
+    // Clean the markdown once for this keyword (removes citations, URLs)
+    const cleanedMarkdown = cleanMarkdownForTextAnalysis(kw.aioMarkdown);
+
     // Check user's brand mention first
-    if (brandName && brandMatchesText(brandName, kw.aioMarkdown)) {
+    if (brandName && brandMatchesText(brandName, cleanedMarkdown)) {
       ensureUserBrand();
       brandMap.get(brandName)!.mentionedInPrompts.add(kw.keyword);
     }
@@ -369,7 +373,7 @@ export function analyzeKeywords(
     brandMap.forEach((data, brand) => {
       if (data.isUserBrand) return; // Already checked above
 
-      if (brandMatchesText(brand, kw.aioMarkdown!)) {
+      if (brandMatchesText(brand, cleanedMarkdown)) {
         data.mentionedInPrompts.add(kw.keyword);
       }
     });

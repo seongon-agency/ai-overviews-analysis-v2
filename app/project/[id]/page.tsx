@@ -119,6 +119,8 @@ export default function ProjectPage() {
   useEffect(() => {
     if (selectedSessionId) {
       fetchSessionKeywords(selectedSessionId);
+      // Clear analysis when switching sessions so it re-runs with new session data
+      setAnalysis(null);
     }
   }, [selectedSessionId, fetchSessionKeywords]);
 
@@ -270,10 +272,15 @@ export default function ProjectPage() {
     }
   };
 
-  // Run competitor analysis
+  // Run competitor analysis on the currently selected session
   const runAnalysis = useCallback(async () => {
     if (!brandName || !brandDomain) {
       setAnalysisError('Please configure brand name and domain first');
+      return;
+    }
+
+    if (!selectedSessionId) {
+      setAnalysisError('Please select a session first');
       return;
     }
 
@@ -284,7 +291,7 @@ export default function ProjectPage() {
       const response = await fetch('/api/analyze', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ projectId, brandName, brandDomain })
+        body: JSON.stringify({ projectId, brandName, brandDomain, sessionId: selectedSessionId })
       });
 
       const data = await response.json();
@@ -299,11 +306,11 @@ export default function ProjectPage() {
     } finally {
       setAnalyzing(false);
     }
-  }, [projectId, brandName, brandDomain]);
+  }, [projectId, brandName, brandDomain, selectedSessionId]);
 
-  // Export CSV
+  // Export CSV for the currently selected session
   const exportCSV = (type: 'keywords' | 'competitors') => {
-    const url = `/api/analyze?projectId=${projectId}&brandName=${encodeURIComponent(brandName)}&brandDomain=${encodeURIComponent(brandDomain)}&format=csv&type=${type}`;
+    const url = `/api/analyze?projectId=${projectId}&brandName=${encodeURIComponent(brandName)}&brandDomain=${encodeURIComponent(brandDomain)}&format=csv&type=${type}&sessionId=${selectedSessionId}`;
     window.open(url, '_blank');
   };
 
@@ -828,7 +835,15 @@ export default function ProjectPage() {
                 <>
                   {/* Header */}
                   <div className="flex items-center justify-between">
-                    <h2 className="text-xl font-semibold">Competitor Analysis</h2>
+                    <div>
+                      <h2 className="text-xl font-semibold">Competitor Analysis</h2>
+                      {selectedSession && (
+                        <p className="text-sm text-muted-foreground mt-0.5">
+                          Analyzing: {selectedSession.name || `Session ${selectedSession.id}`}
+                          {showPastSession && <span className="text-amber-600 ml-2">(Past session)</span>}
+                        </p>
+                      )}
+                    </div>
                     <div className="flex items-center gap-3">
                       <Button variant="outline" size="sm" onClick={runAnalysis}>
                         <RefreshCw className="mr-2 h-4 w-4" />
