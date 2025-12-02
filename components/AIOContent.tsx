@@ -4,6 +4,7 @@ import { useMemo } from 'react';
 import { parseMarkdownWithCitations } from '@/lib/parse-citations';
 import { CitationBadge } from './CitationBadge';
 import { Reference } from '@/lib/types';
+import { splitTextByBrand } from '@/lib/analysis';
 
 interface AIOContentProps {
   markdown: string;
@@ -28,34 +29,31 @@ export function AIOContent({
     [markdown, references]
   );
 
-  // Highlight brand name in text (case-insensitive, word boundary)
+  // Highlight brand name in text using unified brand matching logic
   const highlightBrandName = (text: string, keyPrefix: string): React.ReactNode => {
     if (!brandName || brandName.length < 2) {
       return text;
     }
 
-    // Escape special regex characters in brand name
-    const escapedBrand = brandName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    // Create case-insensitive regex with word boundaries
-    const brandRegex = new RegExp(`(${escapedBrand})`, 'gi');
+    // Use the unified splitTextByBrand function from analysis.ts
+    const parts = splitTextByBrand(brandName, text);
 
-    const parts = text.split(brandRegex);
-    if (parts.length === 1) {
+    if (parts.length === 1 && !parts[0].isBrand) {
       return text; // No matches
     }
 
     return parts.map((part, idx) => {
-      if (part.toLowerCase() === brandName.toLowerCase()) {
+      if (part.isBrand) {
         return (
           <mark
             key={`${keyPrefix}-brand-${idx}`}
             className="bg-yellow-200 text-yellow-900 px-0.5 rounded font-medium"
           >
-            {part}
+            {part.text}
           </mark>
         );
       }
-      return part;
+      return part.text;
     });
   };
 

@@ -3,14 +3,13 @@ import { KeywordRow, Reference, KeywordRecord, CompetitorMetrics, AnalysisResult
 /**
  * Escape special regex characters in a string
  */
-function escapeRegex(str: string): string {
+export function escapeRegex(str: string): string {
   return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
 /**
  * Normalize text for brand matching:
  * - Lowercase
- * - Remove Vietnamese diacritics (optional normalization)
  * - Trim whitespace
  */
 function normalizeForMatching(text: string): string {
@@ -18,31 +17,81 @@ function normalizeForMatching(text: string): string {
 }
 
 /**
- * Check if a brand name appears in text (case-insensitive, partial match)
- * This handles cases like "Novagen" matching "Bệnh viện đa khoa Novagen"
+ * Check if a brand name appears in text (case-insensitive)
+ * Uses simple substring matching after normalizing both strings to lowercase.
+ * This is the SINGLE SOURCE OF TRUTH for brand mention detection.
  */
 export function brandMatchesText(brandName: string, text: string): boolean {
-  if (!brandName || !text) return false;
+  if (!brandName || !text || brandName.length < 2) return false;
 
   const normalizedBrand = normalizeForMatching(brandName);
   const normalizedText = normalizeForMatching(text);
 
-  // Direct substring match (handles partial matches)
-  if (normalizedText.includes(normalizedBrand)) {
-    return true;
+  // Simple case-insensitive substring match
+  return normalizedText.includes(normalizedBrand);
+}
+
+/**
+ * Find all occurrences of brand name in text and return their positions
+ * Used for highlighting brand mentions in UI
+ */
+export function findBrandMentions(brandName: string, text: string): { start: number; end: number; match: string }[] {
+  if (!brandName || !text || brandName.length < 2) return [];
+
+  const results: { start: number; end: number; match: string }[] = [];
+  const normalizedBrand = brandName.toLowerCase();
+  const normalizedText = text.toLowerCase();
+
+  let pos = 0;
+  while (pos < normalizedText.length) {
+    const foundAt = normalizedText.indexOf(normalizedBrand, pos);
+    if (foundAt === -1) break;
+
+    results.push({
+      start: foundAt,
+      end: foundAt + brandName.length,
+      match: text.substring(foundAt, foundAt + brandName.length) // Original case from text
+    });
+
+    pos = foundAt + 1; // Move past this match to find overlapping matches
   }
 
-  // Also try word boundary match for more precision
-  try {
-    const pattern = new RegExp(`\\b${escapeRegex(normalizedBrand)}\\b`, 'i');
-    if (pattern.test(text)) {
-      return true;
+  return results;
+}
+
+/**
+ * Split text by brand name occurrences, preserving original case
+ * Returns array of { text: string, isBrand: boolean }
+ */
+export function splitTextByBrand(brandName: string, text: string): { text: string; isBrand: boolean }[] {
+  if (!brandName || !text || brandName.length < 2) {
+    return [{ text, isBrand: false }];
+  }
+
+  const mentions = findBrandMentions(brandName, text);
+  if (mentions.length === 0) {
+    return [{ text, isBrand: false }];
+  }
+
+  const result: { text: string; isBrand: boolean }[] = [];
+  let lastEnd = 0;
+
+  for (const mention of mentions) {
+    // Add text before this mention
+    if (mention.start > lastEnd) {
+      result.push({ text: text.substring(lastEnd, mention.start), isBrand: false });
     }
-  } catch {
-    // Ignore regex errors
+    // Add the brand mention
+    result.push({ text: mention.match, isBrand: true });
+    lastEnd = mention.end;
   }
 
-  return false;
+  // Add remaining text after last mention
+  if (lastEnd < text.length) {
+    result.push({ text: text.substring(lastEnd), isBrand: false });
+  }
+
+  return result;
 }
 
 /**
