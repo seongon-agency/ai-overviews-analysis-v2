@@ -59,8 +59,16 @@ async function initializeTables() {
 let initialized = false;
 async function ensureInitialized() {
   if (!initialized) {
-    await initializeTables();
-    initialized = true;
+    console.log('[DB] Initializing PostgreSQL connection...');
+    console.log('[DB] DATABASE_URL exists:', !!process.env.DATABASE_URL);
+    try {
+      await initializeTables();
+      console.log('[DB] Tables initialized successfully');
+      initialized = true;
+    } catch (error) {
+      console.error('[DB] Failed to initialize tables:', error);
+      throw error;
+    }
   }
 }
 

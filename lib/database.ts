@@ -3,12 +3,16 @@
 
 const usePostgres = !!process.env.DATABASE_URL;
 
+console.log('[Database] Mode:', usePostgres ? 'PostgreSQL' : 'SQLite');
+
 // Dynamic import based on environment
 let db: typeof import('./db') | typeof import('./db-postgres');
 
 if (usePostgres) {
+  console.log('[Database] Loading PostgreSQL driver...');
   db = require('./db-postgres');
 } else {
+  console.log('[Database] Loading SQLite driver...');
   db = require('./db');
 }
 
