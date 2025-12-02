@@ -70,45 +70,32 @@ export function brandMatchesText(brandName: string, text: string): boolean {
 
 /**
  * Find all occurrences of brand name in text and return their positions
- * Uses word boundary matching to only find whole word matches
+ * Case-insensitive search that finds all matches
  * Used for highlighting brand mentions in UI
  */
 export function findBrandMentions(brandName: string, text: string): { start: number; end: number; match: string }[] {
   if (!brandName || !text || brandName.length < 2) return [];
 
   const results: { start: number; end: number; match: string }[] = [];
+  const lowerBrand = brandName.toLowerCase();
+  const lowerText = text.toLowerCase();
 
-  try {
-    const escaped = escapeRegex(brandName);
-    // Use word boundary regex with global flag to find all matches
-    const pattern = new RegExp(`\\b(${escaped})\\b`, 'gi');
+  let pos = 0;
+  while (pos < lowerText.length) {
+    const foundAt = lowerText.indexOf(lowerBrand, pos);
+    if (foundAt === -1) break;
 
-    let match;
-    while ((match = pattern.exec(text)) !== null) {
-      results.push({
-        start: match.index,
-        end: match.index + match[1].length,
-        match: match[1] // The actual matched text with original case
-      });
-    }
-  } catch {
-    // Fallback to simple indexOf if regex fails
-    const normalizedBrand = brandName.toLowerCase();
-    const normalizedText = text.toLowerCase();
+    // Get the actual matched text with its original case
+    const matchedText = text.substring(foundAt, foundAt + brandName.length);
 
-    let pos = 0;
-    while (pos < normalizedText.length) {
-      const foundAt = normalizedText.indexOf(normalizedBrand, pos);
-      if (foundAt === -1) break;
+    results.push({
+      start: foundAt,
+      end: foundAt + brandName.length,
+      match: matchedText
+    });
 
-      results.push({
-        start: foundAt,
-        end: foundAt + brandName.length,
-        match: text.substring(foundAt, foundAt + brandName.length)
-      });
-
-      pos = foundAt + 1;
-    }
+    // Move past this match
+    pos = foundAt + brandName.length;
   }
 
   return results;
