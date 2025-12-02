@@ -871,42 +871,56 @@ export default function ProjectPage() {
 
                   {/* Brand Performance */}
                   {brandName && (
-                    <Card className="p-6 bg-gradient-to-r from-amber-50 to-orange-50 border-amber-200">
-                      <h3 className="text-lg font-semibold mb-5">{brandName} Performance</h3>
-                      {(() => {
-                        const brandData = analysis.competitors.find(c => c.isUserBrand);
-                        if (!brandData) {
+                    <Card className="overflow-hidden border-amber-200">
+                      <div className="bg-gradient-to-r from-amber-500 to-orange-500 px-6 py-4">
+                        <h3 className="text-lg font-semibold text-white">Your Brand: {brandName}</h3>
+                      </div>
+                      <div className="p-6 bg-gradient-to-b from-amber-50/50 to-white">
+                        {(() => {
+                          const brandData = analysis.competitors.find(c => c.isUserBrand);
+                          const brandRank = analysis.competitors.findIndex(c => c.isUserBrand) + 1;
+                          if (!brandData) {
+                            return (
+                              <div className="text-center py-4">
+                                <p className="text-muted-foreground">
+                                  Your brand was not found in AI Overview citations.
+                                </p>
+                                <p className="text-sm text-muted-foreground mt-1">
+                                  Try checking your brand domain configuration.
+                                </p>
+                              </div>
+                            );
+                          }
                           return (
-                            <p className="text-muted-foreground">
-                              Your brand was not found in AI Overview citations or mentions.
-                            </p>
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                              <div className="text-center p-4 rounded-xl bg-white shadow-sm border">
+                                <div className="text-4xl font-bold text-amber-600">#{brandRank}</div>
+                                <div className="text-sm text-muted-foreground mt-1">Overall Rank</div>
+                                <div className="text-xs text-muted-foreground">of {analysis.competitors.length} sources</div>
+                              </div>
+                              <div className="text-center p-4 rounded-xl bg-white shadow-sm border">
+                                <div className="text-4xl font-bold text-blue-600">{brandData.citedCount}</div>
+                                <div className="text-sm text-muted-foreground mt-1">Citations</div>
+                                <div className="text-xs text-muted-foreground">times cited as source</div>
+                              </div>
+                              <div className="text-center p-4 rounded-xl bg-white shadow-sm border">
+                                <div className="text-4xl font-bold text-purple-600">
+                                  {brandData.averageRank > 0 ? brandData.averageRank.toFixed(1) : '-'}
+                                </div>
+                                <div className="text-sm text-muted-foreground mt-1">Avg Position</div>
+                                <div className="text-xs text-muted-foreground">in citation list</div>
+                              </div>
+                              <div className="text-center p-4 rounded-xl bg-white shadow-sm border">
+                                <div className="text-4xl font-bold text-green-600">
+                                  {(brandData.promptCitedRate * 100).toFixed(1)}%
+                                </div>
+                                <div className="text-sm text-muted-foreground mt-1">Citation Rate</div>
+                                <div className="text-xs text-muted-foreground">of AI Overviews</div>
+                              </div>
+                            </div>
                           );
-                        }
-                        return (
-                          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                            <div>
-                              <div className="text-3xl font-bold text-amber-700">{brandData.citedCount}</div>
-                              <div className="text-sm text-muted-foreground mt-1">Times Cited</div>
-                            </div>
-                            <div>
-                              <div className="text-3xl font-bold text-orange-700">{brandData.mentionedCount}</div>
-                              <div className="text-sm text-muted-foreground mt-1">Times Mentioned</div>
-                            </div>
-                            <div>
-                              <div className="text-3xl font-bold text-amber-700">
-                                {brandData.averageRank > 0 ? brandData.averageRank.toFixed(1) : '-'}
-                              </div>
-                              <div className="text-sm text-muted-foreground mt-1">Avg Citation Rank</div>
-                            </div>
-                            <div>
-                              <div className="text-3xl font-bold text-orange-700">
-                                {(brandData.promptCitedRate * 100).toFixed(1)}%
-                              </div>
-                              <div className="text-sm text-muted-foreground mt-1">Citation Rate</div>
-                            </div>
-                          </div>
-                        );
-                      })()}
+                        })()}
+                      </div>
                     </Card>
                   )}
 
