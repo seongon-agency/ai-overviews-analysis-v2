@@ -2,6 +2,16 @@
 
 import { useState } from 'react';
 import { CompetitorMetrics } from '@/lib/types';
+import { Badge } from '@/components/ui/badge';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { ArrowUp, ArrowDown, ArrowUpDown } from 'lucide-react';
 
 interface CompetitorTableProps {
   competitors: CompetitorMetrics[];
@@ -10,7 +20,7 @@ interface CompetitorTableProps {
 
 type SortField = 'brand' | 'citedCount' | 'mentionedCount' | 'averageRank' | 'promptCitedRate' | 'mentionRate';
 
-export function CompetitorTable({ competitors, brandName }: CompetitorTableProps) {
+export function CompetitorTable({ competitors }: CompetitorTableProps) {
   const [sortField, setSortField] = useState<SortField>('citedCount');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
 
@@ -52,98 +62,107 @@ export function CompetitorTable({ competitors, brandName }: CompetitorTableProps
 
   const SortIcon = ({ field }: { field: SortField }) => {
     if (sortField !== field) {
-      return <span className="text-gray-300 ml-1">↕</span>;
+      return <ArrowUpDown className="h-3 w-3 ml-1 text-muted-foreground/50" />;
     }
-    return <span className="ml-1">{sortDirection === 'asc' ? '↑' : '↓'}</span>;
+    return sortDirection === 'asc'
+      ? <ArrowUp className="h-3 w-3 ml-1" />
+      : <ArrowDown className="h-3 w-3 ml-1" />;
   };
 
-  const isUserBrand = (brand: string) => brand.toLowerCase() === brandName.toLowerCase();
+  const isUserBrand = (competitor: CompetitorMetrics) => competitor.isUserBrand === true;
 
   return (
-    <div className="bg-white rounded-lg shadow border overflow-hidden">
-      <div className="overflow-x-auto">
-        <table className="w-full text-sm">
-          <thead className="bg-gray-50 border-b">
-            <tr>
-              <th className="text-left p-3 font-medium text-gray-700">#</th>
-              <th
-                className="text-left p-3 font-medium text-gray-700 cursor-pointer hover:bg-gray-100"
-                onClick={() => handleSort('brand')}
-              >
+    <div className="rounded-lg border overflow-hidden">
+      <Table>
+        <TableHeader>
+          <TableRow className="hover:bg-transparent">
+            <TableHead className="w-12">#</TableHead>
+            <TableHead
+              className="cursor-pointer hover:bg-muted/50 transition-colors"
+              onClick={() => handleSort('brand')}
+            >
+              <div className="flex items-center">
                 Brand <SortIcon field="brand" />
-              </th>
-              <th
-                className="text-center p-3 font-medium text-gray-700 cursor-pointer hover:bg-gray-100"
-                onClick={() => handleSort('citedCount')}
-              >
+              </div>
+            </TableHead>
+            <TableHead
+              className="text-center cursor-pointer hover:bg-muted/50 transition-colors"
+              onClick={() => handleSort('citedCount')}
+            >
+              <div className="flex items-center justify-center">
                 Citations <SortIcon field="citedCount" />
-              </th>
-              <th
-                className="text-center p-3 font-medium text-gray-700 cursor-pointer hover:bg-gray-100"
-                onClick={() => handleSort('mentionedCount')}
-              >
+              </div>
+            </TableHead>
+            <TableHead
+              className="text-center cursor-pointer hover:bg-muted/50 transition-colors"
+              onClick={() => handleSort('mentionedCount')}
+            >
+              <div className="flex items-center justify-center">
                 Mentions <SortIcon field="mentionedCount" />
-              </th>
-              <th
-                className="text-center p-3 font-medium text-gray-700 cursor-pointer hover:bg-gray-100"
-                onClick={() => handleSort('averageRank')}
-              >
+              </div>
+            </TableHead>
+            <TableHead
+              className="text-center cursor-pointer hover:bg-muted/50 transition-colors"
+              onClick={() => handleSort('averageRank')}
+            >
+              <div className="flex items-center justify-center">
                 Avg Rank <SortIcon field="averageRank" />
-              </th>
-              <th
-                className="text-center p-3 font-medium text-gray-700 cursor-pointer hover:bg-gray-100"
-                onClick={() => handleSort('promptCitedRate')}
-              >
+              </div>
+            </TableHead>
+            <TableHead
+              className="text-center cursor-pointer hover:bg-muted/50 transition-colors"
+              onClick={() => handleSort('promptCitedRate')}
+            >
+              <div className="flex items-center justify-center">
                 Citation Rate <SortIcon field="promptCitedRate" />
-              </th>
-              <th
-                className="text-center p-3 font-medium text-gray-700 cursor-pointer hover:bg-gray-100"
-                onClick={() => handleSort('mentionRate')}
-              >
+              </div>
+            </TableHead>
+            <TableHead
+              className="text-center cursor-pointer hover:bg-muted/50 transition-colors"
+              onClick={() => handleSort('mentionRate')}
+            >
+              <div className="flex items-center justify-center">
                 Mention Rate <SortIcon field="mentionRate" />
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {sortedCompetitors.map((competitor, index) => (
-              <tr
-                key={competitor.brand}
-                className={`
-                  border-b last:border-b-0 hover:bg-gray-50
-                  ${isUserBrand(competitor.brand) ? 'bg-yellow-50' : ''}
-                `}
-              >
-                <td className="p-3 text-gray-500">{index + 1}</td>
-                <td className="p-3">
-                  <span className="font-medium text-gray-900">
-                    {competitor.brand}
-                  </span>
-                  {isUserBrand(competitor.brand) && (
-                    <span className="ml-2 text-xs bg-yellow-200 text-yellow-800 px-1.5 py-0.5 rounded">
+              </div>
+            </TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {sortedCompetitors.map((competitor, index) => (
+            <TableRow
+              key={competitor.brand}
+              className={isUserBrand(competitor) ? 'bg-amber-50/50' : ''}
+            >
+              <TableCell className="text-muted-foreground">{index + 1}</TableCell>
+              <TableCell>
+                <div className="flex items-center gap-2">
+                  <span className="font-medium">{competitor.brand}</span>
+                  {isUserBrand(competitor) && (
+                    <Badge variant="secondary" className="bg-amber-100 text-amber-800">
                       Your Brand
-                    </span>
+                    </Badge>
                   )}
-                </td>
-                <td className="p-3 text-center font-medium text-blue-600">
-                  {competitor.citedCount}
-                </td>
-                <td className="p-3 text-center font-medium text-purple-600">
-                  {competitor.mentionedCount}
-                </td>
-                <td className="p-3 text-center text-gray-600">
-                  {competitor.averageRank.toFixed(1)}
-                </td>
-                <td className="p-3 text-center text-gray-600">
-                  {(competitor.promptCitedRate * 100).toFixed(1)}%
-                </td>
-                <td className="p-3 text-center text-gray-600">
-                  {(competitor.mentionRate * 100).toFixed(1)}%
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+                </div>
+              </TableCell>
+              <TableCell className="text-center font-medium text-blue-600">
+                {competitor.citedCount}
+              </TableCell>
+              <TableCell className="text-center font-medium text-purple-600">
+                {competitor.mentionedCount}
+              </TableCell>
+              <TableCell className="text-center text-muted-foreground">
+                {competitor.averageRank.toFixed(1)}
+              </TableCell>
+              <TableCell className="text-center text-muted-foreground">
+                {(competitor.promptCitedRate * 100).toFixed(1)}%
+              </TableCell>
+              <TableCell className="text-center text-muted-foreground">
+                {(competitor.mentionRate * 100).toFixed(1)}%
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
     </div>
   );
 }

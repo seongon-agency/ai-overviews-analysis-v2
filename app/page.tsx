@@ -1,16 +1,18 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { Project } from '@/lib/types';
+import { Sidebar } from '@/components/Sidebar';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { FolderOpen, Calendar, Globe, Trash2, ArrowRight, Loader2, BarChart3 } from 'lucide-react';
 
 export default function Home() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
-  const [showCreateModal, setShowCreateModal] = useState(false);
-  const [newProjectName, setNewProjectName] = useState('');
-  const [creating, setCreating] = useState(false);
 
-  // Fetch projects on mount
   useEffect(() => {
     fetchProjects();
   }, []);
@@ -29,30 +31,9 @@ export default function Home() {
     }
   };
 
-  const createProject = async () => {
-    if (!newProjectName.trim()) return;
-
-    setCreating(true);
-    try {
-      const response = await fetch('/api/projects', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: newProjectName.trim() })
-      });
-      const data = await response.json();
-      if (data.success) {
-        setNewProjectName('');
-        setShowCreateModal(false);
-        fetchProjects();
-      }
-    } catch (error) {
-      console.error('Error creating project:', error);
-    } finally {
-      setCreating(false);
-    }
-  };
-
-  const deleteProject = async (id: number) => {
+  const deleteProject = async (id: number, e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
     if (!confirm('Are you sure you want to delete this project?')) return;
 
     try {
@@ -68,139 +49,155 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b">
-        <div className="max-w-6xl mx-auto px-4 py-4">
-          <h1 className="text-2xl font-bold text-gray-900">
-            AI Overviews Analysis
-          </h1>
-          <p className="text-gray-600 text-sm mt-1">
-            Analyze Google AI Overview citations and brand mentions
-          </p>
-        </div>
-      </header>
+    <div className="min-h-screen">
+      <Sidebar />
 
       {/* Main Content */}
-      <main className="max-w-6xl mx-auto px-4 py-8">
-        {/* Actions */}
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-lg font-semibold text-gray-800">Projects</h2>
-          <button
-            onClick={() => setShowCreateModal(true)}
-            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors flex items-center gap-2"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-            </svg>
-            New Project
-          </button>
-        </div>
+      <main className="pl-64">
+        <div className="p-8 max-w-6xl">
+          {/* Page Header */}
+          <div className="mb-8">
+            <h1 className="text-2xl font-semibold tracking-tight">Welcome back</h1>
+            <p className="text-muted-foreground mt-1">
+              Select a project to view your AI Overview analysis
+            </p>
+          </div>
 
-        {/* Projects List */}
-        {loading ? (
-          <div className="text-center py-12">
-            <div className="inline-block w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
-            <p className="mt-2 text-gray-600">Loading projects...</p>
-          </div>
-        ) : projects.length === 0 ? (
-          <div className="bg-white rounded-lg shadow border p-12 text-center">
-            <div className="text-gray-400 mb-4">
-              <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
-              </svg>
-            </div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No projects yet</h3>
-            <p className="text-gray-600 mb-4">Create your first project to start analyzing AI Overviews</p>
-            <button
-              onClick={() => setShowCreateModal(true)}
-              className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
-            >
-              Create Project
-            </button>
-          </div>
-        ) : (
-          <div className="grid gap-4">
-            {projects.map((project) => (
-              <div
-                key={project.id}
-                className="bg-white rounded-lg shadow border p-4 hover:shadow-md transition-shadow"
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex-1">
-                    <a
-                      href={`/project/${project.id}`}
-                      className="text-lg font-medium text-gray-900 hover:text-blue-600"
-                    >
-                      {project.name}
-                    </a>
-                    <div className="text-sm text-gray-500 mt-1">
-                      {project.brand_name && (
-                        <span className="mr-4">Brand: {project.brand_name}</span>
-                      )}
-                      {project.brand_domain && (
-                        <span className="mr-4">Domain: {project.brand_domain}</span>
-                      )}
-                      <span>Created: {new Date(project.created_at).toLocaleDateString()}</span>
-                    </div>
+          {/* Stats Overview */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-center gap-4">
+                  <div className="p-2.5 rounded-lg bg-blue-100">
+                    <FolderOpen className="h-5 w-5 text-blue-600" />
                   </div>
-                  <div className="flex items-center gap-2">
-                    <a
-                      href={`/project/${project.id}`}
-                      className="px-3 py-1.5 text-sm bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition-colors"
-                    >
-                      Open
-                    </a>
-                    <button
-                      onClick={() => deleteProject(project.id)}
-                      className="px-3 py-1.5 text-sm text-red-600 hover:bg-red-50 rounded transition-colors"
-                    >
-                      Delete
-                    </button>
+                  <div>
+                    <p className="text-sm text-muted-foreground">Total Projects</p>
+                    <p className="text-2xl font-bold">{projects.length}</p>
                   </div>
                 </div>
-              </div>
-            ))}
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-center gap-4">
+                  <div className="p-2.5 rounded-lg bg-green-100">
+                    <BarChart3 className="h-5 w-5 text-green-600" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">With Brand Config</p>
+                    <p className="text-2xl font-bold">
+                      {projects.filter(p => p.brand_domain).length}
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-center gap-4">
+                  <div className="p-2.5 rounded-lg bg-purple-100">
+                    <Calendar className="h-5 w-5 text-purple-600" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">Recent Activity</p>
+                    <p className="text-2xl font-bold">
+                      {projects.length > 0 ? 'Active' : 'None'}
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
-        )}
-      </main>
 
-      {/* Create Project Modal */}
-      {showCreateModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div
-            className="absolute inset-0 bg-black/50"
-            onClick={() => setShowCreateModal(false)}
-          />
-          <div className="relative bg-white rounded-lg shadow-xl p-6 w-full max-w-md mx-4">
-            <h3 className="text-lg font-semibold mb-4">Create New Project</h3>
-            <input
-              type="text"
-              value={newProjectName}
-              onChange={(e) => setNewProjectName(e.target.value)}
-              placeholder="Project name"
-              className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              onKeyDown={(e) => e.key === 'Enter' && createProject()}
-              autoFocus
-            />
-            <div className="flex justify-end gap-2 mt-4">
-              <button
-                onClick={() => setShowCreateModal(false)}
-                className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={createProject}
-                disabled={creating || !newProjectName.trim()}
-                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50"
-              >
-                {creating ? 'Creating...' : 'Create'}
-              </button>
-            </div>
+          {/* Projects Grid */}
+          <div className="space-y-4">
+            <h2 className="text-lg font-semibold">Your Projects</h2>
+
+            {loading ? (
+              <div className="flex items-center justify-center py-16">
+                <div className="text-center space-y-3">
+                  <Loader2 className="w-8 h-8 animate-spin mx-auto text-muted-foreground" />
+                  <p className="text-sm text-muted-foreground">Loading projects...</p>
+                </div>
+              </div>
+            ) : projects.length === 0 ? (
+              <Card>
+                <CardContent className="flex flex-col items-center justify-center py-16">
+                  <div className="p-4 rounded-full bg-muted mb-4">
+                    <FolderOpen className="w-8 h-8 text-muted-foreground" />
+                  </div>
+                  <h3 className="text-lg font-medium mb-1">No projects yet</h3>
+                  <p className="text-muted-foreground text-sm mb-4 text-center max-w-sm">
+                    Create your first project to start analyzing Google AI Overviews and track your brand citations.
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    Click the <span className="font-medium">+</span> button in the sidebar to get started
+                  </p>
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                {projects.map((project) => (
+                  <Link
+                    key={project.id}
+                    href={`/project/${project.id}`}
+                    className="group block"
+                  >
+                    <Card className="h-full transition-all hover:shadow-md hover:border-primary/20">
+                      <CardHeader className="pb-3">
+                        <div className="flex items-start justify-between">
+                          <div className="flex items-center gap-3">
+                            <div className="p-2 rounded-lg bg-primary/10 text-primary">
+                              <FolderOpen className="h-4 w-4" />
+                            </div>
+                            <CardTitle className="text-base font-medium group-hover:text-primary transition-colors">
+                              {project.name}
+                            </CardTitle>
+                          </div>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-destructive"
+                            onClick={(e) => deleteProject(project.id, e)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </CardHeader>
+                      <CardContent className="pt-0">
+                        <div className="space-y-3">
+                          {project.brand_domain ? (
+                            <div className="flex items-center gap-2">
+                              <Globe className="h-3.5 w-3.5 text-muted-foreground" />
+                              <span className="text-sm text-muted-foreground">{project.brand_domain}</span>
+                            </div>
+                          ) : (
+                            <Badge variant="outline" className="text-xs font-normal text-amber-600 border-amber-200 bg-amber-50">
+                              No brand configured
+                            </Badge>
+                          )}
+                          <div className="flex items-center justify-between pt-2 border-t">
+                            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                              <Calendar className="h-3.5 w-3.5" />
+                              {new Date(project.created_at).toLocaleDateString('en-US', {
+                                month: 'short',
+                                day: 'numeric',
+                                year: 'numeric'
+                              })}
+                            </div>
+                            <ArrowRight className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </Link>
+                ))}
+              </div>
+            )}
           </div>
         </div>
-      )}
+      </main>
     </div>
   );
 }

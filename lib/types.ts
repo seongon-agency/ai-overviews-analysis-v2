@@ -89,8 +89,12 @@ export interface KeywordRecord {
   references: Reference[];
   referenceCount: number;
   brandRank: number | null;
+  brandMentioned?: boolean; // Brand mentioned in AIO text content
   sessionId?: number;
   createdAt?: string;
+  // Change tracking (compared to previous session)
+  changeType?: string | null;
+  previousBrandRank?: number | null;
 }
 
 // Keyword history entry for timeline view
@@ -166,6 +170,7 @@ export interface CompetitorMetrics {
   citedInPrompts: number;
   promptCitedRate: number;
   mentionRate: number;
+  isUserBrand?: boolean; // True if this is the user's configured brand
 }
 
 export interface AnalysisResult {

@@ -2,6 +2,7 @@
 
 import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, Cell } from 'recharts';
 import { CompetitorMetrics } from '@/lib/types';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 interface CompetitorChartProps {
   competitors: CompetitorMetrics[];
@@ -9,14 +10,10 @@ interface CompetitorChartProps {
   limit?: number;
 }
 
-export function CompetitorChart({ competitors, brandName, limit = 15 }: CompetitorChartProps) {
+export function CompetitorChart({ competitors, limit = 15 }: CompetitorChartProps) {
   // Find user's brand and separate it
-  const userBrand = competitors.find(
-    c => c.brand.toLowerCase() === brandName.toLowerCase()
-  );
-  const otherBrands = competitors.filter(
-    c => c.brand.toLowerCase() !== brandName.toLowerCase()
-  );
+  const userBrand = competitors.find(c => c.isUserBrand);
+  const otherBrands = competitors.filter(c => !c.isUserBrand);
 
   // Take top N + ensure user's brand is included
   const topOthers = otherBrands.slice(0, limit - (userBrand ? 1 : 0));
@@ -25,62 +22,70 @@ export function CompetitorChart({ competitors, brandName, limit = 15 }: Competit
   // Reverse for horizontal bar chart (top items at top)
   const reversedData = [...chartData].reverse();
 
-  const isUserBrand = (brand: string) =>
-    brand.toLowerCase() === brandName.toLowerCase();
+  const isUserBrandEntry = (entry: CompetitorMetrics) => entry.isUserBrand === true;
 
   return (
-    <div className="bg-white p-4 rounded-lg shadow border">
-      <h3 className="text-lg font-semibold mb-4">Citations vs Mentions by Brand</h3>
-      <ResponsiveContainer width="100%" height={Math.max(400, chartData.length * 35)}>
-        <BarChart data={reversedData} layout="vertical" margin={{ left: 20, right: 20 }}>
-          <XAxis type="number" />
-          <YAxis
-            type="category"
-            dataKey="brand"
-            width={140}
-            tick={{ fontSize: 12 }}
-          />
-          <Tooltip
-            formatter={(value: number, name: string) => [value, name === 'citedCount' ? 'Citations' : 'Mentions']}
-          />
-          <Legend />
-          <Bar dataKey="citedCount" name="Citations" fill="#87CEEB">
-            {reversedData.map((entry, index) => (
-              <Cell
-                key={`cite-${index}`}
-                fill={isUserBrand(entry.brand) ? '#FFD700' : '#87CEEB'}
-                stroke={isUserBrand(entry.brand) ? '#B8860B' : '#5DADE2'}
-                strokeWidth={isUserBrand(entry.brand) ? 2 : 1}
-              />
-            ))}
-          </Bar>
-          <Bar dataKey="mentionedCount" name="Mentions" fill="#F08080">
-            {reversedData.map((entry, index) => (
-              <Cell
-                key={`mention-${index}`}
-                fill={isUserBrand(entry.brand) ? '#FF6B35' : '#F08080'}
-                stroke={isUserBrand(entry.brand) ? '#CC5500' : '#E57373'}
-                strokeWidth={isUserBrand(entry.brand) ? 2 : 1}
-              />
-            ))}
-          </Bar>
-        </BarChart>
-      </ResponsiveContainer>
+    <Card>
+      <CardHeader>
+        <CardTitle>Citations vs Mentions by Brand</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <ResponsiveContainer width="100%" height={Math.max(400, chartData.length * 35)}>
+          <BarChart data={reversedData} layout="vertical" margin={{ left: 20, right: 20 }}>
+            <XAxis type="number" />
+            <YAxis
+              type="category"
+              dataKey="brand"
+              width={140}
+              tick={{ fontSize: 12 }}
+            />
+            <Tooltip
+              formatter={(value: number, name: string) => [value, name === 'citedCount' ? 'Citations' : 'Mentions']}
+              contentStyle={{
+                backgroundColor: 'hsl(var(--background))',
+                border: '1px solid hsl(var(--border))',
+                borderRadius: '8px'
+              }}
+            />
+            <Legend />
+            <Bar dataKey="citedCount" name="Citations" fill="hsl(210 100% 70%)">
+              {reversedData.map((entry, index) => (
+                <Cell
+                  key={`cite-${index}`}
+                  fill={isUserBrandEntry(entry) ? 'hsl(45 93% 47%)' : 'hsl(210 100% 70%)'}
+                  stroke={isUserBrandEntry(entry) ? 'hsl(45 93% 37%)' : 'hsl(210 100% 50%)'}
+                  strokeWidth={isUserBrandEntry(entry) ? 2 : 1}
+                />
+              ))}
+            </Bar>
+            <Bar dataKey="mentionedCount" name="Mentions" fill="hsl(270 70% 70%)">
+              {reversedData.map((entry, index) => (
+                <Cell
+                  key={`mention-${index}`}
+                  fill={isUserBrandEntry(entry) ? 'hsl(25 95% 53%)' : 'hsl(270 70% 70%)'}
+                  stroke={isUserBrandEntry(entry) ? 'hsl(25 95% 43%)' : 'hsl(270 70% 50%)'}
+                  strokeWidth={isUserBrandEntry(entry) ? 2 : 1}
+                />
+              ))}
+            </Bar>
+          </BarChart>
+        </ResponsiveContainer>
 
-      {userBrand && (
-        <div className="mt-4 p-3 bg-yellow-50 rounded-lg border border-yellow-200">
-          <div className="text-sm font-medium text-yellow-800">
-            Your Brand Performance: {brandName}
+        {userBrand && (
+          <div className="mt-4 p-3 bg-amber-50 rounded-lg border border-amber-200">
+            <div className="text-sm font-medium text-amber-900">
+              Your Brand Performance: {userBrand.brand}
+            </div>
+            <div className="text-sm text-amber-700 mt-1">
+              Rank #{competitors.findIndex(c => c.isUserBrand) + 1} overall
+              &nbsp;•&nbsp;
+              {userBrand.citedCount} citations
+              &nbsp;•&nbsp;
+              {userBrand.mentionedCount} mentions
+            </div>
           </div>
-          <div className="text-sm text-yellow-700 mt-1">
-            Rank #{competitors.findIndex(c => c.brand.toLowerCase() === brandName.toLowerCase()) + 1} overall
-            &nbsp;•&nbsp;
-            {userBrand.citedCount} citations
-            &nbsp;•&nbsp;
-            {userBrand.mentionedCount} mentions
-          </div>
-        </div>
-      )}
-    </div>
+        )}
+      </CardContent>
+    </Card>
   );
 }
