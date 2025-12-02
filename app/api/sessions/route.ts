@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getProjectSessions, createSession, getSessionKeywords } from '@/lib/db';
-import { Reference, KeywordRecord } from '@/lib/types';
+import { getProjectSessions, createSession } from '@/lib/database';
 
 // GET /api/sessions?projectId=1 - Get all sessions for a project
 export async function GET(request: NextRequest) {
@@ -15,7 +14,7 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const sessions = getProjectSessions(parseInt(projectId, 10));
+    const sessions = await getProjectSessions(parseInt(projectId, 10));
     return NextResponse.json({ success: true, data: sessions });
   } catch (error) {
     console.error('Error fetching sessions:', error);
@@ -39,7 +38,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const session = createSession(projectId, name, locationCode, languageCode);
+    const session = await createSession(projectId, name, locationCode, languageCode);
     return NextResponse.json({ success: true, data: session });
   } catch (error) {
     console.error('Error creating session:', error);

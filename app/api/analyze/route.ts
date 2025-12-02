@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getProject, getProjectKeywords } from '@/lib/db';
+import { getProject, getProjectKeywords } from '@/lib/database';
 import { analyzeKeywords, keywordsToCSV, competitorsToCSV } from '@/lib/analysis';
 
 // POST /api/analyze - Run analysis on project keywords
@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check project exists
-    const project = getProject(projectId);
+    const project = await getProject(projectId);
     if (!project) {
       return NextResponse.json(
         { success: false, error: 'Project not found' },
@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Get keywords from database
-    const keywords = getProjectKeywords(projectId);
+    const keywords = await getProjectKeywords(projectId);
 
     if (keywords.length === 0) {
       return NextResponse.json(
@@ -93,7 +93,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Get project and keywords
-    const project = getProject(projectId);
+    const project = await getProject(projectId);
     if (!project) {
       return NextResponse.json(
         { success: false, error: 'Project not found' },
@@ -101,7 +101,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const keywords = getProjectKeywords(projectId);
+    const keywords = await getProjectKeywords(projectId);
     if (keywords.length === 0) {
       return NextResponse.json(
         { success: false, error: 'No keywords found in project' },

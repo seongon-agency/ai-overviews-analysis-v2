@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getProject, updateProject, deleteProject, getProjectKeywords, getProjectKeywordCount, getProjectAIOCount, getProjectSessions } from '@/lib/db';
+import { getProject, updateProject, deleteProject, getProjectKeywords, getProjectKeywordCount, getProjectAIOCount, getProjectSessions } from '@/lib/database';
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -18,7 +18,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       );
     }
 
-    const project = getProject(projectId);
+    const project = await getProject(projectId);
 
     if (!project) {
       return NextResponse.json(
@@ -27,10 +27,10 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       );
     }
 
-    const keywords = getProjectKeywords(projectId);
-    const keywordCount = getProjectKeywordCount(projectId);
-    const aioCount = getProjectAIOCount(projectId);
-    const sessions = getProjectSessions(projectId);
+    const keywords = await getProjectKeywords(projectId);
+    const keywordCount = await getProjectKeywordCount(projectId);
+    const aioCount = await getProjectAIOCount(projectId);
+    const sessions = await getProjectSessions(projectId);
 
     return NextResponse.json({
       success: true,
@@ -67,7 +67,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       );
     }
 
-    const project = getProject(projectId);
+    const project = await getProject(projectId);
     if (!project) {
       return NextResponse.json(
         { success: false, error: 'Project not found' },
@@ -78,13 +78,13 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     const body = await request.json();
     const { name, brandName, brandDomain } = body;
 
-    updateProject(projectId, {
+    await updateProject(projectId, {
       name,
       brand_name: brandName,
       brand_domain: brandDomain
     });
 
-    const updatedProject = getProject(projectId);
+    const updatedProject = await getProject(projectId);
 
     return NextResponse.json({
       success: true,
@@ -112,7 +112,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
       );
     }
 
-    const project = getProject(projectId);
+    const project = await getProject(projectId);
     if (!project) {
       return NextResponse.json(
         { success: false, error: 'Project not found' },
@@ -120,7 +120,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
       );
     }
 
-    deleteProject(projectId);
+    await deleteProject(projectId);
 
     return NextResponse.json({
       success: true,

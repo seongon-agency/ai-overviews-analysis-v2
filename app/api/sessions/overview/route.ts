@@ -1,5 +1,10 @@
 import { NextResponse } from 'next/server';
-import db, { getProjectSessions, compareTwoSessions } from '@/lib/db';
+import {
+  getProjectSessions,
+  compareTwoSessions,
+  getSessionKeywordsBasic,
+  getKeywordResultsForSessions
+} from '@/lib/database';
 import { Reference } from '@/lib/types';
 
 export async function GET(request: Request) {
@@ -12,7 +17,7 @@ export async function GET(request: Request) {
   }
 
   try {
-    const sessions = getProjectSessions(parseInt(projectId, 10));
+    const sessions = await getProjectSessions(parseInt(projectId, 10));
 
     if (sessions.length === 0) {
       return NextResponse.json({
@@ -32,23 +37,14 @@ export async function GET(request: Request) {
     const previousSession = sessions.length > 1 ? sessions[1] : null;
 
     // Get keywords for latest session with brand rank
-    const latestKeywords = db.prepare(`
-      SELECT keyword, has_ai_overview, aio_references
-      FROM keyword_results WHERE session_id = ?
-    `).all(latestSession.id) as { keyword: string; has_ai_overview: number; aio_references: string | null }[];
+    const latestKeywords = await getSessionKeywordsBasic(latestSession.id);
 
     // Get historical rank data for sparklines (last 5 sessions)
     const recentSessionIds = sessions.slice(0, 5).map(s => s.id);
     const historicalData = new Map<string, { rank: number | null }[]>();
 
     if (recentSessionIds.length > 1 && brandDomain) {
-      const placeholders = recentSessionIds.map(() => '?').join(',');
-      const histResults = db.prepare(`
-        SELECT session_id, keyword, aio_references
-        FROM keyword_results
-        WHERE session_id IN (${placeholders})
-        ORDER BY session_id DESC
-      `).all(...recentSessionIds) as { session_id: number; keyword: string; aio_references: string | null }[];
+      const histResults = await getKeywordResultsForSessions(recentSessionIds);
 
       // Group by keyword and calculate ranks
       histResults.forEach(row => {
@@ -108,7 +104,7 @@ export async function GET(request: Request) {
     let changeSummary = null;
 
     if (previousSession) {
-      const comparison = compareTwoSessions(previousSession.id, latestSession.id, brandDomain);
+      const comparison = await compareTwoSessions(previousSession.id, latestSession.id, brandDomain);
 
       const improved = comparison.changes.filter(c => c.changeType === 'rank_improved').length;
       const declined = comparison.changes.filter(c => c.changeType === 'rank_declined').length;

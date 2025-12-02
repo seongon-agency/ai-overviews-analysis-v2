@@ -495,3 +495,54 @@ export function deleteProjectKeywords(projectId: number): void {
   const stmt = db.prepare(`DELETE FROM keyword_results WHERE project_id = ?`);
   stmt.run(projectId);
 }
+
+// ============ Helper Functions for Session Detail ============
+
+export function getPreviousSession(projectId: number, currentCreatedAt: string): CheckSession | undefined {
+  const stmt = db.prepare(`
+    SELECT * FROM check_sessions
+    WHERE project_id = ? AND created_at < ?
+    ORDER BY created_at DESC LIMIT 1
+  `);
+  return stmt.get(projectId, currentCreatedAt) as CheckSession | undefined;
+}
+
+export function getRecentSessionIds(projectId: number, limit: number = 5): number[] {
+  const stmt = db.prepare(`
+    SELECT id FROM check_sessions
+    WHERE project_id = ?
+    ORDER BY created_at ASC
+    LIMIT ?
+  `);
+  const result = stmt.all(projectId, limit) as { id: number }[];
+  return result.map(r => r.id);
+}
+
+export function getKeywordResultsForSessions(sessionIds: number[]): {
+  session_id: number;
+  keyword: string;
+  aio_references: string | null;
+}[] {
+  if (sessionIds.length === 0) return [];
+
+  const placeholders = sessionIds.map(() => '?').join(',');
+  const stmt = db.prepare(`
+    SELECT session_id, keyword, aio_references
+    FROM keyword_results
+    WHERE session_id IN (${placeholders})
+    ORDER BY session_id ASC
+  `);
+  return stmt.all(...sessionIds) as { session_id: number; keyword: string; aio_references: string | null }[];
+}
+
+export function getSessionKeywordsBasic(sessionId: number): {
+  keyword: string;
+  has_ai_overview: number;
+  aio_references: string | null;
+}[] {
+  const stmt = db.prepare(`
+    SELECT keyword, has_ai_overview, aio_references
+    FROM keyword_results WHERE session_id = ?
+  `);
+  return stmt.all(sessionId) as { keyword: string; has_ai_overview: number; aio_references: string | null }[];
+}

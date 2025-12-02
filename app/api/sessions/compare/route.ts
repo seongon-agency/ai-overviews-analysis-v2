@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getSessionsForComparison, compareTwoSessions, getProject } from '@/lib/db';
+import { getSessionsForComparison, compareTwoSessions } from '@/lib/database';
 import { Reference } from '@/lib/types';
 
 // GET /api/sessions/compare?projectId=1&sessionIds=1,2,3&brandDomain=example.com
@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
   try {
     console.log('Comparing sessions:', { projectId, sessionIds });
 
-    const { sessions, keywords, data } = getSessionsForComparison(
+    const { sessions, keywords, data } = await getSessionsForComparison(
       parseInt(projectId, 10),
       sessionIds
     );
@@ -113,7 +113,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const comparison = compareTwoSessions(sessionId1, sessionId2, brandDomain);
+    const comparison = await compareTwoSessions(sessionId1, sessionId2, brandDomain);
 
     // Calculate summary
     const summary = {

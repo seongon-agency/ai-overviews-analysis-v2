@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { fetchKeywordsBatch } from '@/lib/dataforseo';
-import { getProject, createSession, saveKeywordResult, updateSessionCounts } from '@/lib/db';
+import { getProject, createSession, saveKeywordResult, updateSessionCounts } from '@/lib/database';
 
 // POST /api/fetch-keywords - Fetch keywords from DataForSEO and save to a new session
 export async function POST(request: NextRequest) {
@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check project exists
-    const project = getProject(projectId);
+    const project = await getProject(projectId);
     if (!project) {
       return NextResponse.json(
         { success: false, error: 'Project not found' },
@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Create a new session for this fetch
-    const session = createSession(
+    const session = await createSession(
       projectId,
       sessionName || `Check ${new Date().toLocaleDateString()}`,
       locationCode,
@@ -61,7 +61,7 @@ export async function POST(request: NextRequest) {
 
     for (const { keyword, result, error } of results) {
       if (result) {
-        saveKeywordResult(projectId, session.id, keyword, result as unknown as Record<string, unknown>);
+        await saveKeywordResult(projectId, session.id, keyword, result as unknown as Record<string, unknown>);
         savedCount++;
       } else {
         errorCount++;
@@ -72,7 +72,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Update session counts
-    updateSessionCounts(session.id);
+    await updateSessionCounts(session.id);
 
     return NextResponse.json({
       success: true,

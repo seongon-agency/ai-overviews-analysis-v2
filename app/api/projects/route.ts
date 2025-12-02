@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createProject, getAllProjects } from '@/lib/db';
+import { createProject, getAllProjects } from '@/lib/database';
 
 // GET /api/projects - List all projects
 export async function GET() {
   try {
-    const projects = getAllProjects();
+    const projects = await getAllProjects();
     return NextResponse.json({ success: true, data: projects });
   } catch (error) {
     console.error('Error fetching projects:', error);
@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const result = createProject(name, brandName, brandDomain, locationCode, languageCode);
+    const result = await createProject(name, brandName, brandDomain, locationCode, languageCode);
 
     return NextResponse.json({
       success: true,

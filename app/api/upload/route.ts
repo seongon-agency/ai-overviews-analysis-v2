@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getProject, createSession, saveKeywordResult, updateSessionCounts } from '@/lib/db';
+import { getProject, createSession, saveKeywordResult, updateSessionCounts } from '@/lib/database';
 
 // POST /api/upload - Upload JSON file and save to a new session
 export async function POST(request: NextRequest) {
@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check project exists
-    const project = getProject(projectId);
+    const project = await getProject(projectId);
     if (!project) {
       return NextResponse.json(
         { success: false, error: 'Project not found' },
@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Create a new session for this upload
-    const session = createSession(
+    const session = await createSession(
       projectId,
       sessionName || `Upload ${new Date().toLocaleDateString()} (${file.name})`
     );
@@ -68,7 +68,7 @@ export async function POST(request: NextRequest) {
       for (const item of data) {
         if (item && typeof item === 'object') {
           const keyword = (item as Record<string, unknown>).keyword as string || `keyword_${savedCount + 1}`;
-          saveKeywordResult(projectId, session.id, keyword, item as Record<string, unknown>);
+          await saveKeywordResult(projectId, session.id, keyword, item as Record<string, unknown>);
           savedCount++;
         }
       }
@@ -91,13 +91,13 @@ export async function POST(request: NextRequest) {
               // Nested pandas format: { "0": { "0": result } }
               const result = (outerValue as Record<string, unknown>)['0'] as Record<string, unknown>;
               const keyword = result.keyword as string || `keyword_${savedCount + 1}`;
-              saveKeywordResult(projectId, session.id, keyword, result);
+              await saveKeywordResult(projectId, session.id, keyword, result);
               savedCount++;
             } else {
               // Direct result
               const result = outerValue as Record<string, unknown>;
               const keyword = result.keyword as string || `keyword_${savedCount + 1}`;
-              saveKeywordResult(projectId, session.id, keyword, result);
+              await saveKeywordResult(projectId, session.id, keyword, result);
               savedCount++;
             }
           }
@@ -105,13 +105,13 @@ export async function POST(request: NextRequest) {
       } else {
         // Single result object
         const keyword = data.keyword as string || 'keyword_1';
-        saveKeywordResult(projectId, session.id, keyword, data);
+        await saveKeywordResult(projectId, session.id, keyword, data);
         savedCount = 1;
       }
     }
 
     // Update session counts
-    updateSessionCounts(session.id);
+    await updateSessionCounts(session.id);
 
     if (savedCount === 0) {
       return NextResponse.json(

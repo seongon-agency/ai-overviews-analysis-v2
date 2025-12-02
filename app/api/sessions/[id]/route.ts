@@ -1,5 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
-import db, { getSession, getSessionKeywords, updateSessionName, deleteSession } from '@/lib/db';
+import {
+  getSession,
+  getSessionKeywords,
+  updateSessionName,
+  deleteSession,
+  getPreviousSession,
+  getRecentSessionIds,
+  getKeywordResultsForSessions
+} from '@/lib/database';
 import { Reference, KeywordRecord, CheckSession } from '@/lib/types';
 import { findBrandInReferences, isBrandMentionedInText } from '@/lib/analysis';
 
@@ -12,7 +20,7 @@ export async function GET(
   const sessionId = parseInt(id, 10);
 
   try {
-    const session = getSession(sessionId);
+    const session = await getSession(sessionId);
     if (!session) {
       return NextResponse.json(
         { success: false, error: 'Session not found' },
@@ -20,7 +28,7 @@ export async function GET(
       );
     }
 
-    const keywordRows = getSessionKeywords(sessionId);
+    const keywordRows = await getSessionKeywords(sessionId);
 
     // Get brand info from query params for rank calculation
     const searchParams = request.nextUrl.searchParams;
@@ -35,15 +43,11 @@ export async function GET(
 
     if (includeChanges) {
       // Find the previous session
-      const prevSession = db.prepare(`
-        SELECT * FROM check_sessions
-        WHERE project_id = ? AND created_at < ?
-        ORDER BY created_at DESC LIMIT 1
-      `).get(session.project_id, session.created_at) as CheckSession | undefined;
+      const prevSession = await getPreviousSession(session.project_id, session.created_at);
 
       if (prevSession) {
         previousSession = prevSession;
-        const prevKeywords = getSessionKeywords(prevSession.id);
+        const prevKeywords = await getSessionKeywords(prevSession.id);
         previousSessionData = new Map();
 
         prevKeywords.forEach(kw => {
@@ -69,23 +73,10 @@ export async function GET(
 
       // Get rank history for sparklines (last 5 sessions)
       if (brandDomain || brandName) {
-        const recentSessions = db.prepare(`
-          SELECT id FROM check_sessions
-          WHERE project_id = ?
-          ORDER BY created_at ASC
-          LIMIT 5
-        `).all(session.project_id) as { id: number }[];
+        const recentSessionIds = await getRecentSessionIds(session.project_id, 5);
 
-        if (recentSessions.length > 1) {
-          const sessionIds = recentSessions.map(s => s.id);
-          const placeholders = sessionIds.map(() => '?').join(',');
-
-          const histResults = db.prepare(`
-            SELECT session_id, keyword, aio_references
-            FROM keyword_results
-            WHERE session_id IN (${placeholders})
-            ORDER BY session_id ASC
-          `).all(...sessionIds) as { session_id: number; keyword: string; aio_references: string | null }[];
+        if (recentSessionIds.length > 1) {
+          const histResults = await getKeywordResultsForSessions(recentSessionIds);
 
           // Group by keyword, ordered by session
           histResults.forEach(row => {
@@ -207,7 +198,7 @@ export async function PATCH(
     const { name } = body;
 
     if (name !== undefined) {
-      updateSessionName(sessionId, name);
+      await updateSessionName(sessionId, name);
     }
 
     return NextResponse.json({ success: true });
@@ -229,7 +220,7 @@ export async function DELETE(
   const sessionId = parseInt(id, 10);
 
   try {
-    deleteSession(sessionId);
+    await deleteSession(sessionId);
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Error deleting session:', error);
