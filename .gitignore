@@ -40,8 +40,7 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# SQLite database
-*.db
+# SQLite database journals (keep .db files)
 *.db-journal
 *.db-wal
 *.db-shm
