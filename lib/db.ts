@@ -377,8 +377,9 @@ export function getSessionsForComparison(projectId: number, sessionIds: number[]
   const keywords = keywordsResult.map(r => r.keyword);
 
   // Get keyword results for selected sessions
+  // Note: 'references' is aliased with quotes because it's a reserved word in SQL
   const data = db.prepare(`
-    SELECT session_id as sessionId, keyword, has_ai_overview as hasAIO, aio_references as references
+    SELECT session_id as sessionId, keyword, has_ai_overview as hasAIO, aio_references as "references"
     FROM keyword_results
     WHERE session_id IN (${placeholders})
   `).all(...sessionIds) as { sessionId: number; keyword: string; hasAIO: number; references: string | null }[];

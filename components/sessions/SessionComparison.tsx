@@ -34,21 +34,32 @@ export function SessionComparison({
 }: SessionComparisonProps) {
   const [data, setData] = useState<ComparisonData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<'all' | 'aio_only' | 'has_changes'>('all');
   const [sortBy, setSortBy] = useState<'keyword' | 'change'>('keyword');
 
   useEffect(() => {
     const fetchComparison = async () => {
+      setLoading(true);
+      setError(null);
+
       try {
-        const response = await fetch(
-          `/api/sessions/compare?projectId=${projectId}&sessionIds=${sessionIds.join(',')}&brandDomain=${encodeURIComponent(brandDomain)}`
-        );
+        const url = `/api/sessions/compare?projectId=${projectId}&sessionIds=${sessionIds.join(',')}&brandDomain=${encodeURIComponent(brandDomain)}`;
+        console.log('Fetching comparison:', url);
+
+        const response = await fetch(url);
         const result = await response.json();
+
+        console.log('Comparison result:', result);
+
         if (result.success) {
           setData(result.data);
+        } else {
+          setError(result.error || 'Unknown error');
         }
-      } catch (error) {
-        console.error('Error fetching comparison:', error);
+      } catch (err) {
+        console.error('Error fetching comparison:', err);
+        setError(err instanceof Error ? err.message : 'Failed to fetch comparison');
       } finally {
         setLoading(false);
       }
@@ -141,8 +152,14 @@ export function SessionComparison({
   if (!data) {
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-        <div className="bg-white rounded-xl p-8 text-center">
-          <p className="text-red-600">Failed to load comparison data</p>
+        <div className="bg-white rounded-xl p-8 text-center max-w-md">
+          <p className="text-red-600 font-medium">Failed to load comparison data</p>
+          {error && (
+            <p className="text-sm text-gray-600 mt-2">{error}</p>
+          )}
+          <p className="text-sm text-gray-500 mt-2">
+            Session IDs: {sessionIds.join(', ')}
+          </p>
           <button onClick={onClose} className="mt-4 px-4 py-2 bg-gray-100 rounded-lg hover:bg-gray-200">
             Close
           </button>
