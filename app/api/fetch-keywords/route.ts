@@ -1,0 +1,87 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { fetchKeywordsBatch } from '@/lib/dataforseo';
+import { getProject, saveKeywordResult, deleteProjectKeywords } from '@/lib/db';
+
+// POST /api/fetch-keywords - Fetch keywords from DataForSEO and save to database
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json();
+    const { projectId, keywords, locationCode, languageCode } = body;
+
+    // Validation
+    if (!projectId || typeof projectId !== 'number') {
+      return NextResponse.json(
+        { success: false, error: 'Project ID is required' },
+        { status: 400 }
+      );
+    }
+
+    if (!keywords || !Array.isArray(keywords) || keywords.length === 0) {
+      return NextResponse.json(
+        { success: false, error: 'Keywords array is required' },
+        { status: 400 }
+      );
+    }
+
+    if (!locationCode || !languageCode) {
+      return NextResponse.json(
+        { success: false, error: 'Location code and language code are required' },
+        { status: 400 }
+      );
+    }
+
+    // Check project exists
+    const project = getProject(projectId);
+    if (!project) {
+      return NextResponse.json(
+        { success: false, error: 'Project not found' },
+        { status: 404 }
+      );
+    }
+
+    // Clear existing keywords for this project (fresh fetch)
+    deleteProjectKeywords(projectId);
+
+    // Fetch keywords from DataForSEO
+    const results = await fetchKeywordsBatch(
+      keywords,
+      locationCode,
+      languageCode
+    );
+
+    // Save results to database
+    let savedCount = 0;
+    let errorCount = 0;
+    const errors: { keyword: string; error: string }[] = [];
+
+    for (const { keyword, result, error } of results) {
+      if (result) {
+        saveKeywordResult(projectId, keyword, result as unknown as Record<string, unknown>);
+        savedCount++;
+      } else {
+        errorCount++;
+        if (error) {
+          errors.push({ keyword, error });
+        }
+      }
+    }
+
+    return NextResponse.json({
+      success: true,
+      data: {
+        projectId,
+        totalKeywords: keywords.length,
+        savedCount,
+        errorCount,
+        errors: errors.slice(0, 10) // Limit error details
+      }
+    });
+  } catch (error) {
+    console.error('Error fetching keywords:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    return NextResponse.json(
+      { success: false, error: `Failed to fetch keywords: ${errorMessage}` },
+      { status: 500 }
+    );
+  }
+}
