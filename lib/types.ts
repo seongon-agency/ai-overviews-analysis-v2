@@ -51,9 +51,27 @@ export interface Project {
   created_at: string;
 }
 
+// Check session - represents a single check/fetch operation
+export interface CheckSession {
+  id: number;
+  project_id: number;
+  name: string | null;
+  location_code: string | null;
+  language_code: string | null;
+  keyword_count: number;
+  aio_count: number;
+  created_at: string;
+}
+
+// Session with computed stats (for list view)
+export interface CheckSessionWithStats extends CheckSession {
+  aio_rate: number;
+}
+
 export interface KeywordRow {
   id: number;
   project_id: number;
+  session_id: number;
   keyword: string;
   has_ai_overview: number; // SQLite boolean
   raw_api_result: string | null;
@@ -71,6 +89,71 @@ export interface KeywordRecord {
   references: Reference[];
   referenceCount: number;
   brandRank: number | null;
+  sessionId?: number;
+  createdAt?: string;
+}
+
+// Keyword history entry for timeline view
+export interface KeywordHistoryEntry {
+  sessionId: number;
+  sessionName: string | null;
+  sessionDate: string;
+  hasAIOverview: boolean;
+  aioMarkdown: string | null;
+  references: Reference[];
+  referenceCount: number;
+  brandRank: number | null;
+}
+
+// Keyword with full history
+export interface KeywordWithHistory {
+  keyword: string;
+  history: KeywordHistoryEntry[];
+  latestResult: KeywordHistoryEntry | null;
+}
+
+// Session comparison data
+export interface SessionComparisonData {
+  sessions: CheckSession[];
+  keywords: string[];
+  matrix: {
+    [keyword: string]: {
+      [sessionId: number]: {
+        hasAIO: boolean;
+        brandRank: number | null;
+        referenceCount: number;
+      } | null; // null means not checked in this session
+    };
+  };
+}
+
+// Change detection between sessions
+export interface KeywordChange {
+  keyword: string;
+  changeType: 'new' | 'removed' | 'aio_gained' | 'aio_lost' | 'rank_improved' | 'rank_declined' | 'no_change';
+  oldValue?: {
+    hasAIO: boolean;
+    brandRank: number | null;
+  };
+  newValue?: {
+    hasAIO: boolean;
+    brandRank: number | null;
+  };
+}
+
+export interface SessionComparison {
+  fromSession: CheckSession;
+  toSession: CheckSession;
+  changes: KeywordChange[];
+  summary: {
+    newKeywords: number;
+    removedKeywords: number;
+    aioGained: number;
+    aioLost: number;
+    rankImproved: number;
+    rankDeclined: number;
+    unchanged: number;
+  };
 }
 
 // Analysis results

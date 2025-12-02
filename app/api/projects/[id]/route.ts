@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getProject, updateProject, deleteProject, getProjectKeywords, getProjectKeywordCount, getProjectAIOCount } from '@/lib/db';
+import { getProject, updateProject, deleteProject, getProjectKeywords, getProjectKeywordCount, getProjectAIOCount, getProjectSessions } from '@/lib/db';
 
 interface RouteParams {
   params: Promise<{ id: string }>;
 }
 
-// GET /api/projects/[id] - Get a single project with keywords
+// GET /api/projects/[id] - Get a single project with keywords and sessions
 export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
     const { id } = await params;
@@ -30,15 +30,18 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     const keywords = getProjectKeywords(projectId);
     const keywordCount = getProjectKeywordCount(projectId);
     const aioCount = getProjectAIOCount(projectId);
+    const sessions = getProjectSessions(projectId);
 
     return NextResponse.json({
       success: true,
       data: {
         ...project,
         keywords,
+        sessions,
         stats: {
           keywordCount,
-          aioCount
+          aioCount,
+          sessionCount: sessions.length
         }
       }
     });

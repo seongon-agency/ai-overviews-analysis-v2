@@ -7,9 +7,10 @@ import { KeywordPanel } from './KeywordPanel';
 interface KeywordsTableProps {
   keywords: KeywordRecord[];
   brandDomain?: string;
+  onKeywordClick?: (keyword: string) => void;
 }
 
-export function KeywordsTable({ keywords, brandDomain }: KeywordsTableProps) {
+export function KeywordsTable({ keywords, brandDomain, onKeywordClick }: KeywordsTableProps) {
   const [selectedKeyword, setSelectedKeyword] = useState<KeywordRecord | null>(null);
   const [sortField, setSortField] = useState<'keyword' | 'referenceCount' | 'brandRank'>('keyword');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
@@ -124,7 +125,13 @@ export function KeywordsTable({ keywords, brandDomain }: KeywordsTableProps) {
                 className="border-b last:border-b-0 hover:bg-gray-50 transition-colors"
               >
                 <td className="p-3">
-                  <span className="font-medium text-gray-900">{kw.keyword}</span>
+                  <span
+                    className={`font-medium text-gray-900 ${onKeywordClick ? 'cursor-pointer hover:text-blue-600' : ''}`}
+                    onClick={() => onKeywordClick?.(kw.keyword)}
+                    title={onKeywordClick ? 'Click to view history' : undefined}
+                  >
+                    {kw.keyword}
+                  </span>
                 </td>
                 <td className="p-3 text-center">
                   {kw.hasAIOverview ? (

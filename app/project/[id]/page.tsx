@@ -1,28 +1,43 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { useParams } from 'next/navigation';
-import { Project, KeywordRow, KeywordRecord, Reference } from '@/lib/types';
+import { useParams, useRouter } from 'next/navigation';
+import { Project, KeywordRecord, Reference, CheckSessionWithStats } from '@/lib/types';
 import { KeywordsTable } from '@/components/KeywordsTable';
+import { SessionList } from '@/components/sessions/SessionList';
+import { SessionComparison } from '@/components/sessions/SessionComparison';
+import { KeywordTimeline } from '@/components/sessions/KeywordTimeline';
 
 export default function ProjectPage() {
   const params = useParams();
+  const router = useRouter();
   const projectId = parseInt(params.id as string, 10);
 
   const [project, setProject] = useState<Project | null>(null);
+  const [sessions, setSessions] = useState<CheckSessionWithStats[]>([]);
+  const [selectedSessionId, setSelectedSessionId] = useState<number | null>(null);
   const [keywords, setKeywords] = useState<KeywordRecord[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'keywords' | 'fetch' | 'upload'>('keywords');
+  const [activeTab, setActiveTab] = useState<'sessions' | 'fetch' | 'upload'>('sessions');
 
   // Form states
   const [brandName, setBrandName] = useState('');
   const [brandDomain, setBrandDomain] = useState('');
   const [keywordsInput, setKeywordsInput] = useState('');
+  const [sessionName, setSessionName] = useState('');
   const [locationCode, setLocationCode] = useState('2704');
   const [languageCode, setLanguageCode] = useState('vi');
   const [fetching, setFetching] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+
+  // Comparison mode
+  const [comparisonMode, setComparisonMode] = useState(false);
+  const [selectedForComparison, setSelectedForComparison] = useState<number[]>([]);
+  const [showComparison, setShowComparison] = useState(false);
+
+  // Keyword timeline
+  const [timelineKeyword, setTimelineKeyword] = useState<string | null>(null);
 
   // Fetch project data
   const fetchProject = useCallback(async () => {
@@ -34,36 +49,13 @@ export default function ProjectPage() {
         setProject(data.data);
         setBrandName(data.data.brand_name || '');
         setBrandDomain(data.data.brand_domain || '');
+        setSessions(data.data.sessions || []);
 
-        // Convert KeywordRows to KeywordRecords
-        const keywordRecords: KeywordRecord[] = data.data.keywords.map((kw: KeywordRow) => {
-          const refs: Reference[] = kw.aio_references
-            ? JSON.parse(kw.aio_references).map((r: { domain?: string; source?: string; url?: string }, idx: number) => ({
-                rank: idx + 1,
-                domain: r.domain || '',
-                source: r.source || '',
-                url: r.url || ''
-              }))
-            : [];
-
-          // Find brand rank
-          const brandRef = refs.find(r =>
-            (data.data.brand_domain && r.domain.toLowerCase().includes(data.data.brand_domain.toLowerCase())) ||
-            (data.data.brand_name && r.source.toLowerCase().includes(data.data.brand_name.toLowerCase()))
-          );
-
-          return {
-            id: kw.id,
-            keyword: kw.keyword,
-            hasAIOverview: kw.has_ai_overview === 1,
-            aioMarkdown: kw.aio_markdown,
-            references: refs,
-            referenceCount: refs.length,
-            brandRank: brandRef?.rank || null
-          };
-        });
-
-        setKeywords(keywordRecords);
+        // Select the latest session by default
+        if (data.data.sessions && data.data.sessions.length > 0) {
+          const latestSession = data.data.sessions[0];
+          setSelectedSessionId(latestSession.id);
+        }
       }
     } catch (error) {
       console.error('Error fetching project:', error);
@@ -72,9 +64,31 @@ export default function ProjectPage() {
     }
   }, [projectId]);
 
+  // Fetch session keywords
+  const fetchSessionKeywords = useCallback(async (sessionId: number) => {
+    try {
+      const response = await fetch(
+        `/api/sessions/${sessionId}?brandDomain=${encodeURIComponent(brandDomain)}`
+      );
+      const data = await response.json();
+
+      if (data.success) {
+        setKeywords(data.data.keywords);
+      }
+    } catch (error) {
+      console.error('Error fetching session keywords:', error);
+    }
+  }, [brandDomain]);
+
   useEffect(() => {
     fetchProject();
   }, [fetchProject]);
+
+  useEffect(() => {
+    if (selectedSessionId) {
+      fetchSessionKeywords(selectedSessionId);
+    }
+  }, [selectedSessionId, fetchSessionKeywords]);
 
   // Update brand info
   const updateBrandInfo = async () => {
@@ -84,7 +98,10 @@ export default function ProjectPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ brandName, brandDomain })
       });
-      fetchProject(); // Refresh to recalculate brand ranks
+      // Refresh keywords with new brand rank calculation
+      if (selectedSessionId) {
+        fetchSessionKeywords(selectedSessionId);
+      }
       setMessage({ type: 'success', text: 'Brand info updated' });
     } catch (error) {
       setMessage({ type: 'error', text: 'Failed to update brand info' });
@@ -114,7 +131,8 @@ export default function ProjectPage() {
           projectId,
           keywords: keywordList,
           locationCode,
-          languageCode
+          languageCode,
+          sessionName: sessionName || undefined
         })
       });
 
@@ -123,10 +141,13 @@ export default function ProjectPage() {
       if (data.success) {
         setMessage({
           type: 'success',
-          text: `Fetched ${data.data.savedCount} keywords (${data.data.errorCount} errors)`
+          text: `Created session with ${data.data.savedCount} keywords (${data.data.errorCount} errors)`
         });
-        setActiveTab('keywords');
-        fetchProject();
+        setActiveTab('sessions');
+        setKeywordsInput('');
+        setSessionName('');
+        fetchProject(); // Refresh sessions list
+        setSelectedSessionId(data.data.sessionId);
       } else {
         setMessage({ type: 'error', text: data.error });
       }
@@ -149,6 +170,9 @@ export default function ProjectPage() {
       const formData = new FormData();
       formData.append('projectId', projectId.toString());
       formData.append('file', file);
+      if (sessionName) {
+        formData.append('sessionName', sessionName);
+      }
 
       const response = await fetch('/api/upload', {
         method: 'POST',
@@ -158,9 +182,11 @@ export default function ProjectPage() {
       const data = await response.json();
 
       if (data.success) {
-        setMessage({ type: 'success', text: `Uploaded ${data.data.savedCount} keywords` });
-        setActiveTab('keywords');
-        fetchProject();
+        setMessage({ type: 'success', text: `Created session with ${data.data.savedCount} keywords` });
+        setActiveTab('sessions');
+        setSessionName('');
+        fetchProject(); // Refresh sessions list
+        setSelectedSessionId(data.data.sessionId);
       } else {
         setMessage({ type: 'error', text: data.error });
       }
@@ -170,6 +196,50 @@ export default function ProjectPage() {
       setUploading(false);
       e.target.value = '';
     }
+  };
+
+  // Delete session
+  const handleDeleteSession = async (sessionId: number) => {
+    try {
+      await fetch(`/api/sessions/${sessionId}`, { method: 'DELETE' });
+      fetchProject();
+      if (selectedSessionId === sessionId) {
+        setSelectedSessionId(null);
+        setKeywords([]);
+      }
+    } catch (error) {
+      console.error('Error deleting session:', error);
+    }
+  };
+
+  // Handle comparison toggle
+  const handleToggleComparison = (sessionId: number) => {
+    setSelectedForComparison(prev => {
+      if (prev.includes(sessionId)) {
+        return prev.filter(id => id !== sessionId);
+      }
+      return [...prev, sessionId];
+    });
+  };
+
+  // Handle compare click
+  const handleCompareClick = () => {
+    if (comparisonMode && selectedForComparison.length >= 2) {
+      setShowComparison(true);
+    } else {
+      setComparisonMode(!comparisonMode);
+      if (!comparisonMode) {
+        setSelectedForComparison([]);
+      }
+    }
+  };
+
+  // View keyword from comparison
+  const handleViewKeywordFromComparison = (keyword: string, sessionId: number) => {
+    setShowComparison(false);
+    setComparisonMode(false);
+    setSelectedSessionId(sessionId);
+    // Could also scroll to or highlight the keyword
   };
 
   if (loading) {
@@ -196,6 +266,7 @@ export default function ProjectPage() {
     );
   }
 
+  const selectedSession = sessions.find(s => s.id === selectedSessionId);
   const aioCount = keywords.filter(k => k.hasAIOverview).length;
 
   return (
@@ -206,7 +277,7 @@ export default function ProjectPage() {
           <div className="flex items-center justify-between">
             <div>
               <a href="/" className="text-sm text-blue-500 hover:underline">
-                ← Back to Projects
+                &larr; Back to Projects
               </a>
               <h1 className="text-2xl font-bold text-gray-900 mt-1">{project.name}</h1>
             </div>
@@ -222,9 +293,13 @@ export default function ProjectPage() {
 
       <main className="max-w-7xl mx-auto px-4 py-6">
         {/* Stats */}
-        <div className="grid grid-cols-3 gap-4 mb-6">
+        <div className="grid grid-cols-4 gap-4 mb-6">
           <div className="bg-white rounded-lg shadow border p-4">
-            <div className="text-sm text-gray-500">Total Keywords</div>
+            <div className="text-sm text-gray-500">Sessions</div>
+            <div className="text-2xl font-bold">{sessions.length}</div>
+          </div>
+          <div className="bg-white rounded-lg shadow border p-4">
+            <div className="text-sm text-gray-500">Keywords (Current)</div>
             <div className="text-2xl font-bold">{keywords.length}</div>
           </div>
           <div className="bg-white rounded-lg shadow border p-4">
@@ -281,139 +356,234 @@ export default function ProjectPage() {
           </div>
         )}
 
-        {/* Tabs */}
-        <div className="flex gap-2 mb-6 border-b">
-          <button
-            onClick={() => setActiveTab('keywords')}
-            className={`px-4 py-2 font-medium transition-colors ${
-              activeTab === 'keywords'
-                ? 'text-blue-600 border-b-2 border-blue-600'
-                : 'text-gray-600 hover:text-gray-900'
-            }`}
-          >
-            Keywords ({keywords.length})
-          </button>
-          <button
-            onClick={() => setActiveTab('fetch')}
-            className={`px-4 py-2 font-medium transition-colors ${
-              activeTab === 'fetch'
-                ? 'text-blue-600 border-b-2 border-blue-600'
-                : 'text-gray-600 hover:text-gray-900'
-            }`}
-          >
-            Fetch Keywords
-          </button>
-          <button
-            onClick={() => setActiveTab('upload')}
-            className={`px-4 py-2 font-medium transition-colors ${
-              activeTab === 'upload'
-                ? 'text-blue-600 border-b-2 border-blue-600'
-                : 'text-gray-600 hover:text-gray-900'
-            }`}
-          >
-            Upload JSON
-          </button>
-        </div>
-
-        {/* Tab Content */}
-        {activeTab === 'keywords' && (
-          <div className="bg-white rounded-lg shadow border p-4">
-            {keywords.length === 0 ? (
-              <div className="text-center py-12 text-gray-500">
-                <p className="mb-4">No keywords yet. Fetch keywords or upload a JSON file to get started.</p>
-                <div className="flex gap-2 justify-center">
-                  <button
-                    onClick={() => setActiveTab('fetch')}
-                    className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
-                  >
-                    Fetch Keywords
-                  </button>
-                  <button
-                    onClick={() => setActiveTab('upload')}
-                    className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600"
-                  >
-                    Upload JSON
-                  </button>
-                </div>
+        {/* Main content area */}
+        <div className="flex gap-6">
+          {/* Sessions sidebar */}
+          <div className="w-80 flex-shrink-0">
+            <div className="bg-white rounded-lg shadow border p-4">
+              {/* Tabs for sidebar */}
+              <div className="flex gap-1 mb-4 border-b -mx-4 px-4">
+                <button
+                  onClick={() => setActiveTab('sessions')}
+                  className={`px-3 py-2 text-sm font-medium transition-colors ${
+                    activeTab === 'sessions'
+                      ? 'text-blue-600 border-b-2 border-blue-600'
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  Sessions
+                </button>
+                <button
+                  onClick={() => setActiveTab('fetch')}
+                  className={`px-3 py-2 text-sm font-medium transition-colors ${
+                    activeTab === 'fetch'
+                      ? 'text-blue-600 border-b-2 border-blue-600'
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  + Fetch
+                </button>
+                <button
+                  onClick={() => setActiveTab('upload')}
+                  className={`px-3 py-2 text-sm font-medium transition-colors ${
+                    activeTab === 'upload'
+                      ? 'text-blue-600 border-b-2 border-blue-600'
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  + Upload
+                </button>
               </div>
-            ) : (
-              <KeywordsTable keywords={keywords} brandDomain={brandDomain} />
-            )}
-          </div>
-        )}
 
-        {activeTab === 'fetch' && (
-          <div className="bg-white rounded-lg shadow border p-6">
-            <h3 className="font-medium text-gray-900 mb-4">Fetch Keywords from DataForSEO</h3>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm text-gray-600 mb-1">
-                  Keywords (one per line or comma-separated)
-                </label>
-                <textarea
-                  value={keywordsInput}
-                  onChange={(e) => setKeywordsInput(e.target.value)}
-                  placeholder="seo là gì&#10;marketing online&#10;ai trong seo"
-                  rows={6}
-                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              {activeTab === 'sessions' && (
+                <SessionList
+                  sessions={sessions}
+                  selectedSessionId={selectedSessionId}
+                  onSelectSession={setSelectedSessionId}
+                  onDeleteSession={handleDeleteSession}
+                  onCompareClick={handleCompareClick}
+                  comparisonMode={comparisonMode}
+                  selectedForComparison={selectedForComparison}
+                  onToggleComparison={handleToggleComparison}
                 />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm text-gray-600 mb-1">Location Code</label>
-                  <input
-                    type="text"
-                    value={locationCode}
-                    onChange={(e) => setLocationCode(e.target.value)}
-                    placeholder="2704"
-                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                  <p className="text-xs text-gray-500 mt-1">Vietnam: 2704, US: 2840, UK: 2826</p>
+              )}
+
+              {activeTab === 'fetch' && (
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm text-gray-600 mb-1">Session Name (optional)</label>
+                    <input
+                      type="text"
+                      value={sessionName}
+                      onChange={(e) => setSessionName(e.target.value)}
+                      placeholder="e.g., December 2024 Check"
+                      className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm text-gray-600 mb-1">
+                      Keywords (one per line or comma-separated)
+                    </label>
+                    <textarea
+                      value={keywordsInput}
+                      onChange={(e) => setKeywordsInput(e.target.value)}
+                      placeholder="seo la gi&#10;marketing online&#10;ai trong seo"
+                      rows={6}
+                      className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <label className="block text-sm text-gray-600 mb-1">Location</label>
+                      <input
+                        type="text"
+                        value={locationCode}
+                        onChange={(e) => setLocationCode(e.target.value)}
+                        className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm text-gray-600 mb-1">Language</label>
+                      <input
+                        type="text"
+                        value={languageCode}
+                        onChange={(e) => setLanguageCode(e.target.value)}
+                        className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                      />
+                    </div>
+                  </div>
+                  <button
+                    onClick={handleFetch}
+                    disabled={fetching}
+                    className="w-full py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50 text-sm font-medium"
+                  >
+                    {fetching ? 'Fetching...' : 'Fetch Keywords'}
+                  </button>
                 </div>
-                <div>
-                  <label className="block text-sm text-gray-600 mb-1">Language Code</label>
-                  <input
-                    type="text"
-                    value={languageCode}
-                    onChange={(e) => setLanguageCode(e.target.value)}
-                    placeholder="vi"
-                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                  <p className="text-xs text-gray-500 mt-1">vi, en, etc.</p>
+              )}
+
+              {activeTab === 'upload' && (
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm text-gray-600 mb-1">Session Name (optional)</label>
+                    <input
+                      type="text"
+                      value={sessionName}
+                      onChange={(e) => setSessionName(e.target.value)}
+                      placeholder="e.g., Imported Data - Dec 2024"
+                      className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm text-gray-600 mb-2">JSON File</label>
+                    <input
+                      type="file"
+                      accept=".json"
+                      onChange={handleUpload}
+                      disabled={uploading}
+                      className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 disabled:opacity-50"
+                    />
+                  </div>
+                  {uploading && (
+                    <p className="text-sm text-gray-600">Uploading and processing...</p>
+                  )}
                 </div>
-              </div>
-              <button
-                onClick={handleFetch}
-                disabled={fetching}
-                className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50"
-              >
-                {fetching ? 'Fetching...' : 'Fetch Keywords'}
-              </button>
+              )}
             </div>
           </div>
-        )}
 
-        {activeTab === 'upload' && (
-          <div className="bg-white rounded-lg shadow border p-6">
-            <h3 className="font-medium text-gray-900 mb-4">Upload JSON File</h3>
-            <p className="text-gray-600 mb-4">
-              Upload a JSON file containing DataForSEO API results
-            </p>
-            <label className="block">
-              <input
-                type="file"
-                accept=".json"
-                onChange={handleUpload}
-                disabled={uploading}
-                className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 disabled:opacity-50"
-              />
-            </label>
-            {uploading && (
-              <p className="mt-2 text-gray-600">Uploading and processing...</p>
-            )}
+          {/* Keywords table */}
+          <div className="flex-1">
+            <div className="bg-white rounded-lg shadow border p-4">
+              {selectedSession ? (
+                <>
+                  <div className="flex items-center justify-between mb-4">
+                    <div>
+                      <h3 className="font-medium text-gray-900">
+                        {selectedSession.name || `Session ${selectedSession.id}`}
+                      </h3>
+                      <p className="text-sm text-gray-500">
+                        {new Date(selectedSession.created_at).toLocaleDateString('en-US', {
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        })}
+                      </p>
+                    </div>
+                    <div className="text-sm text-gray-500">
+                      {keywords.length} keywords &middot; {aioCount} with AIO
+                    </div>
+                  </div>
+                  {keywords.length === 0 ? (
+                    <div className="text-center py-12 text-gray-500">
+                      <p>No keywords in this session.</p>
+                    </div>
+                  ) : (
+                    <KeywordsTable
+                      keywords={keywords}
+                      brandDomain={brandDomain}
+                      onKeywordClick={(keyword) => setTimelineKeyword(keyword)}
+                    />
+                  )}
+                </>
+              ) : sessions.length === 0 ? (
+                <div className="text-center py-12 text-gray-500">
+                  <p className="mb-4">No sessions yet. Create your first check session to get started.</p>
+                  <div className="flex gap-2 justify-center">
+                    <button
+                      onClick={() => setActiveTab('fetch')}
+                      className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+                    >
+                      Fetch Keywords
+                    </button>
+                    <button
+                      onClick={() => setActiveTab('upload')}
+                      className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600"
+                    >
+                      Upload JSON
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="text-center py-12 text-gray-500">
+                  <p>Select a session from the sidebar to view keywords.</p>
+                </div>
+              )}
+            </div>
           </div>
-        )}
+        </div>
       </main>
+
+      {/* Session Comparison Modal */}
+      {showComparison && (
+        <SessionComparison
+          projectId={projectId}
+          sessionIds={selectedForComparison}
+          brandDomain={brandDomain}
+          onClose={() => {
+            setShowComparison(false);
+            setComparisonMode(false);
+            setSelectedForComparison([]);
+          }}
+          onViewKeyword={handleViewKeywordFromComparison}
+        />
+      )}
+
+      {/* Keyword Timeline Modal */}
+      {timelineKeyword && (
+        <KeywordTimeline
+          projectId={projectId}
+          keyword={timelineKeyword}
+          brandDomain={brandDomain}
+          onClose={() => setTimelineKeyword(null)}
+          onViewSession={(sessionId) => {
+            setTimelineKeyword(null);
+            setSelectedSessionId(sessionId);
+          }}
+        />
+      )}
     </div>
   );
 }

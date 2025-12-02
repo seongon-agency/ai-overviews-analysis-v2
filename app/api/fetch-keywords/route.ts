@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { fetchKeywordsBatch } from '@/lib/dataforseo';
-import { getProject, saveKeywordResult, deleteProjectKeywords } from '@/lib/db';
+import { getProject, createSession, saveKeywordResult, updateSessionCounts } from '@/lib/db';
 
-// POST /api/fetch-keywords - Fetch keywords from DataForSEO and save to database
+// POST /api/fetch-keywords - Fetch keywords from DataForSEO and save to a new session
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { projectId, keywords, locationCode, languageCode } = body;
+    const { projectId, keywords, locationCode, languageCode, sessionName } = body;
 
     // Validation
     if (!projectId || typeof projectId !== 'number') {
@@ -39,8 +39,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Clear existing keywords for this project (fresh fetch)
-    deleteProjectKeywords(projectId);
+    // Create a new session for this fetch
+    const session = createSession(
+      projectId,
+      sessionName || `Check ${new Date().toLocaleDateString()}`,
+      locationCode,
+      languageCode
+    );
 
     // Fetch keywords from DataForSEO
     const results = await fetchKeywordsBatch(
@@ -56,7 +61,7 @@ export async function POST(request: NextRequest) {
 
     for (const { keyword, result, error } of results) {
       if (result) {
-        saveKeywordResult(projectId, keyword, result as unknown as Record<string, unknown>);
+        saveKeywordResult(projectId, session.id, keyword, result as unknown as Record<string, unknown>);
         savedCount++;
       } else {
         errorCount++;
@@ -66,10 +71,14 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // Update session counts
+    updateSessionCounts(session.id);
+
     return NextResponse.json({
       success: true,
       data: {
         projectId,
+        sessionId: session.id,
         totalKeywords: keywords.length,
         savedCount,
         errorCount,
