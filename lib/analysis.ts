@@ -49,28 +49,51 @@ export function cleanMarkdownForTextAnalysis(md: string): string {
 
 /**
  * Check if a brand name appears in text as a whole word (case-insensitive)
- * Uses word boundary matching to avoid false positives like "Nova" in "innovation"
+ * Uses custom word boundary matching that works with Unicode
  * This is the SINGLE SOURCE OF TRUTH for brand mention detection.
  */
 export function brandMatchesText(brandName: string, text: string): boolean {
   if (!brandName || !text || brandName.length < 2) return false;
 
-  const escaped = escapeRegex(brandName);
+  const lowerBrand = brandName.toLowerCase();
+  const lowerText = text.toLowerCase();
 
-  // Use word boundary matching (case-insensitive)
-  // \b works for ASCII word boundaries
-  try {
-    const pattern = new RegExp(`\\b${escaped}\\b`, 'i');
-    return pattern.test(text);
-  } catch {
-    // Fallback to simple includes if regex fails
-    return text.toLowerCase().includes(brandName.toLowerCase());
+  let pos = 0;
+  while (pos < lowerText.length) {
+    const foundAt = lowerText.indexOf(lowerBrand, pos);
+    if (foundAt === -1) return false;
+
+    // Check word boundaries using isWordChar (defined below)
+    const charBefore = foundAt > 0 ? text[foundAt - 1] : '';
+    const charAfter = text[foundAt + brandName.length] || '';
+
+    const isWordBoundaryBefore = !charBefore || !/[\p{L}\p{N}_]/u.test(charBefore);
+    const isWordBoundaryAfter = !charAfter || !/[\p{L}\p{N}_]/u.test(charAfter);
+
+    if (isWordBoundaryBefore && isWordBoundaryAfter) {
+      return true;
+    }
+
+    pos = foundAt + 1;
   }
+
+  return false;
+}
+
+/**
+ * Check if a character is a word character (letter, digit, or underscore)
+ * Works with Unicode characters
+ */
+function isWordChar(char: string): boolean {
+  if (!char) return false;
+  // Check for letters (including Unicode), digits, or underscore
+  return /[\p{L}\p{N}_]/u.test(char);
 }
 
 /**
  * Find all occurrences of brand name in text and return their positions
- * Case-insensitive search that finds all matches
+ * Uses word boundary logic to avoid matching partial words
+ * Case-insensitive search
  * Used for highlighting brand mentions in UI
  */
 export function findBrandMentions(brandName: string, text: string): { start: number; end: number; match: string }[] {
@@ -85,17 +108,26 @@ export function findBrandMentions(brandName: string, text: string): { start: num
     const foundAt = lowerText.indexOf(lowerBrand, pos);
     if (foundAt === -1) break;
 
-    // Get the actual matched text with its original case
-    const matchedText = text.substring(foundAt, foundAt + brandName.length);
+    // Check word boundaries
+    const charBefore = foundAt > 0 ? text[foundAt - 1] : '';
+    const charAfter = text[foundAt + brandName.length] || '';
 
-    results.push({
-      start: foundAt,
-      end: foundAt + brandName.length,
-      match: matchedText
-    });
+    const isWordBoundaryBefore = !isWordChar(charBefore);
+    const isWordBoundaryAfter = !isWordChar(charAfter);
 
-    // Move past this match
-    pos = foundAt + brandName.length;
+    if (isWordBoundaryBefore && isWordBoundaryAfter) {
+      // Get the actual matched text with its original case
+      const matchedText = text.substring(foundAt, foundAt + brandName.length);
+
+      results.push({
+        start: foundAt,
+        end: foundAt + brandName.length,
+        match: matchedText
+      });
+    }
+
+    // Move past this position
+    pos = foundAt + 1;
   }
 
   return results;
