@@ -18,9 +18,10 @@ A Next.js application for tracking and analyzing Google AI Overview citations ac
 
 ### Analysis Dashboard
 - **Competitor Analysis**: See who gets cited most in AI Overviews
-- **Brand Performance**: Track your brand's citation rate and rank
-- **Visual Charts**: Bar charts comparing citations vs mentions
+- **Brand Performance**: Track your brand's citation rate, rank, and average position
+- **Visual Charts**: Bar charts showing top cited sources
 - **CSV Export**: Export data for further analysis
+- **Brand Highlighting**: Your brand mentions are highlighted in AI Overview content
 
 ## Quick Start
 
@@ -40,16 +41,23 @@ Open http://localhost:3000
 
 ## Environment Variables
 
-```
+```bash
+# DataForSEO API credentials
 DATAFORSEO_LOGIN=your_login
 DATAFORSEO_PASSWORD=your_password
+
+# PostgreSQL connection (optional - for production)
+# If not set, SQLite will be used automatically
+DATABASE_URL=postgresql://user:password@host:5432/database
 ```
 
 ## Tech Stack
 
 - **Next.js 14** - React framework with App Router
-- **SQLite** - Local database via better-sqlite3
+- **SQLite** - Local database via better-sqlite3 (development)
+- **PostgreSQL** - Production database via pg (Railway deployment)
 - **Tailwind CSS** - Styling
+- **shadcn/ui** - UI component library
 - **Recharts** - Data visualization
 - **TypeScript** - Type safety
 
