@@ -9,7 +9,7 @@ const db = new Database(dbPath);
 // Enable foreign keys
 db.pragma('foreign_keys = ON');
 
-// Initialize tables on first run
+// Initialize tables on first run (without user_id initially for existing databases)
 db.exec(`
   CREATE TABLE IF NOT EXISTS projects (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -18,7 +18,6 @@ db.exec(`
     brand_domain TEXT,
     location_code TEXT,
     language_code TEXT,
-    user_id TEXT NOT NULL DEFAULT '',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
   );
 
@@ -52,7 +51,6 @@ db.exec(`
   CREATE INDEX IF NOT EXISTS idx_keyword_results_project ON keyword_results(project_id);
   CREATE INDEX IF NOT EXISTS idx_keyword_results_session ON keyword_results(session_id);
   CREATE INDEX IF NOT EXISTS idx_keyword_results_keyword ON keyword_results(keyword);
-  CREATE INDEX IF NOT EXISTS idx_projects_user ON projects(user_id);
 `);
 
 // Migration: Add user_id column if it doesn't exist
@@ -60,6 +58,13 @@ try {
   db.exec(`ALTER TABLE projects ADD COLUMN user_id TEXT NOT NULL DEFAULT ''`);
 } catch {
   // Column already exists, ignore error
+}
+
+// Create index on user_id after ensuring column exists
+try {
+  db.exec(`CREATE INDEX IF NOT EXISTS idx_projects_user ON projects(user_id);`);
+} catch {
+  // Index might already exist or other error, ignore
 }
 
 // Migration: Check if old 'keywords' table exists and migrate data
