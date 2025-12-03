@@ -48,6 +48,7 @@ export interface Project {
   brand_domain: string | null;
   location_code: string | null;
   language_code: string | null;
+  user_id: string;
   created_at: string;
 }
 

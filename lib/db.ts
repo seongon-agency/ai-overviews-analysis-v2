@@ -18,6 +18,7 @@ db.exec(`
     brand_domain TEXT,
     location_code TEXT,
     language_code TEXT,
+    user_id TEXT NOT NULL DEFAULT '',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
   );
 
@@ -51,7 +52,15 @@ db.exec(`
   CREATE INDEX IF NOT EXISTS idx_keyword_results_project ON keyword_results(project_id);
   CREATE INDEX IF NOT EXISTS idx_keyword_results_session ON keyword_results(session_id);
   CREATE INDEX IF NOT EXISTS idx_keyword_results_keyword ON keyword_results(keyword);
+  CREATE INDEX IF NOT EXISTS idx_projects_user ON projects(user_id);
 `);
+
+// Migration: Add user_id column if it doesn't exist
+try {
+  db.exec(`ALTER TABLE projects ADD COLUMN user_id TEXT NOT NULL DEFAULT ''`);
+} catch {
+  // Column already exists, ignore error
+}
 
 // Migration: Check if old 'keywords' table exists and migrate data
 const oldTableExists = db.prepare(`
@@ -108,26 +117,43 @@ export function createProject(
   brandName?: string,
   brandDomain?: string,
   locationCode?: string,
-  languageCode?: string
+  languageCode?: string,
+  userId?: string
 ): { id: number } {
   const stmt = db.prepare(`
-    INSERT INTO projects (name, brand_name, brand_domain, location_code, language_code)
-    VALUES (?, ?, ?, ?, ?)
+    INSERT INTO projects (name, brand_name, brand_domain, location_code, language_code, user_id)
+    VALUES (?, ?, ?, ?, ?, ?)
   `);
-  const result = stmt.run(name, brandName || null, brandDomain || null, locationCode || null, languageCode || null);
+  const result = stmt.run(name, brandName || null, brandDomain || null, locationCode || null, languageCode || null, userId || '');
   return { id: result.lastInsertRowid as number };
 }
 
-export function getAllProjects(): Project[] {
+export function getAllProjects(userId?: string): Project[] {
+  if (userId) {
+    const stmt = db.prepare(`
+      SELECT * FROM projects WHERE user_id = ? ORDER BY created_at DESC
+    `);
+    return stmt.all(userId) as Project[];
+  }
   const stmt = db.prepare(`
     SELECT * FROM projects ORDER BY created_at DESC
   `);
   return stmt.all() as Project[];
 }
 
-export function getProject(id: number): Project | undefined {
+export function getProject(id: number, userId?: string): Project | undefined {
+  if (userId) {
+    const stmt = db.prepare(`SELECT * FROM projects WHERE id = ? AND user_id = ?`);
+    return stmt.get(id, userId) as Project | undefined;
+  }
   const stmt = db.prepare(`SELECT * FROM projects WHERE id = ?`);
   return stmt.get(id) as Project | undefined;
+}
+
+export function verifyProjectOwnership(projectId: number, userId: string): boolean {
+  const stmt = db.prepare(`SELECT id FROM projects WHERE id = ? AND user_id = ?`);
+  const result = stmt.get(projectId, userId);
+  return !!result;
 }
 
 export function updateProject(
@@ -545,4 +571,22 @@ export function getSessionKeywordsBasic(sessionId: number): {
     FROM keyword_results WHERE session_id = ?
   `);
   return stmt.all(sessionId) as { keyword: string; has_ai_overview: number; aio_references: string | null }[];
+}
+
+// ============ Migration Functions ============
+
+export function migrateProjectsToUser(userId: string): number {
+  const stmt = db.prepare(`
+    UPDATE projects SET user_id = ? WHERE user_id IS NULL OR user_id = ''
+  `);
+  const result = stmt.run(userId);
+  return result.changes;
+}
+
+export function getOrphanedProjectsCount(): number {
+  const stmt = db.prepare(`
+    SELECT COUNT(*) as count FROM projects WHERE user_id IS NULL OR user_id = ''
+  `);
+  const result = stmt.get() as { count: number };
+  return result.count;
 }

@@ -19,6 +19,7 @@ async function initializeTables() {
         brand_domain TEXT,
         location_code TEXT,
         language_code TEXT,
+        user_id TEXT NOT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
 
@@ -49,6 +50,20 @@ async function initializeTables() {
       CREATE INDEX IF NOT EXISTS idx_keyword_results_project ON keyword_results(project_id);
       CREATE INDEX IF NOT EXISTS idx_keyword_results_session ON keyword_results(session_id);
       CREATE INDEX IF NOT EXISTS idx_keyword_results_keyword ON keyword_results(keyword);
+      CREATE INDEX IF NOT EXISTS idx_projects_user ON projects(user_id);
+    `);
+
+    // Add user_id column if it doesn't exist (migration for existing databases)
+    await client.query(`
+      DO $$
+      BEGIN
+        IF NOT EXISTS (
+          SELECT 1 FROM information_schema.columns
+          WHERE table_name = 'projects' AND column_name = 'user_id'
+        ) THEN
+          ALTER TABLE projects ADD COLUMN user_id TEXT;
+        END IF;
+      END $$;
     `);
   } finally {
     client.release();
@@ -79,27 +94,51 @@ export async function createProject(
   brandName?: string,
   brandDomain?: string,
   locationCode?: string,
-  languageCode?: string
+  languageCode?: string,
+  userId?: string
 ): Promise<{ id: number }> {
   await ensureInitialized();
   const result = await pool.query(
-    `INSERT INTO projects (name, brand_name, brand_domain, location_code, language_code)
-     VALUES ($1, $2, $3, $4, $5) RETURNING id`,
-    [name, brandName || null, brandDomain || null, locationCode || null, languageCode || null]
+    `INSERT INTO projects (name, brand_name, brand_domain, location_code, language_code, user_id)
+     VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`,
+    [name, brandName || null, brandDomain || null, locationCode || null, languageCode || null, userId || '']
   );
   return { id: result.rows[0].id };
 }
 
-export async function getAllProjects(): Promise<Project[]> {
+export async function getAllProjects(userId?: string): Promise<Project[]> {
   await ensureInitialized();
+  if (userId) {
+    const result = await pool.query(
+      'SELECT * FROM projects WHERE user_id = $1 ORDER BY created_at DESC',
+      [userId]
+    );
+    return result.rows;
+  }
   const result = await pool.query('SELECT * FROM projects ORDER BY created_at DESC');
   return result.rows;
 }
 
-export async function getProject(id: number): Promise<Project | undefined> {
+export async function getProject(id: number, userId?: string): Promise<Project | undefined> {
   await ensureInitialized();
+  if (userId) {
+    const result = await pool.query(
+      'SELECT * FROM projects WHERE id = $1 AND user_id = $2',
+      [id, userId]
+    );
+    return result.rows[0];
+  }
   const result = await pool.query('SELECT * FROM projects WHERE id = $1', [id]);
   return result.rows[0];
+}
+
+export async function verifyProjectOwnership(projectId: number, userId: string): Promise<boolean> {
+  await ensureInitialized();
+  const result = await pool.query(
+    'SELECT id FROM projects WHERE id = $1 AND user_id = $2',
+    [projectId, userId]
+  );
+  return result.rows.length > 0;
 }
 
 export async function updateProject(
@@ -553,6 +592,25 @@ export async function getSessionKeywordsBasic(sessionId: number): Promise<{
     [sessionId]
   );
   return result.rows;
+}
+
+// ============ Migration Functions ============
+
+export async function migrateProjectsToUser(userId: string): Promise<number> {
+  await ensureInitialized();
+  const result = await pool.query(
+    `UPDATE projects SET user_id = $1 WHERE user_id IS NULL OR user_id = '' RETURNING id`,
+    [userId]
+  );
+  return result.rowCount || 0;
+}
+
+export async function getOrphanedProjectsCount(): Promise<number> {
+  await ensureInitialized();
+  const result = await pool.query(
+    `SELECT COUNT(*) as count FROM projects WHERE user_id IS NULL OR user_id = ''`
+  );
+  return parseInt(result.rows[0].count);
 }
 
 export default pool;

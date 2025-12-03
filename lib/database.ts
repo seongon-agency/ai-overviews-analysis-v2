@@ -18,20 +18,26 @@ export async function createProject(
   brandName?: string,
   brandDomain?: string,
   locationCode?: string,
-  languageCode?: string
+  languageCode?: string,
+  userId?: string
 ): Promise<{ id: number }> {
   const db = getDb();
-  return db.createProject(name, brandName, brandDomain, locationCode, languageCode);
+  return db.createProject(name, brandName, brandDomain, locationCode, languageCode, userId);
 }
 
-export async function getAllProjects() {
+export async function getAllProjects(userId?: string) {
   const db = getDb();
-  return db.getAllProjects();
+  return db.getAllProjects(userId);
 }
 
-export async function getProject(id: number) {
+export async function getProject(id: number, userId?: string) {
   const db = getDb();
-  return db.getProject(id);
+  return db.getProject(id, userId);
+}
+
+export async function verifyProjectOwnership(projectId: number, userId: string) {
+  const db = getDb();
+  return db.verifyProjectOwnership(projectId, userId);
 }
 
 export async function updateProject(
@@ -186,4 +192,16 @@ export async function getKeywordResultsForSessions(sessionIds: number[]) {
 export async function getSessionKeywordsBasic(sessionId: number) {
   const db = getDb();
   return db.getSessionKeywordsBasic(sessionId);
+}
+
+// ============ Migration Functions ============
+
+export async function migrateProjectsToUser(userId: string) {
+  const db = getDb();
+  return db.migrateProjectsToUser(userId);
+}
+
+export async function getOrphanedProjectsCount() {
+  const db = getDb();
+  return db.getOrphanedProjectsCount();
 }
