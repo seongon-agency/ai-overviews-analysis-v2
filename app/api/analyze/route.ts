@@ -1,11 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getProject, getProjectKeywords, getSessionKeywords } from '@/lib/database';
 import { analyzeKeywords, keywordsToCSV, competitorsToCSV } from '@/lib/analysis';
+import { getUserId } from '@/lib/auth-utils';
 
 // POST /api/analyze - Run analysis on project keywords
 // Can optionally specify sessionId to analyze a specific session instead of latest
 export async function POST(request: NextRequest) {
   try {
+    const userId = await getUserId();
+    if (!userId) {
+      return NextResponse.json(
+        { success: false, error: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+
     const body = await request.json();
     const { projectId, brandName, brandDomain, sessionId } = body;
 
@@ -31,8 +40,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check project exists
-    const project = await getProject(projectId);
+    // Check project exists and belongs to user
+    const project = await getProject(projectId, userId);
     if (!project) {
       return NextResponse.json(
         { success: false, error: 'Project not found' },
@@ -73,6 +82,14 @@ export async function POST(request: NextRequest) {
 // Export analysis as CSV
 export async function GET(request: NextRequest) {
   try {
+    const userId = await getUserId();
+    if (!userId) {
+      return NextResponse.json(
+        { success: false, error: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+
     const searchParams = request.nextUrl.searchParams;
     const projectId = parseInt(searchParams.get('projectId') || '', 10);
     const brandName = searchParams.get('brandName') || '';
@@ -97,8 +114,8 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Get project and keywords
-    const project = await getProject(projectId);
+    // Get project and keywords - check ownership
+    const project = await getProject(projectId, userId);
     if (!project) {
       return NextResponse.json(
         { success: false, error: 'Project not found' },

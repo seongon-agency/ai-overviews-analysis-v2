@@ -1,10 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { fetchKeywordsBatch } from '@/lib/dataforseo';
 import { getProject, createSession, saveKeywordResult, updateSessionCounts } from '@/lib/database';
+import { getUserId } from '@/lib/auth-utils';
 
 // POST /api/fetch-keywords - Fetch keywords from DataForSEO and save to a new session
 export async function POST(request: NextRequest) {
   try {
+    const userId = await getUserId();
+    if (!userId) {
+      return NextResponse.json(
+        { success: false, error: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+
     const body = await request.json();
     const { projectId, keywords, locationCode, languageCode, sessionName } = body;
 
@@ -30,8 +39,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check project exists
-    const project = await getProject(projectId);
+    // Check project exists and belongs to user
+    const project = await getProject(projectId, userId);
     if (!project) {
       return NextResponse.json(
         { success: false, error: 'Project not found' },

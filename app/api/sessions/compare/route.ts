@@ -1,10 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getSessionsForComparison, compareTwoSessions } from '@/lib/database';
+import { getSessionsForComparison, compareTwoSessions, verifyProjectOwnership, getSession } from '@/lib/database';
 import { Reference } from '@/lib/types';
+import { getUserId } from '@/lib/auth-utils';
 
 // GET /api/sessions/compare?projectId=1&sessionIds=1,2,3&brandDomain=example.com
 // Multi-session comparison - returns matrix view data
 export async function GET(request: NextRequest) {
+  const userId = await getUserId();
+  if (!userId) {
+    return NextResponse.json(
+      { success: false, error: 'Unauthorized' },
+      { status: 401 }
+    );
+  }
+
   const searchParams = request.nextUrl.searchParams;
   const projectId = searchParams.get('projectId');
   const sessionIdsParam = searchParams.get('sessionIds');
@@ -14,6 +23,15 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(
       { success: false, error: 'projectId and sessionIds are required' },
       { status: 400 }
+    );
+  }
+
+  const projectIdNum = parseInt(projectId, 10);
+  const hasAccess = await verifyProjectOwnership(projectIdNum, userId);
+  if (!hasAccess) {
+    return NextResponse.json(
+      { success: false, error: 'Project not found' },
+      { status: 404 }
     );
   }
 
@@ -103,6 +121,14 @@ export async function GET(request: NextRequest) {
 // POST /api/sessions/compare - Compare two sessions with change detection
 export async function POST(request: NextRequest) {
   try {
+    const userId = await getUserId();
+    if (!userId) {
+      return NextResponse.json(
+        { success: false, error: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+
     const body = await request.json();
     const { sessionId1, sessionId2, brandDomain } = body;
 
@@ -110,6 +136,23 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { success: false, error: 'sessionId1 and sessionId2 are required' },
         { status: 400 }
+      );
+    }
+
+    // Verify user owns the sessions
+    const session1 = await getSession(sessionId1);
+    if (!session1) {
+      return NextResponse.json(
+        { success: false, error: 'Session not found' },
+        { status: 404 }
+      );
+    }
+
+    const hasAccess = await verifyProjectOwnership(session1.project_id, userId);
+    if (!hasAccess) {
+      return NextResponse.json(
+        { success: false, error: 'Session not found' },
+        { status: 404 }
       );
     }
 

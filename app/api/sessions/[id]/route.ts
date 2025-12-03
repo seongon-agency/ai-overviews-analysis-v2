@@ -6,22 +6,41 @@ import {
   deleteSession,
   getPreviousSession,
   getRecentSessionIds,
-  getKeywordResultsForSessions
+  getKeywordResultsForSessions,
+  verifyProjectOwnership
 } from '@/lib/database';
 import { Reference, KeywordRecord, CheckSession } from '@/lib/types';
 import { findBrandInReferences, isBrandMentionedInText } from '@/lib/analysis';
+import { getUserId } from '@/lib/auth-utils';
 
 // GET /api/sessions/[id] - Get session details with keywords
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const userId = await getUserId();
+  if (!userId) {
+    return NextResponse.json(
+      { success: false, error: 'Unauthorized' },
+      { status: 401 }
+    );
+  }
+
   const { id } = await params;
   const sessionId = parseInt(id, 10);
 
   try {
     const session = await getSession(sessionId);
     if (!session) {
+      return NextResponse.json(
+        { success: false, error: 'Session not found' },
+        { status: 404 }
+      );
+    }
+
+    // Verify user owns the project this session belongs to
+    const hasAccess = await verifyProjectOwnership(session.project_id, userId);
+    if (!hasAccess) {
       return NextResponse.json(
         { success: false, error: 'Session not found' },
         { status: 404 }
@@ -190,10 +209,34 @@ export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const userId = await getUserId();
+  if (!userId) {
+    return NextResponse.json(
+      { success: false, error: 'Unauthorized' },
+      { status: 401 }
+    );
+  }
+
   const { id } = await params;
   const sessionId = parseInt(id, 10);
 
   try {
+    const session = await getSession(sessionId);
+    if (!session) {
+      return NextResponse.json(
+        { success: false, error: 'Session not found' },
+        { status: 404 }
+      );
+    }
+
+    const hasAccess = await verifyProjectOwnership(session.project_id, userId);
+    if (!hasAccess) {
+      return NextResponse.json(
+        { success: false, error: 'Session not found' },
+        { status: 404 }
+      );
+    }
+
     const body = await request.json();
     const { name } = body;
 
@@ -216,10 +259,34 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const userId = await getUserId();
+  if (!userId) {
+    return NextResponse.json(
+      { success: false, error: 'Unauthorized' },
+      { status: 401 }
+    );
+  }
+
   const { id } = await params;
   const sessionId = parseInt(id, 10);
 
   try {
+    const session = await getSession(sessionId);
+    if (!session) {
+      return NextResponse.json(
+        { success: false, error: 'Session not found' },
+        { status: 404 }
+      );
+    }
+
+    const hasAccess = await verifyProjectOwnership(session.project_id, userId);
+    if (!hasAccess) {
+      return NextResponse.json(
+        { success: false, error: 'Session not found' },
+        { status: 404 }
+      );
+    }
+
     await deleteSession(sessionId);
     return NextResponse.json({ success: true });
   } catch (error) {

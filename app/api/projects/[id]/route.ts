@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getProject, updateProject, deleteProject, getProjectKeywords, getProjectKeywordCount, getProjectAIOCount, getProjectSessions } from '@/lib/database';
+import { getUserId } from '@/lib/auth-utils';
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -8,6 +9,14 @@ interface RouteParams {
 // GET /api/projects/[id] - Get a single project with keywords and sessions
 export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
+    const userId = await getUserId();
+    if (!userId) {
+      return NextResponse.json(
+        { success: false, error: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+
     const { id } = await params;
     const projectId = parseInt(id, 10);
 
@@ -18,7 +27,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       );
     }
 
-    const project = await getProject(projectId);
+    const project = await getProject(projectId, userId);
 
     if (!project) {
       return NextResponse.json(
@@ -57,6 +66,14 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 // PATCH /api/projects/[id] - Update a project
 export async function PATCH(request: NextRequest, { params }: RouteParams) {
   try {
+    const userId = await getUserId();
+    if (!userId) {
+      return NextResponse.json(
+        { success: false, error: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+
     const { id } = await params;
     const projectId = parseInt(id, 10);
 
@@ -67,7 +84,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       );
     }
 
-    const project = await getProject(projectId);
+    const project = await getProject(projectId, userId);
     if (!project) {
       return NextResponse.json(
         { success: false, error: 'Project not found' },
@@ -84,7 +101,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       brand_domain: brandDomain
     });
 
-    const updatedProject = await getProject(projectId);
+    const updatedProject = await getProject(projectId, userId);
 
     return NextResponse.json({
       success: true,
@@ -102,6 +119,14 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 // DELETE /api/projects/[id] - Delete a project
 export async function DELETE(request: NextRequest, { params }: RouteParams) {
   try {
+    const userId = await getUserId();
+    if (!userId) {
+      return NextResponse.json(
+        { success: false, error: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+
     const { id } = await params;
     const projectId = parseInt(id, 10);
 
@@ -112,7 +137,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
       );
     }
 
-    const project = await getProject(projectId);
+    const project = await getProject(projectId, userId);
     if (!project) {
       return NextResponse.json(
         { success: false, error: 'Project not found' },
