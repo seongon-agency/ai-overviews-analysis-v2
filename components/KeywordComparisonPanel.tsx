@@ -88,7 +88,7 @@ function SessionCard({
 
   return (
     <div
-      className={`flex-shrink-0 w-[calc(50%-12px)] min-w-[400px] h-full flex flex-col bg-white rounded-lg border ${
+      className={`flex-shrink-0 w-[720px] h-full flex flex-col bg-white rounded-lg border ${
         isPinned ? 'border-blue-300 shadow-md' : 'border-gray-200'
       }`}
     >
