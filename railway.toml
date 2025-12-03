@@ -5,4 +5,4 @@ builder = "nixpacks"
 nodeVersion = "20"
 
 [deploy]
-startCommand = "node .next/standalone/server.js"
+startCommand = "PORT=${PORT:-3000} node .next/standalone/server.js"
