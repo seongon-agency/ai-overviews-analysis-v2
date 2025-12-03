@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 
 // Icons
-import { X, Loader2, Pin, PinOff, ChevronDown, ChevronUp, ExternalLink, Clock } from 'lucide-react';
+import { X, Loader2, Pin, PinOff, ExternalLink, Clock } from 'lucide-react';
 
 interface HistoryEntry {
   sessionId: number;
@@ -51,12 +51,16 @@ function SessionCard({
   isLatest: boolean;
   changeFromPrevious: 'improved' | 'declined' | 'gained' | 'lost' | 'same' | null;
 }) {
-  const [citationsExpanded, setCitationsExpanded] = useState(false);
   const [highlightedCitation, setHighlightedCitation] = useState<number | null>(null);
+  const citationRefs = useRef<Map<number, HTMLDivElement>>(new Map());
 
   const handleCitationClick = useCallback((num: number) => {
     setHighlightedCitation(num);
-    setCitationsExpanded(true);
+    // Scroll to citation in sidebar
+    const el = citationRefs.current.get(num);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
     setTimeout(() => setHighlightedCitation(null), 2000);
   }, []);
 
@@ -84,7 +88,7 @@ function SessionCard({
 
   return (
     <div
-      className={`flex-shrink-0 w-[380px] h-full flex flex-col bg-white rounded-lg border ${
+      className={`flex-shrink-0 w-[calc(50%-12px)] min-w-[400px] h-full flex flex-col bg-white rounded-lg border ${
         isPinned ? 'border-blue-300 shadow-md' : 'border-gray-200'
       }`}
     >
@@ -149,95 +153,94 @@ function SessionCard({
         </div>
       </div>
 
-      {/* Card Content */}
-      <div className="flex-1 overflow-y-auto p-4">
-        {entry.hasAIOverview && entry.aioMarkdown ? (
-          <AIOContent
-            markdown={entry.aioMarkdown}
-            references={entry.references}
-            highlightedCitation={highlightedCitation}
-            onCitationHover={setHighlightedCitation}
-            onCitationClick={handleCitationClick}
-            brandName={brandName}
-          />
-        ) : (
-          <div className="flex items-center justify-center h-full text-muted-foreground text-sm">
-            <div className="text-center">
-              <div className="text-4xl mb-2 opacity-30">∅</div>
-              <p>No AI Overview</p>
+      {/* Card Content - split into AIO content and citations sidebar */}
+      <div className="flex-1 flex overflow-hidden">
+        {/* AI Overview Content */}
+        <div className="flex-1 overflow-y-auto p-4">
+          {entry.hasAIOverview && entry.aioMarkdown ? (
+            <AIOContent
+              markdown={entry.aioMarkdown}
+              references={entry.references}
+              highlightedCitation={highlightedCitation}
+              onCitationHover={setHighlightedCitation}
+              onCitationClick={handleCitationClick}
+              brandName={brandName}
+            />
+          ) : (
+            <div className="flex items-center justify-center h-full text-muted-foreground text-sm">
+              <div className="text-center">
+                <div className="text-4xl mb-2 opacity-30">∅</div>
+                <p>No AI Overview</p>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Citations Sidebar on right */}
+        {entry.references.length > 0 && (
+          <div className="w-56 border-l bg-gray-50/50 overflow-y-auto flex-shrink-0">
+            <div className="p-3">
+              <h4 className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">
+                Citations ({entry.references.length})
+              </h4>
+              <div className="space-y-1">
+                {entry.references.map((ref) => {
+                  const isHighlighted = highlightedCitation === ref.rank;
+                  const isBrand = isBrandCitation(ref);
+
+                  return (
+                    <div
+                      key={ref.rank}
+                      ref={(el) => {
+                        if (el) citationRefs.current.set(ref.rank, el);
+                      }}
+                      className={`
+                        flex items-center gap-2 p-2 rounded text-xs
+                        transition-all duration-150
+                        ${isHighlighted ? 'bg-blue-100 ring-1 ring-blue-400' : 'hover:bg-gray-100'}
+                        ${isBrand ? 'border-l-2 border-yellow-400 bg-yellow-50' : ''}
+                      `}
+                      onMouseEnter={() => setHighlightedCitation(ref.rank)}
+                      onMouseLeave={() => setHighlightedCitation(null)}
+                    >
+                      <span
+                        className={`
+                          w-5 h-5 flex items-center justify-center rounded text-xs font-medium flex-shrink-0
+                          ${isHighlighted ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'}
+                        `}
+                      >
+                        {ref.rank}
+                      </span>
+                      <div className="flex-1 min-w-0">
+                        <div className="font-medium truncate">
+                          {ref.source || ref.domain}
+                        </div>
+                        <div className="text-gray-500 truncate flex items-center gap-1">
+                          {ref.domain}
+                          {isBrand && (
+                            <span className="text-[10px] bg-yellow-200 text-yellow-800 px-1 rounded">
+                              Brand
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      <a
+                        href={ref.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-500 hover:text-blue-700 flex-shrink-0"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <ExternalLink className="h-3 w-3" />
+                      </a>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           </div>
         )}
       </div>
-
-      {/* Citations Section (Collapsible at bottom) */}
-      {entry.references.length > 0 && (
-        <div className="border-t">
-          <button
-            onClick={() => setCitationsExpanded(!citationsExpanded)}
-            className="w-full px-4 py-2 flex items-center justify-between text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
-          >
-            <span>Citations ({entry.references.length})</span>
-            {citationsExpanded ? (
-              <ChevronDown className="h-4 w-4" />
-            ) : (
-              <ChevronUp className="h-4 w-4" />
-            )}
-          </button>
-
-          {citationsExpanded && (
-            <div className="px-4 pb-3 max-h-48 overflow-y-auto space-y-1">
-              {entry.references.map((ref) => {
-                const isHighlighted = highlightedCitation === ref.rank;
-                const isBrand = isBrandCitation(ref);
-
-                return (
-                  <div
-                    key={ref.rank}
-                    className={`
-                      flex items-center gap-2 p-2 rounded text-xs
-                      transition-all duration-150
-                      ${isHighlighted ? 'bg-blue-100 ring-1 ring-blue-400' : 'hover:bg-gray-50'}
-                      ${isBrand ? 'border-l-2 border-yellow-400 bg-yellow-50' : ''}
-                    `}
-                    onMouseEnter={() => setHighlightedCitation(ref.rank)}
-                    onMouseLeave={() => setHighlightedCitation(null)}
-                  >
-                    <span
-                      className={`
-                        w-5 h-5 flex items-center justify-center rounded text-xs font-medium flex-shrink-0
-                        ${isHighlighted ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'}
-                      `}
-                    >
-                      {ref.rank}
-                    </span>
-                    <div className="flex-1 min-w-0">
-                      <div className="font-medium truncate flex items-center gap-1">
-                        {ref.source || ref.domain}
-                        {isBrand && (
-                          <span className="text-[10px] bg-yellow-200 text-yellow-800 px-1 rounded">
-                            Brand
-                          </span>
-                        )}
-                      </div>
-                      <div className="text-gray-500 truncate">{ref.domain}</div>
-                    </div>
-                    <a
-                      href={ref.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-500 hover:text-blue-700 flex-shrink-0 p-1"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      <ExternalLink className="h-3 w-3" />
-                    </a>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </div>
-      )}
     </div>
   );
 }
