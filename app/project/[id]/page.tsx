@@ -316,10 +316,10 @@ export default function ProjectPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50/30">
         <div className="text-center space-y-3">
-          <Loader2 className="w-8 h-8 animate-spin mx-auto text-muted-foreground" />
-          <p className="text-sm text-muted-foreground">Loading project...</p>
+          <Loader2 className="w-8 h-8 animate-spin mx-auto text-indigo-600" />
+          <p className="text-sm text-gray-500">Loading project...</p>
         </div>
       </div>
     );
@@ -327,18 +327,17 @@ export default function ProjectPage() {
 
   if (!project) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Card className="w-[400px]">
-          <CardHeader className="text-center">
-            <CardTitle>Project not found</CardTitle>
-            <CardDescription>The project you&apos;re looking for doesn&apos;t exist.</CardDescription>
-          </CardHeader>
-          <CardContent className="flex justify-center">
-            <Button asChild variant="outline">
-              <Link href="/">Back to Home</Link>
-            </Button>
-          </CardContent>
-        </Card>
+      <div className="min-h-screen flex items-center justify-center bg-gray-50/30">
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 w-[400px] text-center">
+          <div className="h-16 w-16 rounded-2xl bg-gray-50 flex items-center justify-center mx-auto mb-4">
+            <Search className="w-8 h-8 text-gray-300" />
+          </div>
+          <h2 className="text-lg font-semibold text-gray-900 mb-1">Project not found</h2>
+          <p className="text-gray-500 text-sm mb-6">The project you&apos;re looking for doesn&apos;t exist.</p>
+          <Button asChild variant="outline" className="rounded-xl">
+            <Link href="/">Back to Home</Link>
+          </Button>
+        </div>
       </div>
     );
   }
@@ -355,20 +354,23 @@ export default function ProjectPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gray-50/30">
       <Sidebar currentProjectId={projectId} />
 
       {/* Main Content with left margin for sidebar */}
       <div className="pl-64">
         {/* Project Header */}
-        <header className="sticky top-0 z-30 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <header className="sticky top-0 z-30 border-b border-gray-100 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60">
           <div className="flex h-16 items-center justify-between px-8">
             <div className="flex items-center gap-4">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-gray-100 to-gray-50 text-sm font-bold text-gray-600">
+                {project.name.charAt(0).toUpperCase()}
+              </div>
               <div>
-                <h1 className="text-lg font-semibold">{project.name}</h1>
+                <h1 className="text-lg font-semibold text-gray-900">{project.name}</h1>
                 <div className="flex items-center gap-2 mt-0.5">
                   {brandDomain ? (
-                    <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                    <div className="flex items-center gap-1.5 text-sm text-gray-500">
                       <Globe className="h-3.5 w-3.5" />
                       {brandDomain}
                     </div>
@@ -380,7 +382,7 @@ export default function ProjectPage() {
             </div>
             <div className="flex items-center gap-3">
               {sessions.length >= 2 && (
-                <Button variant="outline" size="sm" onClick={handleStartComparison}>
+                <Button variant="outline" size="sm" onClick={handleStartComparison} className="rounded-xl border-gray-200">
                   <Layers className="mr-2 h-4 w-4" />
                   Compare Sessions
                 </Button>
@@ -402,10 +404,10 @@ export default function ProjectPage() {
                       runAnalysis();
                     }
                   }}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all ${
                     isActive
-                      ? 'bg-primary text-primary-foreground'
-                      : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                      ? 'bg-gray-900 text-white shadow-sm'
+                      : 'text-gray-500 hover:text-gray-900 hover:bg-gray-100'
                   }`}
                 >
                   <Icon className="h-4 w-4" />
@@ -420,9 +422,9 @@ export default function ProjectPage() {
         <main className="p-8">
           {/* Message */}
           {message && (
-            <div className={`mb-6 p-4 rounded-lg border ${
+            <div className={`mb-6 p-4 rounded-xl border ${
               message.type === 'success'
-                ? 'bg-green-50 text-green-900 border-green-200'
+                ? 'bg-emerald-50 text-emerald-900 border-emerald-200'
                 : 'bg-red-50 text-red-900 border-red-200'
             }`}>
               {message.text}
@@ -436,14 +438,14 @@ export default function ProjectPage() {
                 <>
                   {/* Past session banner */}
                   {showPastSession && (
-                    <div className="flex items-center justify-between p-4 rounded-lg border bg-amber-50 border-amber-200">
+                    <div className="flex items-center justify-between p-4 rounded-xl border bg-amber-50 border-amber-200">
                       <div className="flex items-center gap-3 text-amber-900">
                         <Clock className="h-5 w-5" />
                         <span>
                           Viewing past session: <strong>{selectedSession.name || `Session ${selectedSession.id}`}</strong>
                         </span>
                       </div>
-                      <Button size="sm" variant="outline" onClick={handleReturnToLatest}>
+                      <Button size="sm" variant="outline" onClick={handleReturnToLatest} className="rounded-xl">
                         <ArrowLeft className="mr-2 h-4 w-4" />
                         Return to Latest
                       </Button>
@@ -452,82 +454,82 @@ export default function ProjectPage() {
 
                   {/* Stats Grid */}
                   <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-                    <Card className="p-5">
+                    <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
                       <div className="flex items-center gap-3">
-                        <div className="p-2.5 rounded-lg bg-blue-100">
+                        <div className="h-11 w-11 rounded-xl bg-blue-50 flex items-center justify-center">
                           <Search className="h-5 w-5 text-blue-600" />
                         </div>
                         <div>
-                          <div className="text-2xl font-bold">{keywords.length}</div>
-                          <p className="text-sm text-muted-foreground">Keywords</p>
+                          <div className="text-2xl font-bold text-gray-900">{keywords.length}</div>
+                          <p className="text-sm text-gray-500">Keywords</p>
                         </div>
                       </div>
-                    </Card>
-                    <Card className="p-5">
+                    </div>
+                    <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
                       <div className="flex items-center gap-3">
-                        <div className="p-2.5 rounded-lg bg-green-100">
-                          <Eye className="h-5 w-5 text-green-600" />
+                        <div className="h-11 w-11 rounded-xl bg-emerald-50 flex items-center justify-center">
+                          <Eye className="h-5 w-5 text-emerald-600" />
                         </div>
                         <div>
-                          <div className="text-2xl font-bold text-green-600">{aioCount}</div>
-                          <p className="text-sm text-muted-foreground">AI Overviews</p>
+                          <div className="text-2xl font-bold text-emerald-600">{aioCount}</div>
+                          <p className="text-sm text-gray-500">AI Overviews</p>
                         </div>
                       </div>
-                    </Card>
-                    <Card className="p-5">
+                    </div>
+                    <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
                       <div className="flex items-center gap-3">
-                        <div className="p-2.5 rounded-lg bg-purple-100">
+                        <div className="h-11 w-11 rounded-xl bg-purple-50 flex items-center justify-center">
                           <TrendingUp className="h-5 w-5 text-purple-600" />
                         </div>
                         <div>
                           <div className="text-2xl font-bold text-purple-600">
                             {keywords.length > 0 ? ((aioCount / keywords.length) * 100).toFixed(0) : 0}%
                           </div>
-                          <p className="text-sm text-muted-foreground">AIO Rate</p>
+                          <p className="text-sm text-gray-500">AIO Rate</p>
                         </div>
                       </div>
-                    </Card>
-                    <Card className="p-5">
+                    </div>
+                    <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
                       <div className="flex items-center gap-3">
-                        <div className="p-2.5 rounded-lg bg-amber-100">
+                        <div className="h-11 w-11 rounded-xl bg-amber-50 flex items-center justify-center">
                           <Globe className="h-5 w-5 text-amber-600" />
                         </div>
                         <div>
                           <div className="text-2xl font-bold text-amber-600">
                             {keywords.filter(k => k.brandRank !== null).length}
                           </div>
-                          <p className="text-sm text-muted-foreground">Brand Cited</p>
+                          <p className="text-sm text-gray-500">Brand Cited</p>
                         </div>
                       </div>
-                    </Card>
-                    <Card className="p-5">
+                    </div>
+                    <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
                       <div className="flex items-center gap-3">
-                        <div className="p-2.5 rounded-lg bg-gray-100">
+                        <div className="h-11 w-11 rounded-xl bg-gray-50 flex items-center justify-center">
                           <Layers className="h-5 w-5 text-gray-600" />
                         </div>
                         <div>
-                          <div className="text-2xl font-bold">{sessions.length}</div>
-                          <p className="text-sm text-muted-foreground">Sessions</p>
+                          <div className="text-2xl font-bold text-gray-900">{sessions.length}</div>
+                          <p className="text-sm text-gray-500">Sessions</p>
                         </div>
                       </div>
-                    </Card>
+                    </div>
                   </div>
 
                   {/* Session Selector Card */}
-                  <Card className="p-5">
+                  <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-6">
                         <div className="space-y-1">
                           <div className="flex items-center gap-3">
-                            <span className="text-sm text-muted-foreground">Current Session:</span>
+                            <span className="text-sm text-gray-500">Current Session:</span>
                             <Select
                               value={selectedSessionId?.toString()}
                               onValueChange={handleViewSession}
                             >
-                              <SelectTrigger className="w-[260px] h-9">
+                              <SelectTrigger className="w-[260px] h-9 rounded-xl border-gray-200">
                                 <SelectValue />
                               </SelectTrigger>
-                              <SelectContent>
+                              <SelectContent className="rounded-xl">
                                 {sessions.map((session, idx) => (
                                   <SelectItem key={session.id} value={session.id.toString()}>
                                     {session.name || `Session ${session.id}`} {idx === 0 ? '(Latest)' : ''}
@@ -536,12 +538,12 @@ export default function ProjectPage() {
                               </SelectContent>
                             </Select>
                             {!showPastSession && sessions[0]?.id === selectedSession.id && (
-                              <Badge variant="secondary" className="bg-green-100 text-green-700">
+                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700">
                                 Latest
-                              </Badge>
+                              </span>
                             )}
                           </div>
-                          <p className="text-sm text-muted-foreground">
+                          <p className="text-sm text-gray-500">
                             {new Date(selectedSession.created_at).toLocaleDateString('en-US', {
                               year: 'numeric',
                               month: 'long',
@@ -554,14 +556,14 @@ export default function ProjectPage() {
                       </div>
                       <div className="flex items-center gap-3">
                         {previousSession && !showPastSession && (
-                          <span className="text-sm text-muted-foreground">
+                          <span className="text-sm text-gray-500">
                             Comparing to: {previousSession.name || `Session ${previousSession.id}`}
                           </span>
                         )}
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="text-muted-foreground hover:text-destructive"
+                          className="text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-xl"
                           onClick={() => {
                             if (confirm('Delete this session? This cannot be undone.')) {
                               handleDeleteSession(selectedSession.id);
@@ -572,15 +574,17 @@ export default function ProjectPage() {
                         </Button>
                       </div>
                     </div>
-                  </Card>
+                  </div>
 
                   {/* Keywords Table */}
-                  <Card className="p-6">
+                  <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
                     {keywords.length === 0 ? (
-                      <div className="text-center py-16 text-muted-foreground">
-                        <Search className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                        <p className="text-lg font-medium">No keywords in this session</p>
-                        <p className="text-sm mt-1">Fetch new keywords or upload data to get started</p>
+                      <div className="text-center py-16">
+                        <div className="h-16 w-16 rounded-2xl bg-gray-50 flex items-center justify-center mx-auto mb-4">
+                          <Search className="w-8 h-8 text-gray-300" />
+                        </div>
+                        <p className="text-lg font-semibold text-gray-900 mb-1">No keywords in this session</p>
+                        <p className="text-sm text-gray-500">Fetch new keywords or upload data to get started</p>
                       </div>
                     ) : (
                       <KeywordsTable
@@ -597,28 +601,28 @@ export default function ProjectPage() {
                         }}
                       />
                     )}
-                  </Card>
+                  </div>
                 </>
               ) : sessions.length === 0 ? (
-                <Card className="p-16 text-center">
-                  <div className="w-20 h-20 mx-auto mb-6 bg-muted rounded-full flex items-center justify-center">
-                    <Search className="w-10 h-10 text-muted-foreground" />
+                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-16 text-center">
+                  <div className="w-20 h-20 mx-auto mb-6 bg-gray-50 rounded-2xl flex items-center justify-center">
+                    <Search className="w-10 h-10 text-gray-300" />
                   </div>
-                  <h3 className="text-xl font-semibold mb-2">No keywords yet</h3>
-                  <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+                  <h3 className="text-xl font-semibold text-gray-900 mb-2">No keywords yet</h3>
+                  <p className="text-gray-500 mb-6 max-w-md mx-auto">
                     Get started by fetching keywords from the DataForSEO API or uploading existing data
                   </p>
                   <div className="flex gap-4 justify-center">
-                    <Button onClick={() => setActiveView('fetch')} size="lg">
+                    <Button onClick={() => setActiveView('fetch')} size="lg" className="rounded-xl bg-gray-900 hover:bg-gray-800">
                       <Plus className="mr-2 h-5 w-5" />
                       Fetch Keywords
                     </Button>
-                    <Button variant="outline" onClick={() => setActiveView('upload')} size="lg">
+                    <Button variant="outline" onClick={() => setActiveView('upload')} size="lg" className="rounded-xl border-gray-200">
                       <Upload className="mr-2 h-5 w-5" />
                       Upload JSON
                     </Button>
                   </div>
-                </Card>
+                </div>
               ) : null}
             </div>
           )}
@@ -626,17 +630,17 @@ export default function ProjectPage() {
           {/* Fetch View */}
           {activeView === 'fetch' && (
             <div className="max-w-2xl mx-auto">
-              <Card>
-                <CardHeader className="pb-4">
-                  <CardTitle>Fetch New Keywords</CardTitle>
-                  <CardDescription>
+              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                <div className="px-8 py-6 border-b border-gray-100">
+                  <h2 className="text-lg font-semibold text-gray-900">Fetch New Keywords</h2>
+                  <p className="text-sm text-gray-500 mt-1">
                     Enter keywords to fetch AI Overview data from DataForSEO
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-6">
+                  </p>
+                </div>
+                <div className="p-8 space-y-6">
                   {/* Brand config reminder */}
                   {!brandDomain && (
-                    <div className="p-4 rounded-lg border bg-amber-50 border-amber-200">
+                    <div className="p-4 rounded-xl border bg-amber-50 border-amber-200">
                       <div className="flex items-start gap-3">
                         <AlertTriangle className="h-5 w-5 text-amber-600 mt-0.5" />
                         <div className="flex-1">
@@ -649,9 +653,9 @@ export default function ProjectPage() {
                               value={brandDomain}
                               onChange={(e) => setBrandDomain(e.target.value)}
                               placeholder="yourdomain.com"
-                              className="flex-1"
+                              className="flex-1 rounded-xl border-gray-200"
                             />
-                            <Button onClick={updateBrandInfo} variant="secondary">
+                            <Button onClick={updateBrandInfo} variant="secondary" className="rounded-xl">
                               Save
                             </Button>
                           </div>
@@ -661,50 +665,53 @@ export default function ProjectPage() {
                   )}
 
                   <div className="space-y-2">
-                    <label className="text-sm font-medium">Session Name (optional)</label>
+                    <label className="text-sm font-medium text-gray-700">Session Name (optional)</label>
                     <Input
                       value={sessionName}
                       onChange={(e) => setSessionName(e.target.value)}
                       placeholder="e.g., December 2024 Check"
+                      className="h-11 rounded-xl border-gray-200 focus:border-indigo-300 focus:ring-indigo-200"
                     />
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-sm font-medium">Keywords</label>
+                    <label className="text-sm font-medium text-gray-700">Keywords</label>
                     <Textarea
                       value={keywordsInput}
                       onChange={(e) => setKeywordsInput(e.target.value)}
                       placeholder="One keyword per line or comma-separated"
                       rows={10}
-                      className="font-mono text-sm"
+                      className="font-mono text-sm rounded-xl border-gray-200 focus:border-indigo-300 focus:ring-indigo-200"
                     />
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-xs text-gray-400">
                       {keywordsInput.split(/[\n,]/).filter(k => k.trim()).length} keywords entered
                     </p>
                   </div>
 
                   <div className="grid grid-cols-2 gap-6">
                     <div className="space-y-2">
-                      <label className="text-sm font-medium">Location Code</label>
+                      <label className="text-sm font-medium text-gray-700">Location Code</label>
                       <Input
                         value={locationCode}
                         onChange={(e) => setLocationCode(e.target.value)}
+                        className="h-11 rounded-xl border-gray-200 focus:border-indigo-300 focus:ring-indigo-200"
                       />
-                      <p className="text-xs text-muted-foreground">2704 = Vietnam, 2840 = USA</p>
+                      <p className="text-xs text-gray-400">2704 = Vietnam, 2840 = USA</p>
                     </div>
                     <div className="space-y-2">
-                      <label className="text-sm font-medium">Language Code</label>
+                      <label className="text-sm font-medium text-gray-700">Language Code</label>
                       <Input
                         value={languageCode}
                         onChange={(e) => setLanguageCode(e.target.value)}
+                        className="h-11 rounded-xl border-gray-200 focus:border-indigo-300 focus:ring-indigo-200"
                       />
-                      <p className="text-xs text-muted-foreground">vi = Vietnamese, en = English</p>
+                      <p className="text-xs text-gray-400">vi = Vietnamese, en = English</p>
                     </div>
                   </div>
 
-                  <Separator />
+                  <Separator className="bg-gray-100" />
 
-                  <Button onClick={handleFetch} disabled={fetching} className="w-full" size="lg">
+                  <Button onClick={handleFetch} disabled={fetching} className="w-full h-12 rounded-xl bg-gray-900 hover:bg-gray-800" size="lg">
                     {fetching ? (
                       <>
                         <Loader2 className="mr-2 h-5 w-5 animate-spin" />
@@ -717,34 +724,35 @@ export default function ProjectPage() {
                       </>
                     )}
                   </Button>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             </div>
           )}
 
           {/* Upload View */}
           {activeView === 'upload' && (
             <div className="max-w-2xl mx-auto">
-              <Card>
-                <CardHeader className="pb-4">
-                  <CardTitle>Upload JSON Data</CardTitle>
-                  <CardDescription>
+              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                <div className="px-8 py-6 border-b border-gray-100">
+                  <h2 className="text-lg font-semibold text-gray-900">Upload JSON Data</h2>
+                  <p className="text-sm text-gray-500 mt-1">
                     Upload a DataForSEO JSON file to import keyword data
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-6">
+                  </p>
+                </div>
+                <div className="p-8 space-y-6">
                   <div className="space-y-2">
-                    <label className="text-sm font-medium">Session Name (optional)</label>
+                    <label className="text-sm font-medium text-gray-700">Session Name (optional)</label>
                     <Input
                       value={sessionName}
                       onChange={(e) => setSessionName(e.target.value)}
                       placeholder="e.g., Imported Data - Dec 2024"
+                      className="h-11 rounded-xl border-gray-200 focus:border-indigo-300 focus:ring-indigo-200"
                     />
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-sm font-medium">JSON File</label>
-                    <div className="border-2 border-dashed rounded-xl p-12 text-center hover:border-primary/50 transition-colors cursor-pointer">
+                    <label className="text-sm font-medium text-gray-700">JSON File</label>
+                    <div className="border-2 border-dashed border-gray-200 rounded-2xl p-12 text-center hover:border-indigo-300 transition-colors cursor-pointer bg-gray-50/50">
                       <input
                         type="file"
                         accept=".json"
@@ -754,23 +762,25 @@ export default function ProjectPage() {
                         id="json-upload"
                       />
                       <label htmlFor="json-upload" className="cursor-pointer">
-                        <Upload className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+                        <div className="h-16 w-16 rounded-2xl bg-white border border-gray-200 flex items-center justify-center mx-auto mb-4">
+                          <Upload className="w-8 h-8 text-gray-400" />
+                        </div>
                         <p className="text-lg mb-1">
-                          <span className="text-primary font-medium">Click to upload</span>
-                          <span className="text-muted-foreground"> or drag and drop</span>
+                          <span className="text-indigo-600 font-medium">Click to upload</span>
+                          <span className="text-gray-500"> or drag and drop</span>
                         </p>
-                        <p className="text-sm text-muted-foreground">JSON files only</p>
+                        <p className="text-sm text-gray-400">JSON files only</p>
                       </label>
                     </div>
                     {uploading && (
-                      <div className="flex items-center justify-center gap-3 py-4 text-muted-foreground">
-                        <Loader2 className="h-5 w-5 animate-spin" />
+                      <div className="flex items-center justify-center gap-3 py-4 text-gray-500">
+                        <Loader2 className="h-5 w-5 animate-spin text-indigo-600" />
                         Uploading and processing...
                       </div>
                     )}
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             </div>
           )}
 
@@ -779,7 +789,7 @@ export default function ProjectPage() {
             <div className="space-y-6">
               {/* Brand config warning */}
               {(!brandName || !brandDomain) && (
-                <Card className="p-5 border-amber-200 bg-amber-50">
+                <div className="rounded-2xl p-5 border-amber-200 bg-amber-50 border">
                   <div className="flex items-start gap-4">
                     <AlertTriangle className="h-6 w-6 text-amber-600 mt-0.5" />
                     <div className="flex-1">
@@ -792,42 +802,42 @@ export default function ProjectPage() {
                           value={brandName}
                           onChange={(e) => setBrandName(e.target.value)}
                           placeholder="Brand Name"
-                          className="flex-1"
+                          className="flex-1 rounded-xl border-gray-200"
                         />
                         <Input
                           value={brandDomain}
                           onChange={(e) => setBrandDomain(e.target.value)}
                           placeholder="yourdomain.com"
-                          className="flex-1"
+                          className="flex-1 rounded-xl border-gray-200"
                         />
-                        <Button onClick={() => { updateBrandInfo(); runAnalysis(); }}>
+                        <Button onClick={() => { updateBrandInfo(); runAnalysis(); }} className="rounded-xl bg-gray-900 hover:bg-gray-800">
                           Save & Analyze
                         </Button>
                       </div>
                     </div>
                   </div>
-                </Card>
+                </div>
               )}
 
               {/* Loading state */}
               {analyzing && (
-                <Card className="p-16 text-center">
-                  <Loader2 className="w-10 h-10 animate-spin mx-auto mb-4 text-muted-foreground" />
-                  <p className="text-muted-foreground">Running competitor analysis...</p>
-                </Card>
+                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-16 text-center">
+                  <Loader2 className="w-10 h-10 animate-spin mx-auto mb-4 text-indigo-600" />
+                  <p className="text-gray-500">Running competitor analysis...</p>
+                </div>
               )}
 
               {/* Error state */}
               {analysisError && (
-                <Card className="p-5 border-destructive bg-destructive/10">
-                  <div className="flex items-center gap-3 text-destructive">
+                <div className="rounded-2xl p-5 border-red-200 bg-red-50 border">
+                  <div className="flex items-center gap-3 text-red-700">
                     <AlertTriangle className="h-6 w-6" />
                     <span className="flex-1">{analysisError}</span>
-                    <Button variant="outline" onClick={runAnalysis} size="sm">
+                    <Button variant="outline" onClick={runAnalysis} size="sm" className="rounded-xl">
                       Try again
                     </Button>
                   </div>
-                </Card>
+                </div>
               )}
 
               {/* Analysis results */}
@@ -836,20 +846,20 @@ export default function ProjectPage() {
                   {/* Header */}
                   <div className="flex items-center justify-between">
                     <div>
-                      <h2 className="text-xl font-semibold">Competitor Analysis</h2>
+                      <h2 className="text-xl font-semibold text-gray-900">Competitor Analysis</h2>
                       {selectedSession && (
-                        <p className="text-sm text-muted-foreground mt-0.5">
+                        <p className="text-sm text-gray-500 mt-0.5">
                           Analyzing: {selectedSession.name || `Session ${selectedSession.id}`}
                           {showPastSession && <span className="text-amber-600 ml-2">(Past session)</span>}
                         </p>
                       )}
                     </div>
                     <div className="flex items-center gap-3">
-                      <Button variant="outline" size="sm" onClick={runAnalysis}>
+                      <Button variant="outline" size="sm" onClick={runAnalysis} className="rounded-xl border-gray-200">
                         <RefreshCw className="mr-2 h-4 w-4" />
                         Refresh
                       </Button>
-                      <Button size="sm" onClick={() => exportCSV('competitors')}>
+                      <Button size="sm" onClick={() => exportCSV('competitors')} className="rounded-xl bg-gray-900 hover:bg-gray-800">
                         <Download className="mr-2 h-4 w-4" />
                         Export CSV
                       </Button>
@@ -871,21 +881,21 @@ export default function ProjectPage() {
 
                   {/* Brand Performance */}
                   {brandName && (
-                    <Card className="overflow-hidden border-amber-200">
-                      <div className="bg-gradient-to-r from-amber-500 to-orange-500 px-6 py-4">
+                    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                      <div className="bg-gradient-to-r from-indigo-500 to-purple-600 px-6 py-4">
                         <h3 className="text-lg font-semibold text-white">Your Brand: {brandName}</h3>
                       </div>
-                      <div className="p-6 bg-gradient-to-b from-amber-50/50 to-white">
+                      <div className="p-6 bg-gradient-to-b from-indigo-50/30 to-white">
                         {(() => {
                           const brandData = analysis.competitors.find(c => c.isUserBrand);
                           const brandRank = analysis.competitors.findIndex(c => c.isUserBrand) + 1;
                           if (!brandData) {
                             return (
                               <div className="text-center py-4">
-                                <p className="text-muted-foreground">
+                                <p className="text-gray-500">
                                   Your brand was not found in AI Overview citations.
                                 </p>
-                                <p className="text-sm text-muted-foreground mt-1">
+                                <p className="text-sm text-gray-400 mt-1">
                                   Try checking your brand domain configuration.
                                 </p>
                               </div>
@@ -893,61 +903,61 @@ export default function ProjectPage() {
                           }
                           return (
                             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                              <div className="text-center p-4 rounded-xl bg-white shadow-sm border">
-                                <div className="text-4xl font-bold text-amber-600">#{brandRank}</div>
-                                <div className="text-sm text-muted-foreground mt-1">Overall Rank</div>
-                                <div className="text-xs text-muted-foreground">of {analysis.competitors.length} sources</div>
+                              <div className="text-center p-4 rounded-xl bg-white shadow-sm border border-gray-100">
+                                <div className="text-4xl font-bold text-indigo-600">#{brandRank}</div>
+                                <div className="text-sm text-gray-500 mt-1">Overall Rank</div>
+                                <div className="text-xs text-gray-400">of {analysis.competitors.length} sources</div>
                               </div>
-                              <div className="text-center p-4 rounded-xl bg-white shadow-sm border">
+                              <div className="text-center p-4 rounded-xl bg-white shadow-sm border border-gray-100">
                                 <div className="text-4xl font-bold text-blue-600">{brandData.citedCount}</div>
-                                <div className="text-sm text-muted-foreground mt-1">Citations</div>
-                                <div className="text-xs text-muted-foreground">times cited as source</div>
+                                <div className="text-sm text-gray-500 mt-1">Citations</div>
+                                <div className="text-xs text-gray-400">times cited as source</div>
                               </div>
-                              <div className="text-center p-4 rounded-xl bg-white shadow-sm border">
+                              <div className="text-center p-4 rounded-xl bg-white shadow-sm border border-gray-100">
                                 <div className="text-4xl font-bold text-purple-600">
                                   {brandData.averageRank > 0 ? brandData.averageRank.toFixed(1) : '-'}
                                 </div>
-                                <div className="text-sm text-muted-foreground mt-1">Avg Position</div>
-                                <div className="text-xs text-muted-foreground">in citation list</div>
+                                <div className="text-sm text-gray-500 mt-1">Avg Position</div>
+                                <div className="text-xs text-gray-400">in citation list</div>
                               </div>
-                              <div className="text-center p-4 rounded-xl bg-white shadow-sm border">
-                                <div className="text-4xl font-bold text-green-600">
+                              <div className="text-center p-4 rounded-xl bg-white shadow-sm border border-gray-100">
+                                <div className="text-4xl font-bold text-emerald-600">
                                   {(brandData.promptCitedRate * 100).toFixed(1)}%
                                 </div>
-                                <div className="text-sm text-muted-foreground mt-1">Citation Rate</div>
-                                <div className="text-xs text-muted-foreground">of AI Overviews</div>
+                                <div className="text-sm text-gray-500 mt-1">Citation Rate</div>
+                                <div className="text-xs text-gray-400">of AI Overviews</div>
                               </div>
                             </div>
                           );
                         })()}
                       </div>
-                    </Card>
+                    </div>
                   )}
 
                   {/* Competitor Table */}
-                  <Card className="p-6">
-                    <h3 className="text-lg font-semibold mb-5">All Competitors</h3>
+                  <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-5">All Competitors</h3>
                     <CompetitorTable
                       competitors={analysis.competitors}
                       brandName={brandName}
                     />
-                  </Card>
+                  </div>
                 </>
               )}
 
               {/* Empty state */}
               {!analysis && !analyzing && !analysisError && brandName && brandDomain && (
-                <Card className="p-16 text-center">
-                  <div className="w-20 h-20 mx-auto mb-6 bg-muted rounded-full flex items-center justify-center">
-                    <BarChart3 className="w-10 h-10 text-muted-foreground" />
+                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-16 text-center">
+                  <div className="w-20 h-20 mx-auto mb-6 bg-gray-50 rounded-2xl flex items-center justify-center">
+                    <BarChart3 className="w-10 h-10 text-gray-300" />
                   </div>
-                  <h3 className="text-xl font-semibold mb-2">Ready to analyze</h3>
-                  <p className="text-muted-foreground mb-6">Click the button below to run competitor analysis</p>
-                  <Button onClick={runAnalysis} size="lg">
+                  <h3 className="text-xl font-semibold text-gray-900 mb-2">Ready to analyze</h3>
+                  <p className="text-gray-500 mb-6">Click the button below to run competitor analysis</p>
+                  <Button onClick={runAnalysis} size="lg" className="rounded-xl bg-gray-900 hover:bg-gray-800">
                     <BarChart3 className="mr-2 h-5 w-5" />
                     Run Analysis
                   </Button>
-                </Card>
+                </div>
               )}
             </div>
           )}
@@ -955,46 +965,48 @@ export default function ProjectPage() {
           {/* Settings View */}
           {activeView === 'settings' && (
             <div className="max-w-2xl mx-auto">
-              <Card>
-                <CardHeader className="pb-4">
-                  <CardTitle>Project Settings</CardTitle>
-                  <CardDescription>
+              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                <div className="px-8 py-6 border-b border-gray-100">
+                  <h2 className="text-lg font-semibold text-gray-900">Project Settings</h2>
+                  <p className="text-sm text-gray-500 mt-1">
                     Configure your brand information for tracking citations
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-6">
+                  </p>
+                </div>
+                <div className="p-8 space-y-6">
                   <div className="space-y-2">
-                    <label className="text-sm font-medium">Brand Name</label>
+                    <label className="text-sm font-medium text-gray-700">Brand Name</label>
                     <Input
                       value={brandName}
                       onChange={(e) => setBrandName(e.target.value)}
                       placeholder="Your Brand Name"
+                      className="h-11 rounded-xl border-gray-200 focus:border-indigo-300 focus:ring-indigo-200"
                     />
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-xs text-gray-400">
                       Used to detect brand mentions in AI Overview content
                     </p>
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-sm font-medium">Brand Domain</label>
+                    <label className="text-sm font-medium text-gray-700">Brand Domain</label>
                     <Input
                       value={brandDomain}
                       onChange={(e) => setBrandDomain(e.target.value)}
                       placeholder="yourdomain.com"
+                      className="h-11 rounded-xl border-gray-200 focus:border-indigo-300 focus:ring-indigo-200"
                     />
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-xs text-gray-400">
                       Used to identify your brand in citation sources
                     </p>
                   </div>
 
-                  <Separator />
+                  <Separator className="bg-gray-100" />
 
-                  <Button onClick={updateBrandInfo} size="lg">
+                  <Button onClick={updateBrandInfo} size="lg" className="rounded-xl bg-gray-900 hover:bg-gray-800">
                     <Settings className="mr-2 h-5 w-5" />
                     Save Settings
                   </Button>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             </div>
           )}
         </main>

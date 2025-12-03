@@ -4,10 +4,8 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Project } from '@/lib/types';
 import { Sidebar } from '@/components/Sidebar';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { FolderOpen, Calendar, Globe, Trash2, ArrowRight, Loader2, BarChart3 } from 'lucide-react';
+import { FolderOpen, Calendar, Globe, Trash2, ArrowRight, Loader2, Sparkles, TrendingUp } from 'lucide-react';
 
 export default function Home() {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -49,148 +47,150 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-gray-50/30">
       <Sidebar />
 
       {/* Main Content */}
       <main className="pl-64">
-        <div className="p-8 max-w-6xl">
+        <div className="p-8 max-w-6xl mx-auto">
           {/* Page Header */}
-          <div className="mb-8">
-            <h1 className="text-2xl font-semibold tracking-tight">Welcome back</h1>
-            <p className="text-muted-foreground mt-1">
-              Select a project to view your AI Overview analysis
+          <div className="mb-10">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 text-white">
+                <Sparkles className="h-5 w-5" />
+              </div>
+              <h1 className="text-2xl font-bold text-gray-900">Welcome back</h1>
+            </div>
+            <p className="text-gray-500 ml-13">
+              Track and analyze Google AI Overview citations for your brand
             </p>
           </div>
 
           {/* Stats Overview */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-            <Card>
-              <CardContent className="pt-6">
-                <div className="flex items-center gap-4">
-                  <div className="p-2.5 rounded-lg bg-blue-100">
-                    <FolderOpen className="h-5 w-5 text-blue-600" />
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">Total Projects</p>
-                    <p className="text-2xl font-bold">{projects.length}</p>
-                  </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-10">
+            <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Total Projects</p>
+                  <p className="text-3xl font-bold text-gray-900 mt-1">{projects.length}</p>
                 </div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="pt-6">
-                <div className="flex items-center gap-4">
-                  <div className="p-2.5 rounded-lg bg-green-100">
-                    <BarChart3 className="h-5 w-5 text-green-600" />
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">With Brand Config</p>
-                    <p className="text-2xl font-bold">
-                      {projects.filter(p => p.brand_domain).length}
-                    </p>
-                  </div>
+                <div className="h-12 w-12 rounded-xl bg-indigo-50 flex items-center justify-center">
+                  <FolderOpen className="h-6 w-6 text-indigo-600" />
                 </div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="pt-6">
-                <div className="flex items-center gap-4">
-                  <div className="p-2.5 rounded-lg bg-purple-100">
-                    <Calendar className="h-5 w-5 text-purple-600" />
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">Recent Activity</p>
-                    <p className="text-2xl font-bold">
-                      {projects.length > 0 ? 'Active' : 'None'}
-                    </p>
-                  </div>
+              </div>
+            </div>
+            <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Brand Tracking</p>
+                  <p className="text-3xl font-bold text-gray-900 mt-1">
+                    {projects.filter(p => p.brand_domain).length}
+                  </p>
                 </div>
-              </CardContent>
-            </Card>
+                <div className="h-12 w-12 rounded-xl bg-emerald-50 flex items-center justify-center">
+                  <TrendingUp className="h-6 w-6 text-emerald-600" />
+                </div>
+              </div>
+            </div>
+            <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Recent Activity</p>
+                  <p className="text-3xl font-bold text-gray-900 mt-1">
+                    {projects.length > 0 ? 'Active' : '—'}
+                  </p>
+                </div>
+                <div className="h-12 w-12 rounded-xl bg-purple-50 flex items-center justify-center">
+                  <Calendar className="h-6 w-6 text-purple-600" />
+                </div>
+              </div>
+            </div>
           </div>
 
-          {/* Projects Grid */}
-          <div className="space-y-4">
-            <h2 className="text-lg font-semibold">Your Projects</h2>
+          {/* Projects Section */}
+          <div>
+            <div className="flex items-center justify-between mb-5">
+              <h2 className="text-lg font-semibold text-gray-900">Your Projects</h2>
+              <span className="text-sm text-gray-400">{projects.length} total</span>
+            </div>
 
             {loading ? (
-              <div className="flex items-center justify-center py-16">
-                <div className="text-center space-y-3">
-                  <Loader2 className="w-8 h-8 animate-spin mx-auto text-muted-foreground" />
-                  <p className="text-sm text-muted-foreground">Loading projects...</p>
+              <div className="flex items-center justify-center py-20">
+                <div className="text-center">
+                  <Loader2 className="w-8 h-8 animate-spin mx-auto text-indigo-600" />
+                  <p className="text-sm text-gray-500 mt-3">Loading your projects...</p>
                 </div>
               </div>
             ) : projects.length === 0 ? (
-              <Card>
-                <CardContent className="flex flex-col items-center justify-center py-16">
-                  <div className="p-4 rounded-full bg-muted mb-4">
-                    <FolderOpen className="w-8 h-8 text-muted-foreground" />
+              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm">
+                <div className="flex flex-col items-center justify-center py-16 px-4">
+                  <div className="h-16 w-16 rounded-2xl bg-gray-50 flex items-center justify-center mb-4">
+                    <FolderOpen className="w-8 h-8 text-gray-300" />
                   </div>
-                  <h3 className="text-lg font-medium mb-1">No projects yet</h3>
-                  <p className="text-muted-foreground text-sm mb-4 text-center max-w-sm">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-1">No projects yet</h3>
+                  <p className="text-gray-500 text-sm mb-6 text-center max-w-sm">
                     Create your first project to start analyzing Google AI Overviews and track your brand citations.
                   </p>
-                  <p className="text-sm text-muted-foreground">
-                    Click the <span className="font-medium">+</span> button in the sidebar to get started
+                  <p className="text-sm text-gray-400">
+                    Click the <span className="inline-flex items-center justify-center w-5 h-5 bg-gray-100 rounded text-gray-600 font-medium text-xs mx-1">+</span> button in the sidebar to get started
                   </p>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             ) : (
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {projects.map((project) => (
+                {projects.map((project, index) => (
                   <Link
                     key={project.id}
                     href={`/project/${project.id}`}
-                    className="group block"
+                    className="group block animate-fade-in-up"
+                    style={{ animationDelay: `${index * 50}ms` }}
                   >
-                    <Card className="h-full transition-all hover:shadow-md hover:border-primary/20">
-                      <CardHeader className="pb-3">
-                        <div className="flex items-start justify-between">
+                    <div className="h-full bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden transition-all duration-200 hover:shadow-lg hover:border-gray-200 hover:-translate-y-0.5">
+                      <div className="p-5">
+                        <div className="flex items-start justify-between mb-4">
                           <div className="flex items-center gap-3">
-                            <div className="p-2 rounded-lg bg-primary/10 text-primary">
-                              <FolderOpen className="h-4 w-4" />
+                            <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-gray-100 to-gray-50 flex items-center justify-center text-sm font-bold text-gray-600 group-hover:from-indigo-100 group-hover:to-indigo-50 group-hover:text-indigo-600 transition-colors">
+                              {project.name.charAt(0).toUpperCase()}
                             </div>
-                            <CardTitle className="text-base font-medium group-hover:text-primary transition-colors">
-                              {project.name}
-                            </CardTitle>
+                            <div>
+                              <h3 className="font-semibold text-gray-900 group-hover:text-indigo-600 transition-colors">
+                                {project.name}
+                              </h3>
+                              {project.brand_domain ? (
+                                <div className="flex items-center gap-1.5 mt-0.5">
+                                  <Globe className="h-3 w-3 text-gray-400" />
+                                  <span className="text-xs text-gray-500">{project.brand_domain}</span>
+                                </div>
+                              ) : (
+                                <span className="text-xs text-amber-600">No brand configured</span>
+                              )}
+                            </div>
                           </div>
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-destructive"
+                            className="h-8 w-8 rounded-lg opacity-0 group-hover:opacity-100 transition-all text-gray-400 hover:text-red-600 hover:bg-red-50"
                             onClick={(e) => deleteProject(project.id, e)}
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>
                         </div>
-                      </CardHeader>
-                      <CardContent className="pt-0">
-                        <div className="space-y-3">
-                          {project.brand_domain ? (
-                            <div className="flex items-center gap-2">
-                              <Globe className="h-3.5 w-3.5 text-muted-foreground" />
-                              <span className="text-sm text-muted-foreground">{project.brand_domain}</span>
-                            </div>
-                          ) : (
-                            <Badge variant="outline" className="text-xs font-normal text-amber-600 border-amber-200 bg-amber-50">
-                              No brand configured
-                            </Badge>
-                          )}
-                          <div className="flex items-center justify-between pt-2 border-t">
-                            <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                              <Calendar className="h-3.5 w-3.5" />
-                              {new Date(project.created_at).toLocaleDateString('en-US', {
-                                month: 'short',
-                                day: 'numeric',
-                                year: 'numeric'
-                              })}
-                            </div>
-                            <ArrowRight className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                        <div className="flex items-center justify-between pt-4 border-t border-gray-50">
+                          <div className="flex items-center gap-1.5 text-xs text-gray-400">
+                            <Calendar className="h-3.5 w-3.5" />
+                            {new Date(project.created_at).toLocaleDateString('en-US', {
+                              month: 'short',
+                              day: 'numeric',
+                              year: 'numeric'
+                            })}
+                          </div>
+                          <div className="flex items-center gap-1 text-xs font-medium text-gray-400 group-hover:text-indigo-600 transition-colors">
+                            <span>Open</span>
+                            <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
                           </div>
                         </div>
-                      </CardContent>
-                    </Card>
+                      </div>
+                    </div>
                   </Link>
                 ))}
               </div>
