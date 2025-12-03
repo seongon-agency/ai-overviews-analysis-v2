@@ -158,22 +158,22 @@ export function AIOContent({
     );
 
     return (
-      <div key={key} className="overflow-x-auto my-3">
-        <table className="min-w-full border-collapse border border-gray-300 text-sm">
+      <div key={key} className="overflow-x-auto my-3 rounded-lg border border-gray-200 shadow-sm">
+        <table className="w-full border-collapse text-sm">
           <thead className="bg-gray-50">
             <tr>
               {headerCells.map((cell, i) => (
-                <th key={i} className="border border-gray-300 px-3 py-2 text-left font-medium">
+                <th key={i} className="border-b border-gray-200 px-3 py-2 text-left font-semibold text-gray-700 whitespace-nowrap">
                   {renderInlineFormatting(cell, `${key}-th-${i}`)}
                 </th>
               ))}
             </tr>
           </thead>
-          <tbody>
+          <tbody className="divide-y divide-gray-100">
             {bodyRows.map((row, rowIdx) => (
-              <tr key={rowIdx} className={rowIdx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+              <tr key={rowIdx} className="hover:bg-gray-50/50">
                 {row.map((cell, cellIdx) => (
-                  <td key={cellIdx} className="border border-gray-300 px-3 py-2">
+                  <td key={cellIdx} className="px-3 py-2 text-gray-600">
                     {renderInlineFormatting(cell, `${key}-td-${rowIdx}-${cellIdx}`)}
                   </td>
                 ))}
