@@ -2,11 +2,18 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { Project } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import {
   LayoutDashboard,
   FolderOpen,
@@ -14,8 +21,11 @@ import {
   Search,
   ChevronRight,
   Loader2,
-  X
+  X,
+  LogOut,
+  User
 } from 'lucide-react';
+import { useSession, signOut } from '@/lib/auth-client';
 
 interface SidebarProps {
   currentProjectId?: number;
@@ -23,6 +33,8 @@ interface SidebarProps {
 
 export function Sidebar({ currentProjectId }: SidebarProps) {
   const pathname = usePathname();
+  const router = useRouter();
+  const { data: session } = useSession();
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -31,7 +43,29 @@ export function Sidebar({ currentProjectId }: SidebarProps) {
 
   useEffect(() => {
     fetchProjects();
+    // Check for orphaned projects and migrate them
+    migrateOrphanedProjects();
   }, []);
+
+  const migrateOrphanedProjects = async () => {
+    try {
+      const response = await fetch('/api/migrate');
+      const data = await response.json();
+      if (data.success && data.data.orphanedCount > 0) {
+        // There are orphaned projects, migrate them
+        await fetch('/api/migrate', { method: 'POST' });
+        fetchProjects(); // Refresh projects list
+      }
+    } catch (error) {
+      console.error('Error checking for orphaned projects:', error);
+    }
+  };
+
+  const handleSignOut = async () => {
+    await signOut();
+    router.push('/login');
+    router.refresh();
+  };
 
   const fetchProjects = async () => {
     try {
@@ -165,6 +199,39 @@ export function Sidebar({ currentProjectId }: SidebarProps) {
             </div>
           </nav>
 
+          {/* User Section */}
+          {session?.user && (
+            <div className="border-t p-4">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="w-full justify-start gap-3 px-3">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground text-sm font-medium">
+                      {session.user.name?.[0]?.toUpperCase() || session.user.email?.[0]?.toUpperCase() || 'U'}
+                    </div>
+                    <div className="flex-1 text-left">
+                      <p className="text-sm font-medium truncate">
+                        {session.user.name || 'User'}
+                      </p>
+                      <p className="text-xs text-muted-foreground truncate">
+                        {session.user.email}
+                      </p>
+                    </div>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" className="w-56">
+                  <DropdownMenuItem disabled>
+                    <User className="mr-2 h-4 w-4" />
+                    <span>{session.user.email}</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleSignOut}>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Sign out</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          )}
         </div>
       </aside>
 
