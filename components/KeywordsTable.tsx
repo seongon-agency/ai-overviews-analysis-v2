@@ -7,18 +7,9 @@ import { RankSparkline } from './RankSparkline';
 
 // shadcn/ui components
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
 
 // Icons
-import { ArrowUp, ArrowDown, ArrowUpDown } from 'lucide-react';
+import { ArrowUp, ArrowDown, ArrowUpDown, Search, Eye, TrendingUp, Sparkles } from 'lucide-react';
 
 interface KeywordsTableProps {
   keywords: KeywordRecord[];
@@ -107,11 +98,11 @@ export function KeywordsTable({
 
   const SortIcon = ({ field }: { field: SortField }) => {
     if (sortField !== field) {
-      return <ArrowUpDown className="h-3 w-3 ml-1 text-muted-foreground/50" />;
+      return <ArrowUpDown className="h-3 w-3 ml-1 text-gray-300" />;
     }
     return sortDirection === 'asc'
-      ? <ArrowUp className="h-3 w-3 ml-1" />
-      : <ArrowDown className="h-3 w-3 ml-1" />;
+      ? <ArrowUp className="h-3 w-3 ml-1 text-indigo-600" />
+      : <ArrowDown className="h-3 w-3 ml-1 text-indigo-600" />;
   };
 
   // Helper to render change indicator
@@ -121,35 +112,35 @@ export function KeywordsTable({
     switch (kw.changeType) {
       case 'rank_improved':
         return (
-          <Badge variant="secondary" className="bg-green-100 text-green-700 gap-1">
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700">
             <ArrowUp className="h-3 w-3" />
             {kw.previousBrandRank && kw.brandRank && `+${kw.previousBrandRank - kw.brandRank}`}
-          </Badge>
+          </span>
         );
       case 'rank_declined':
         return (
-          <Badge variant="secondary" className="bg-red-100 text-red-700 gap-1">
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-700">
             <ArrowDown className="h-3 w-3" />
             {kw.previousBrandRank && kw.brandRank && `-${kw.brandRank - kw.previousBrandRank}`}
-          </Badge>
+          </span>
         );
       case 'aio_gained':
         return (
-          <Badge variant="secondary" className="bg-blue-100 text-blue-700">
+          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-700">
             +AIO
-          </Badge>
+          </span>
         );
       case 'aio_lost':
         return (
-          <Badge variant="secondary" className="bg-orange-100 text-orange-700">
+          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-700">
             -AIO
-          </Badge>
+          </span>
         );
       case 'new':
         return (
-          <Badge variant="secondary" className="bg-purple-100 text-purple-700">
+          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-700">
             NEW
-          </Badge>
+          </span>
         );
       default:
         return null;
@@ -159,38 +150,52 @@ export function KeywordsTable({
   return (
     <div className="w-full space-y-4">
       {/* Filters */}
-      <div className="flex flex-wrap gap-4 items-center">
-        <p className="text-sm text-muted-foreground">
-          Showing {processedKeywords.length} of {keywords.length} keywords
+      <div className="flex flex-wrap gap-4 items-center justify-between">
+        <p className="text-sm text-gray-500">
+          Showing <span className="font-medium text-gray-900">{processedKeywords.length}</span> of <span className="font-medium text-gray-900">{keywords.length}</span> keywords
         </p>
         <div className="flex flex-wrap gap-2">
           <Button
             variant={filterAIO === true ? "default" : "outline"}
             size="sm"
             onClick={() => setFilterAIO(filterAIO === true ? null : true)}
-            className="h-7 text-xs"
+            className={`h-8 text-xs rounded-xl ${
+              filterAIO === true
+                ? 'bg-emerald-600 hover:bg-emerald-700'
+                : 'border-gray-200 hover:bg-gray-50'
+            }`}
           >
+            <Eye className="h-3 w-3 mr-1.5" />
             Has AI Overview
           </Button>
           <Button
             variant={filterAIO === false ? "default" : "outline"}
             size="sm"
             onClick={() => setFilterAIO(filterAIO === false ? null : false)}
-            className="h-7 text-xs"
+            className={`h-8 text-xs rounded-xl ${
+              filterAIO === false
+                ? 'bg-gray-600 hover:bg-gray-700'
+                : 'border-gray-200 hover:bg-gray-50'
+            }`}
           >
             No AI Overview
           </Button>
           {/* Change filters */}
           {showChanges && hasAnyChanges && (
             <>
-              <span className="text-muted-foreground/30">|</span>
+              <span className="text-gray-200">|</span>
               {changeCounts.rank_improved > 0 && (
                 <Button
                   variant={filterChange === 'rank_improved' ? "default" : "outline"}
                   size="sm"
                   onClick={() => setFilterChange(filterChange === 'rank_improved' ? null : 'rank_improved')}
-                  className="h-7 text-xs"
+                  className={`h-8 text-xs rounded-xl ${
+                    filterChange === 'rank_improved'
+                      ? 'bg-emerald-600 hover:bg-emerald-700'
+                      : 'border-gray-200 hover:bg-gray-50'
+                  }`}
                 >
+                  <TrendingUp className="h-3 w-3 mr-1.5" />
                   Improved ({changeCounts.rank_improved})
                 </Button>
               )}
@@ -199,7 +204,11 @@ export function KeywordsTable({
                   variant={filterChange === 'rank_declined' ? "default" : "outline"}
                   size="sm"
                   onClick={() => setFilterChange(filterChange === 'rank_declined' ? null : 'rank_declined')}
-                  className="h-7 text-xs"
+                  className={`h-8 text-xs rounded-xl ${
+                    filterChange === 'rank_declined'
+                      ? 'bg-red-600 hover:bg-red-700'
+                      : 'border-gray-200 hover:bg-gray-50'
+                  }`}
                 >
                   Declined ({changeCounts.rank_declined})
                 </Button>
@@ -209,7 +218,11 @@ export function KeywordsTable({
                   variant={filterChange === 'aio_gained' ? "default" : "outline"}
                   size="sm"
                   onClick={() => setFilterChange(filterChange === 'aio_gained' ? null : 'aio_gained')}
-                  className="h-7 text-xs"
+                  className={`h-8 text-xs rounded-xl ${
+                    filterChange === 'aio_gained'
+                      ? 'bg-blue-600 hover:bg-blue-700'
+                      : 'border-gray-200 hover:bg-gray-50'
+                  }`}
                 >
                   +AIO ({changeCounts.aio_gained})
                 </Button>
@@ -219,7 +232,11 @@ export function KeywordsTable({
                   variant={filterChange === 'aio_lost' ? "default" : "outline"}
                   size="sm"
                   onClick={() => setFilterChange(filterChange === 'aio_lost' ? null : 'aio_lost')}
-                  className="h-7 text-xs"
+                  className={`h-8 text-xs rounded-xl ${
+                    filterChange === 'aio_lost'
+                      ? 'bg-orange-600 hover:bg-orange-700'
+                      : 'border-gray-200 hover:bg-gray-50'
+                  }`}
                 >
                   -AIO ({changeCounts.aio_lost})
                 </Button>
@@ -231,129 +248,139 @@ export function KeywordsTable({
 
       {/* Previous session info banner */}
       {showChanges && previousSessionName && hasAnyChanges && (
-        <div className="px-3 py-2 bg-purple-50 border border-purple-100 rounded-lg text-sm text-purple-700">
-          Comparing to: <span className="font-medium">{previousSessionName}</span>
+        <div className="px-4 py-3 bg-indigo-50 border border-indigo-100 rounded-xl text-sm text-indigo-700 flex items-center gap-2">
+          <Sparkles className="h-4 w-4" />
+          Comparing to: <span className="font-semibold">{previousSessionName}</span>
         </div>
       )}
 
       {/* Table */}
-      <div className="rounded-lg border overflow-hidden">
-        <Table>
-          <TableHeader>
-            <TableRow className="hover:bg-transparent">
-              <TableHead
-                className="cursor-pointer hover:bg-muted/50 transition-colors"
+      <div className="rounded-xl border border-gray-200 overflow-hidden">
+        <table className="w-full">
+          <thead>
+            <tr className="bg-gray-50/80">
+              <th
+                className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
                 onClick={() => handleSort('keyword')}
               >
                 <div className="flex items-center">
                   Keyword <SortIcon field="keyword" />
                 </div>
-              </TableHead>
+              </th>
               {rankHistory && (
-                <TableHead className="w-20 text-center">Trend</TableHead>
+                <th className="w-20 px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  Trend
+                </th>
               )}
               {showChanges && (
-                <TableHead
-                  className="w-24 text-center cursor-pointer hover:bg-muted/50 transition-colors"
+                <th
+                  className="w-24 px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
                   onClick={() => handleSort('change')}
                 >
                   <div className="flex items-center justify-center">
                     Change <SortIcon field="change" />
                   </div>
-                </TableHead>
+                </th>
               )}
-              <TableHead className="w-20 text-center">AIO</TableHead>
-              <TableHead
-                className="w-24 text-center cursor-pointer hover:bg-muted/50 transition-colors"
+              <th className="w-20 px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                AIO
+              </th>
+              <th
+                className="w-24 px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
                 onClick={() => handleSort('referenceCount')}
               >
                 <div className="flex items-center justify-center">
                   Citations <SortIcon field="referenceCount" />
                 </div>
-              </TableHead>
-              <TableHead
-                className="w-28 text-center cursor-pointer hover:bg-muted/50 transition-colors"
+              </th>
+              <th
+                className="w-28 px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
                 onClick={() => handleSort('brandRank')}
               >
                 <div className="flex items-center justify-center">
                   Brand Cited <SortIcon field="brandRank" />
                 </div>
-              </TableHead>
-              <TableHead className="w-24 text-center">Mentioned</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
+              </th>
+              <th className="w-24 px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                Mentioned
+              </th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-100">
             {processedKeywords.map((kw) => (
-              <TableRow
+              <tr
                 key={kw.id}
-                className={`cursor-pointer transition-colors ${
+                className={`cursor-pointer transition-all duration-150 ${
                   kw.changeType === 'rank_improved' || kw.changeType === 'aio_gained'
-                    ? 'bg-green-50/50 hover:bg-green-100/50'
+                    ? 'bg-emerald-50/50 hover:bg-emerald-100/50'
                     : kw.changeType === 'rank_declined' || kw.changeType === 'aio_lost'
                     ? 'bg-red-50/50 hover:bg-red-100/50'
-                    : 'hover:bg-muted/50'
+                    : 'hover:bg-gray-50'
                 }`}
                 onClick={() => setSelectedKeyword(kw)}
               >
-                <TableCell>
-                  <span className="font-medium hover:text-primary transition-colors">
+                <td className="px-4 py-3">
+                  <span className="font-medium text-gray-900 hover:text-indigo-600 transition-colors">
                     {kw.keyword}
                   </span>
-                </TableCell>
+                </td>
                 {rankHistory && (
-                  <TableCell className="text-center">
+                  <td className="px-4 py-3 text-center">
                     {rankHistory.get(kw.keyword) && rankHistory.get(kw.keyword)!.length >= 2 ? (
                       <RankSparkline data={rankHistory.get(kw.keyword)!} />
                     ) : (
-                      <span className="text-muted-foreground/50">-</span>
+                      <span className="text-gray-300">-</span>
                     )}
-                  </TableCell>
+                  </td>
                 )}
                 {showChanges && (
-                  <TableCell className="text-center">
-                    {renderChangeIndicator(kw) || <span className="text-muted-foreground/50">-</span>}
-                  </TableCell>
+                  <td className="px-4 py-3 text-center">
+                    {renderChangeIndicator(kw) || <span className="text-gray-300">-</span>}
+                  </td>
                 )}
-                <TableCell className="text-center">
+                <td className="px-4 py-3 text-center">
                   {kw.hasAIOverview ? (
-                    <Badge variant="secondary" className="bg-green-100 text-green-700">
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700">
                       Yes
-                    </Badge>
+                    </span>
                   ) : (
-                    <span className="text-muted-foreground/50">-</span>
+                    <span className="text-gray-300">-</span>
                   )}
-                </TableCell>
-                <TableCell className="text-center text-muted-foreground">
-                  {kw.referenceCount || '-'}
-                </TableCell>
-                <TableCell className="text-center">
+                </td>
+                <td className="px-4 py-3 text-center text-gray-500">
+                  {kw.referenceCount || <span className="text-gray-300">-</span>}
+                </td>
+                <td className="px-4 py-3 text-center">
                   {kw.brandRank ? (
-                    <Badge variant="secondary" className="bg-amber-100 text-amber-800">
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-700">
                       #{kw.brandRank}
-                    </Badge>
+                    </span>
                   ) : (
-                    <span className="text-muted-foreground/50">-</span>
+                    <span className="text-gray-300">-</span>
                   )}
-                </TableCell>
-                <TableCell className="text-center">
+                </td>
+                <td className="px-4 py-3 text-center">
                   {kw.brandMentioned ? (
-                    <Badge variant="secondary" className="bg-purple-100 text-purple-700">
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-700">
                       Yes
-                    </Badge>
+                    </span>
                   ) : kw.hasAIOverview ? (
-                    <span className="text-muted-foreground/50">No</span>
+                    <span className="text-gray-400">No</span>
                   ) : (
-                    <span className="text-muted-foreground/50">-</span>
+                    <span className="text-gray-300">-</span>
                   )}
-                </TableCell>
-              </TableRow>
+                </td>
+              </tr>
             ))}
-          </TableBody>
-        </Table>
+          </tbody>
+        </table>
 
         {processedKeywords.length === 0 && (
-          <div className="p-8 text-center text-muted-foreground">
-            No keywords found matching the filter criteria
+          <div className="p-12 text-center">
+            <div className="h-12 w-12 rounded-xl bg-gray-100 flex items-center justify-center mx-auto mb-3">
+              <Search className="h-6 w-6 text-gray-400" />
+            </div>
+            <p className="text-gray-500">No keywords found matching the filter criteria</p>
           </div>
         )}
       </div>

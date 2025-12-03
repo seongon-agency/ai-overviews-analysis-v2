@@ -6,10 +6,9 @@ import { AIOContent } from './AIOContent';
 
 // shadcn/ui components
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 
 // Icons
-import { X, Loader2, Pin, PinOff, ExternalLink, Clock } from 'lucide-react';
+import { X, Loader2, Pin, PinOff, ExternalLink, Clock, Sparkles, FileText, Hash } from 'lucide-react';
 
 interface HistoryEntry {
   sessionId: number;
@@ -88,14 +87,14 @@ function SessionCard({
 
   return (
     <div
-      className={`flex-shrink-0 w-[calc(50vw-48px)] max-w-[700px] min-w-[450px] h-full flex flex-col rounded-xl shadow-lg overflow-hidden transition-all ${
+      className={`flex-shrink-0 w-[calc(50vw-48px)] max-w-[700px] min-w-[450px] h-full flex flex-col rounded-2xl overflow-hidden transition-all ${
         isPinned
-          ? 'bg-white ring-2 ring-blue-400 shadow-blue-100'
-          : 'bg-white border border-gray-200 hover:shadow-xl'
+          ? 'bg-white ring-2 ring-indigo-400 shadow-xl shadow-indigo-100/50'
+          : 'bg-white border border-gray-200 shadow-lg hover:shadow-xl'
       }`}
     >
       {/* Card Header */}
-      <div className={`px-5 py-4 ${isPinned ? 'bg-gradient-to-r from-blue-50 to-indigo-50' : 'bg-gradient-to-r from-gray-50 to-slate-50'}`}>
+      <div className={`px-5 py-4 ${isPinned ? 'bg-gradient-to-r from-indigo-50 to-purple-50' : 'bg-gradient-to-r from-gray-50 to-slate-50'}`}>
         <div className="flex items-center justify-between gap-3">
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
@@ -103,19 +102,19 @@ function SessionCard({
                 {entry.sessionName || `Session ${entry.sessionId}`}
               </h3>
               {isLatest && (
-                <Badge className="bg-emerald-500 text-white text-xs px-2 py-0.5">
+                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-500 text-white">
                   Latest
-                </Badge>
+                </span>
               )}
               {isPinned && (
-                <Badge className="bg-blue-500 text-white text-xs px-2 py-0.5">
+                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-indigo-500 text-white">
                   Pinned
-                </Badge>
+                </span>
               )}
               {changeFromPrevious && changeFromPrevious !== 'same' && (
-                <Badge
-                  className={`text-xs px-2 py-0.5 ${
-                    changeFromPrevious === 'improved' ? 'bg-green-500 text-white' :
+                <span
+                  className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+                    changeFromPrevious === 'improved' ? 'bg-emerald-500 text-white' :
                     changeFromPrevious === 'declined' ? 'bg-red-500 text-white' :
                     changeFromPrevious === 'gained' ? 'bg-blue-500 text-white' :
                     'bg-orange-500 text-white'
@@ -124,7 +123,7 @@ function SessionCard({
                   {changeFromPrevious === 'improved' ? '↑ Rank Up' :
                    changeFromPrevious === 'declined' ? '↓ Rank Down' :
                    changeFromPrevious === 'gained' ? '+ AIO Gained' : '- AIO Lost'}
-                </Badge>
+                </span>
               )}
             </div>
             <div className="flex items-center gap-1.5 text-sm text-gray-500 mt-1.5">
@@ -138,7 +137,7 @@ function SessionCard({
             variant={isPinned ? "default" : "outline"}
             size="sm"
             onClick={isPinned ? onUnpin : onPin}
-            className={`h-9 px-3 gap-1.5 ${isPinned ? 'bg-blue-500 hover:bg-blue-600' : ''}`}
+            className={`h-9 px-3 gap-1.5 rounded-xl ${isPinned ? 'bg-indigo-600 hover:bg-indigo-700' : 'border-gray-200'}`}
           >
             {isPinned ? <PinOff className="h-4 w-4" /> : <Pin className="h-4 w-4" />}
             <span className="text-xs">{isPinned ? 'Unpin' : 'Pin'}</span>
@@ -152,21 +151,24 @@ function SessionCard({
               ? 'bg-emerald-100 text-emerald-700'
               : 'bg-gray-100 text-gray-500'
           }`}>
-            {entry.hasAIOverview ? '✓ Has AI Overview' : '✗ No AI Overview'}
+            <Sparkles className="h-3 w-3" />
+            {entry.hasAIOverview ? 'Has AI Overview' : 'No AI Overview'}
           </div>
           {entry.brandRank && (
             <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-amber-100 text-amber-700">
+              <Hash className="h-3 w-3" />
               Brand Rank #{entry.brandRank}
             </div>
           )}
           <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-slate-100 text-slate-600">
+            <FileText className="h-3 w-3" />
             {entry.referenceCount} citation{entry.referenceCount !== 1 ? 's' : ''}
           </div>
         </div>
       </div>
 
       {/* Card Content - split into AIO content and citations sidebar */}
-      <div className="flex-1 flex overflow-hidden border-t">
+      <div className="flex-1 flex overflow-hidden border-t border-gray-100">
         {/* AI Overview Content */}
         <div className="flex-1 overflow-y-auto p-5 bg-white">
           {entry.hasAIOverview && entry.aioMarkdown ? (
@@ -179,11 +181,13 @@ function SessionCard({
               brandName={brandName}
             />
           ) : (
-            <div className="flex items-center justify-center h-full text-gray-400">
+            <div className="flex items-center justify-center h-full">
               <div className="text-center">
-                <div className="text-5xl mb-3">📭</div>
-                <p className="font-medium">No AI Overview</p>
-                <p className="text-sm mt-1">This keyword didn't trigger an AI Overview in this session</p>
+                <div className="h-16 w-16 rounded-2xl bg-gray-100 flex items-center justify-center mx-auto mb-4">
+                  <FileText className="h-8 w-8 text-gray-300" />
+                </div>
+                <p className="font-medium text-gray-900">No AI Overview</p>
+                <p className="text-sm text-gray-500 mt-1">This keyword didn&apos;t trigger an AI Overview in this session</p>
               </div>
             </div>
           )}
@@ -191,10 +195,10 @@ function SessionCard({
 
         {/* Citations Sidebar on right */}
         {entry.references.length > 0 && (
-          <div className="w-64 border-l bg-gradient-to-b from-slate-50 to-gray-50 overflow-y-auto flex-shrink-0">
+          <div className="w-64 border-l border-gray-100 bg-gray-50/50 overflow-y-auto flex-shrink-0">
             <div className="p-4">
               <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 flex items-center gap-2">
-                <span className="w-5 h-5 bg-gray-200 rounded flex items-center justify-center text-gray-600">#</span>
+                <span className="w-5 h-5 bg-gray-200 rounded-lg flex items-center justify-center text-gray-600 text-[10px] font-bold">#</span>
                 Citations ({entry.references.length})
               </h4>
               <div className="space-y-2">
@@ -209,22 +213,22 @@ function SessionCard({
                         if (el) citationRefs.current.set(ref.rank, el);
                       }}
                       className={`
-                        group flex items-start gap-2.5 p-2.5 rounded-lg text-xs cursor-pointer
+                        group flex items-start gap-2.5 p-2.5 rounded-xl text-xs cursor-pointer
                         transition-all duration-200
                         ${isHighlighted
-                          ? 'bg-blue-100 ring-2 ring-blue-400 shadow-sm'
+                          ? 'bg-indigo-100 ring-2 ring-indigo-400 shadow-sm'
                           : 'hover:bg-white hover:shadow-sm'
                         }
-                        ${isBrand ? 'bg-amber-50 border-l-3 border-amber-400' : ''}
+                        ${isBrand ? 'bg-amber-50 border-l-2 border-amber-400' : ''}
                       `}
                       onMouseEnter={() => setHighlightedCitation(ref.rank)}
                       onMouseLeave={() => setHighlightedCitation(null)}
                     >
                       <span
                         className={`
-                          w-6 h-6 flex items-center justify-center rounded-md text-xs font-bold flex-shrink-0 transition-colors
+                          w-6 h-6 flex items-center justify-center rounded-lg text-xs font-bold flex-shrink-0 transition-colors
                           ${isHighlighted
-                            ? 'bg-blue-500 text-white'
+                            ? 'bg-indigo-600 text-white'
                             : 'bg-gray-200 text-gray-600 group-hover:bg-gray-300'
                           }
                         `}
@@ -239,7 +243,7 @@ function SessionCard({
                           {ref.domain}
                         </div>
                         {isBrand && (
-                          <span className="inline-block mt-1 text-[10px] bg-amber-200 text-amber-800 px-1.5 py-0.5 rounded font-medium">
+                          <span className="inline-block mt-1 text-[10px] bg-amber-200 text-amber-800 px-1.5 py-0.5 rounded-md font-medium">
                             Your Brand
                           </span>
                         )}
@@ -248,7 +252,7 @@ function SessionCard({
                         href={ref.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-gray-400 hover:text-blue-500 flex-shrink-0 p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                        className="text-gray-400 hover:text-indigo-600 flex-shrink-0 p-1 opacity-0 group-hover:opacity-100 transition-opacity"
                         onClick={(e) => e.stopPropagation()}
                       >
                         <ExternalLink className="h-3.5 w-3.5" />
@@ -399,10 +403,10 @@ export function KeywordComparisonPanel({
   if (loadingHistory) {
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center">
-        <div className="absolute inset-0 bg-black/50" onClick={onClose} />
-        <div className="relative bg-white rounded-xl p-8 text-center shadow-2xl">
-          <Loader2 className="h-8 w-8 mx-auto mb-3 animate-spin text-muted-foreground" />
-          <p className="text-muted-foreground">Loading keyword history...</p>
+        <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
+        <div className="relative bg-white rounded-2xl p-8 text-center shadow-2xl">
+          <Loader2 className="h-8 w-8 mx-auto mb-3 animate-spin text-indigo-600" />
+          <p className="text-gray-500">Loading keyword history...</p>
         </div>
       </div>
     );
@@ -414,39 +418,47 @@ export function KeywordComparisonPanel({
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
 
       {/* Panel */}
-      <div className="relative w-full max-w-[1600px] h-[90vh] bg-gradient-to-br from-slate-100 to-gray-100 rounded-2xl shadow-2xl flex flex-col overflow-hidden">
+      <div className="relative w-full max-w-[1600px] h-[90vh] bg-gradient-to-br from-gray-50 to-slate-100 rounded-3xl shadow-2xl flex flex-col overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-5 border-b bg-white/80 backdrop-blur-sm">
+        <div className="flex items-center justify-between px-6 py-5 border-b border-gray-200 bg-white">
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-3">
-              <h2 className="text-2xl font-bold text-gray-900 truncate">{keyword.keyword}</h2>
-              {keyword.hasAIOverview && (
-                <Badge className="bg-emerald-500 text-white">Has AIO</Badge>
-              )}
-            </div>
-            <div className="flex items-center gap-3 mt-2">
-              <span className="text-sm text-gray-500">
-                {history.length} session{history.length !== 1 ? 's' : ''} tracked
-              </span>
-              {pinnedSessionIds.size > 0 && (
-                <Badge variant="outline" className="border-blue-300 text-blue-600">
-                  {pinnedSessionIds.size} pinned
-                </Badge>
-              )}
-              <span className="text-sm text-gray-400">•</span>
-              <span className="text-sm text-gray-500">Scroll horizontally to compare sessions</span>
+              <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
+                <Sparkles className="h-5 w-5 text-white" />
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-gray-900 truncate">{keyword.keyword}</h2>
+                <div className="flex items-center gap-3 mt-0.5">
+                  <span className="text-sm text-gray-500">
+                    {history.length} session{history.length !== 1 ? 's' : ''} tracked
+                  </span>
+                  {pinnedSessionIds.size > 0 && (
+                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium border border-indigo-200 text-indigo-600 bg-indigo-50">
+                      {pinnedSessionIds.size} pinned
+                    </span>
+                  )}
+                  {keyword.hasAIOverview && (
+                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700">
+                      Has AIO
+                    </span>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
-          <Button variant="outline" size="icon" onClick={onClose} className="h-10 w-10 rounded-full">
+          <Button variant="outline" size="icon" onClick={onClose} className="h-10 w-10 rounded-xl border-gray-200">
             <X className="h-5 w-5" />
           </Button>
         </div>
 
         {history.length === 0 ? (
-          <div className="flex-1 flex items-center justify-center text-muted-foreground">
+          <div className="flex-1 flex items-center justify-center">
             <div className="text-center">
-              <div className="text-6xl mb-4 opacity-30">📊</div>
-              <p className="text-lg">No history found for this keyword</p>
+              <div className="h-20 w-20 rounded-2xl bg-gray-100 flex items-center justify-center mx-auto mb-4">
+                <FileText className="h-10 w-10 text-gray-300" />
+              </div>
+              <p className="text-lg font-medium text-gray-900">No history found</p>
+              <p className="text-gray-500 mt-1">This keyword doesn&apos;t have any session data yet</p>
             </div>
           </div>
         ) : (
@@ -454,7 +466,7 @@ export function KeywordComparisonPanel({
             {/* Pinned Cards Section */}
             {pinnedEntries.length > 0 && (
               <>
-                <div className="flex-shrink-0 flex gap-4 p-4 bg-blue-50/50">
+                <div className="flex-shrink-0 flex gap-4 p-4 bg-indigo-50/50">
                   {pinnedEntries.map((entry) => {
                     const originalIndex = history.findIndex((h) => h.sessionId === entry.sessionId);
                     return (
@@ -473,7 +485,7 @@ export function KeywordComparisonPanel({
                   })}
                 </div>
                 {/* Divider */}
-                <div className="w-px bg-gray-300 flex-shrink-0" />
+                <div className="w-px bg-gray-200 flex-shrink-0" />
               </>
             )}
 
@@ -506,11 +518,11 @@ export function KeywordComparisonPanel({
 
             {/* Show message if all are pinned */}
             {unpinnedEntries.length === 0 && pinnedEntries.length > 0 && (
-              <div className="flex-1 flex items-center justify-center text-muted-foreground bg-gray-50">
+              <div className="flex-1 flex items-center justify-center bg-gray-50/50">
                 <div className="text-center">
-                  <Pin className="h-8 w-8 mx-auto mb-2 opacity-30" />
-                  <p>All sessions are pinned</p>
-                  <p className="text-sm">Unpin some to see them in the scrollable area</p>
+                  <Pin className="h-8 w-8 mx-auto mb-2 text-gray-300" />
+                  <p className="text-gray-600">All sessions are pinned</p>
+                  <p className="text-sm text-gray-400">Unpin some to see them in the scrollable area</p>
                 </div>
               </div>
             )}
@@ -518,11 +530,11 @@ export function KeywordComparisonPanel({
         )}
 
         {/* Footer with instructions */}
-        <div className="px-6 py-3 border-t bg-white/80 backdrop-blur-sm">
+        <div className="px-6 py-3 border-t border-gray-200 bg-white">
           <div className="flex items-center justify-between text-xs text-gray-500">
             <div className="flex items-center gap-6">
               <span className="flex items-center gap-1.5">
-                <Pin className="h-3.5 w-3.5 text-blue-500" />
+                <Pin className="h-3.5 w-3.5 text-indigo-500" />
                 <span>Pin sessions to compare side-by-side</span>
               </span>
               <span className="flex items-center gap-1.5">
@@ -530,7 +542,7 @@ export function KeywordComparisonPanel({
                 <span>Scroll to browse history</span>
               </span>
             </div>
-            <span className="text-gray-400">Press <kbd className="px-1.5 py-0.5 bg-gray-100 rounded text-gray-600 font-mono text-[10px]">ESC</kbd> to close</span>
+            <span className="text-gray-400">Press <kbd className="px-1.5 py-0.5 bg-gray-100 border border-gray-200 rounded-md text-gray-600 font-mono text-[10px]">ESC</kbd> to close</span>
           </div>
         </div>
       </div>
