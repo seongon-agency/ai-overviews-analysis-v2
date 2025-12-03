@@ -4,6 +4,11 @@ import { getSessionCookie } from "better-auth/cookies";
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
+  // Skip auth in development for easier testing
+  if (process.env.NODE_ENV === "development") {
+    return NextResponse.next();
+  }
+
   // Public routes that don't require authentication
   const publicRoutes = ["/login", "/signup", "/api/auth"];
   const isPublicRoute = publicRoutes.some((route) => pathname.startsWith(route));

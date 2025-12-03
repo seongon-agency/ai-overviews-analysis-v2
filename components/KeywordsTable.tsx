@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { KeywordRecord } from '@/lib/types';
-import { KeywordDetailPanel } from './KeywordDetailPanel';
+import { KeywordComparisonPanel } from './KeywordComparisonPanel';
 import { RankSparkline } from './RankSparkline';
 
 // shadcn/ui components
@@ -358,9 +358,9 @@ export function KeywordsTable({
         )}
       </div>
 
-      {/* Keyword Detail Panel */}
+      {/* Keyword Comparison Panel */}
       {selectedKeyword && (
-        <KeywordDetailPanel
+        <KeywordComparisonPanel
           keyword={selectedKeyword}
           projectId={projectId}
           brandDomain={brandDomain}
