@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "WebFetch(domain:www.better-auth.com)",
+      "Bash(npm run build:*)",
+      "Bash(git push:*)",
+      "WebSearch"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
