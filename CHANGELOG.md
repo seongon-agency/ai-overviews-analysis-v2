@@ -4,6 +4,51 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [3.0.0] - 2024-12-03 - User Authentication & Multi-Tenancy
+
+### Major Features Added
+
+#### User Authentication
+- **Email/Password Authentication**: Sign up and sign in with email and password
+- **Google OAuth**: Sign in with Google account (optional, requires Google Cloud credentials)
+- **Session Management**: Secure cookie-based sessions with automatic refresh
+- **Route Protection**: All routes require authentication except login/signup
+
+#### Multi-User Support
+- **User Isolation**: Each user only sees their own projects and data
+- **Project Ownership**: Projects are linked to user accounts via `user_id`
+- **Data Migration**: Existing projects automatically assigned to first user who logs in
+
+### New Files
+- `lib/auth.ts` - Better-auth configuration with PostgreSQL and OAuth providers
+- `lib/auth-client.ts` - React client hooks for authentication
+- `lib/auth-utils.ts` - Server-side session helpers
+- `app/login/page.tsx` - Login page with email/password and Google OAuth
+- `app/signup/page.tsx` - Registration page
+- `app/api/auth/[...all]/route.ts` - Better-auth API handler
+- `app/api/migrate/route.ts` - Migration API for orphaned projects
+- `proxy.ts` - Route protection middleware
+
+### Database Changes
+- Added `user_id` column to `projects` table
+- Better-auth creates `user`, `session`, `account`, `verification` tables automatically
+
+### Changed
+- All API routes now require authentication and filter by user
+- Sidebar shows user profile with avatar, name, email, and sign-out option
+- Projects API includes `userId` parameter for filtering
+
+### Environment Variables
+New required variables for production:
+- `BETTER_AUTH_SECRET` - Secret key for session encryption (32+ characters)
+- `BETTER_AUTH_URL` - Application URL for OAuth callbacks
+
+Optional for Google OAuth:
+- `GOOGLE_CLIENT_ID` - Google OAuth client ID
+- `GOOGLE_CLIENT_SECRET` - Google OAuth client secret
+
+---
+
 ## [2.1.0] - 2024-12-03 - Dashboard Improvements & Data Consistency
 
 ### Added

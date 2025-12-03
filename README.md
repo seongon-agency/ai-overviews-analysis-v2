@@ -4,6 +4,12 @@ A Next.js application for tracking and analyzing Google AI Overview citations ac
 
 ## Features
 
+### User Authentication (v3.0)
+- **Email/Password Auth**: Sign up and sign in with email and password
+- **Google OAuth**: Sign in with Google account (optional)
+- **Multi-User Support**: Each user has their own isolated projects and data
+- **Secure Sessions**: Cookie-based authentication with automatic session refresh
+
 ### Core Features
 - **AI Overview Detection**: Identify which keywords trigger Google AI Overviews
 - **Citation Tracking**: See which sources are cited in AI Overviews
@@ -42,18 +48,27 @@ Open http://localhost:3000
 ## Environment Variables
 
 ```bash
-# DataForSEO API credentials
-DATAFORSEO_LOGIN=your_login
-DATAFORSEO_PASSWORD=your_password
+# DataForSEO API credentials (Base64 encoded)
+SEO_API_KEY=Basic YOUR_BASE64_ENCODED_CREDENTIALS
 
 # PostgreSQL connection (optional - for production)
 # If not set, SQLite will be used automatically
 DATABASE_URL=postgresql://user:password@host:5432/database
+
+# Authentication (required for production)
+BETTER_AUTH_SECRET=your-secret-key-at-least-32-characters
+BETTER_AUTH_URL=http://localhost:3000
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+
+# Google OAuth (optional)
+GOOGLE_CLIENT_ID=your-google-client-id
+GOOGLE_CLIENT_SECRET=your-google-client-secret
 ```
 
 ## Tech Stack
 
-- **Next.js 14** - React framework with App Router
+- **Next.js 16** - React framework with App Router
+- **better-auth** - Authentication library with OAuth support
 - **SQLite** - Local database via better-sqlite3 (development)
 - **PostgreSQL** - Production database via pg (Railway deployment)
 - **Tailwind CSS** - Styling
