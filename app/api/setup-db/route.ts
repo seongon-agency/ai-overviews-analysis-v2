@@ -7,6 +7,8 @@ export async function GET() {
     ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : false,
   });
 
+  const results: string[] = [];
+
   try {
     // Create better-auth tables
     await pool.query(`
@@ -56,11 +58,37 @@ export async function GET() {
         "updatedAt" TIMESTAMP NOT NULL DEFAULT NOW()
       );
     `);
+    results.push("Auth tables created");
 
-    return NextResponse.json({ success: true, message: "Auth tables created successfully" });
+    // Add user_id column to projects if it doesn't exist
+    const columnCheck = await pool.query(`
+      SELECT column_name FROM information_schema.columns
+      WHERE table_name = 'projects' AND column_name = 'user_id'
+    `);
+
+    if (columnCheck.rows.length === 0) {
+      await pool.query(`ALTER TABLE projects ADD COLUMN user_id TEXT`);
+      results.push("Added user_id column to projects");
+    } else {
+      results.push("user_id column already exists");
+    }
+
+    // Create index on user_id if it doesn't exist
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_projects_user ON projects(user_id)
+    `);
+    results.push("Created index on user_id");
+
+    // Count orphaned projects
+    const orphaned = await pool.query(`
+      SELECT COUNT(*) as count FROM projects WHERE user_id IS NULL OR user_id = ''
+    `);
+    results.push(`Orphaned projects: ${orphaned.rows[0].count}`);
+
+    return NextResponse.json({ success: true, results });
   } catch (error) {
     console.error("Setup error:", error);
-    return NextResponse.json({ success: false, error: String(error) }, { status: 500 });
+    return NextResponse.json({ success: false, error: String(error), results }, { status: 500 });
   } finally {
     await pool.end();
   }
