@@ -8,6 +8,8 @@ import { SummaryCards } from '@/components/dashboard/SummaryCards';
 import { CompetitorTable } from '@/components/dashboard/CompetitorTable';
 import { CompetitorChart } from '@/components/dashboard/CompetitorChart';
 import { MetricsTrends } from '@/components/dashboard/MetricsTrends';
+import { InsightsPanel } from '@/components/dashboard/InsightsPanel';
+import { KeywordPerformanceGrid } from '@/components/dashboard/KeywordPerformanceGrid';
 import { Sidebar } from '@/components/Sidebar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -41,7 +43,7 @@ export default function DashboardPage() {
   const [sessions, setSessions] = useState<CheckSessionWithStats[]>([]);
   const [sessionMetrics, setSessionMetrics] = useState<SessionMetrics[]>([]);
 
-  // Fetch project
+  // Fetch project and trends data
   useEffect(() => {
     const fetchProject = async () => {
       try {
@@ -60,6 +62,26 @@ export default function DashboardPage() {
     };
     fetchProject();
   }, [projectId]);
+
+  // Fetch trends data when brand domain is available
+  useEffect(() => {
+    const fetchTrends = async () => {
+      if (!brandDomain) return;
+      try {
+        const response = await fetch(
+          `/api/analyze/trends?projectId=${projectId}&brandDomain=${encodeURIComponent(brandDomain)}&limit=10`
+        );
+        const data = await response.json();
+        if (data.success) {
+          setSessions(data.data.sessions);
+          setSessionMetrics(data.data.metrics);
+        }
+      } catch (err) {
+        console.error('Error fetching trends:', err);
+      }
+    };
+    fetchTrends();
+  }, [projectId, brandDomain]);
 
   // Run analysis
   const runAnalysis = useCallback(async () => {
@@ -235,6 +257,33 @@ export default function DashboardPage() {
                 <CompetitorChart
                   competitors={analysis.competitors}
                   brandName={brandName}
+                />
+              )}
+
+              {/* AI-Powered Insights */}
+              {analysis.competitors.length > 0 && (
+                <InsightsPanel
+                  competitors={analysis.competitors}
+                  brandName={brandName}
+                  totalAIOs={analysis.summary.aiOverviewsFound}
+                />
+              )}
+
+              {/* Performance Trends Over Time */}
+              {sessionMetrics.length > 0 && (
+                <MetricsTrends
+                  sessions={sessions}
+                  sessionMetrics={sessionMetrics}
+                  brandName={brandName}
+                />
+              )}
+
+              {/* Keyword Performance Grid */}
+              {analysis.keywordsAnalysis.length > 0 && (
+                <KeywordPerformanceGrid
+                  keywords={analysis.keywordsAnalysis}
+                  brandName={brandName}
+                  brandDomain={brandDomain}
                 />
               )}
 
