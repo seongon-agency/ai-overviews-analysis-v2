@@ -18,9 +18,9 @@ export function CompetitorChart({ competitors, brandName, limit = 12 }: Competit
   // Take top N competitors
   const topCompetitors = sortedCompetitors.slice(0, limit);
 
-  // For horizontal bar chart: we want highest at TOP, so reverse for display
-  // (Recharts renders from bottom to top in vertical layout)
-  const chartData = [...topCompetitors].reverse();
+  // For horizontal bar chart with layout="vertical", Recharts renders from top to bottom
+  // So we keep the sorted order (highest first) without reversing
+  const chartData = topCompetitors;
 
   const isUserBrandEntry = (entry: CompetitorMetrics) => entry.isUserBrand === true;
   const userBrand = competitors.find(c => c.isUserBrand);
@@ -136,7 +136,7 @@ export function CompetitorChart({ competitors, brandName, limit = 12 }: Competit
                 );
               }}
             />
-            <Tooltip content={<CustomTooltip />} cursor={{ fill: 'hsl(var(--muted)/0.1)' }} />
+            <Tooltip content={<CustomTooltip />} cursor={{ fill: 'transparent' }} />
             <Bar
               dataKey="citedCount"
               name="Citations"

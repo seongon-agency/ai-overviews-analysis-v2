@@ -252,53 +252,7 @@ export default function DashboardPage() {
                 </Button>
               </div>
 
-              {/* Chart */}
-              {analysis.competitors.length > 0 && (
-                <CompetitorChart
-                  competitors={analysis.competitors}
-                  brandName={brandName}
-                />
-              )}
-
-              {/* AI-Powered Insights */}
-              {analysis.competitors.length > 0 && (
-                <InsightsPanel
-                  competitors={analysis.competitors}
-                  brandName={brandName}
-                  totalAIOs={analysis.summary.aiOverviewsFound}
-                />
-              )}
-
-              {/* Performance Trends Over Time */}
-              {sessionMetrics.length > 0 && (
-                <MetricsTrends
-                  sessions={sessions}
-                  sessionMetrics={sessionMetrics}
-                  brandName={brandName}
-                />
-              )}
-
-              {/* Keyword Performance Grid */}
-              {analysis.keywordsAnalysis.length > 0 && (
-                <KeywordPerformanceGrid
-                  keywords={analysis.keywordsAnalysis}
-                  brandName={brandName}
-                  brandDomain={brandDomain}
-                />
-              )}
-
-              {/* Competitor Table */}
-              {analysis.competitors.length > 0 && (
-                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Competitor Analysis</h3>
-                  <CompetitorTable
-                    competitors={analysis.competitors}
-                    brandName={brandName}
-                  />
-                </div>
-              )}
-
-              {/* Brand Performance Summary */}
+              {/* Brand Performance Summary - moved up for visibility */}
               {(() => {
                 const userBrand = analysis.competitors.find(
                   c => c.brand.toLowerCase() === brandName.toLowerCase()
@@ -356,6 +310,52 @@ export default function DashboardPage() {
                 }
                 return null;
               })()}
+
+              {/* Chart */}
+              {analysis.competitors.length > 0 && (
+                <CompetitorChart
+                  competitors={analysis.competitors}
+                  brandName={brandName}
+                />
+              )}
+
+              {/* AI-Powered Insights */}
+              {analysis.competitors.length > 0 && (
+                <InsightsPanel
+                  competitors={analysis.competitors}
+                  brandName={brandName}
+                  totalAIOs={analysis.summary.aiOverviewsFound}
+                />
+              )}
+
+              {/* Performance Trends Over Time */}
+              {sessionMetrics.length > 0 && (
+                <MetricsTrends
+                  sessions={sessions}
+                  sessionMetrics={sessionMetrics}
+                  brandName={brandName}
+                />
+              )}
+
+              {/* Keyword Performance Grid */}
+              {analysis.keywordsAnalysis.length > 0 && (
+                <KeywordPerformanceGrid
+                  keywords={analysis.keywordsAnalysis}
+                  brandName={brandName}
+                  brandDomain={brandDomain}
+                />
+              )}
+
+              {/* Competitor Table */}
+              {analysis.competitors.length > 0 && (
+                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Competitor Analysis</h3>
+                  <CompetitorTable
+                    competitors={analysis.competitors}
+                    brandName={brandName}
+                  />
+                </div>
+              )}
             </div>
           ) : (
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-16 text-center">
