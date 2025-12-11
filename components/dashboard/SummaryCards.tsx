@@ -1,61 +1,73 @@
 'use client';
 
 import { Card } from '@/components/ui/card';
-import { Search, Eye, Users, TrendingUp } from 'lucide-react';
+import { Search, Eye, Users, TrendingUp, Award } from 'lucide-react';
 
 interface SummaryCardsProps {
   totalKeywords: number;
   aiOverviewsFound: number;
   competitorsIdentified: number;
+  brandCitations?: number;
+  brandName?: string;
 }
 
 export function SummaryCards({
   totalKeywords,
   aiOverviewsFound,
-  competitorsIdentified
+  competitorsIdentified,
+  brandCitations,
+  brandName
 }: SummaryCardsProps) {
   const aioRate = totalKeywords > 0 ? ((aiOverviewsFound / totalKeywords) * 100).toFixed(1) : '0';
+  const brandCitationRate = aiOverviewsFound > 0 && brandCitations !== undefined
+    ? ((brandCitations / aiOverviewsFound) * 100).toFixed(1)
+    : '0';
 
   const cards = [
     {
       label: 'Keywords Analyzed',
       value: totalKeywords,
+      subtext: 'total tracked',
       icon: Search,
-      color: 'blue',
-      bgColor: 'bg-blue-50',
-      iconBg: 'bg-blue-100',
-      iconColor: 'text-blue-600',
-      valueColor: 'text-blue-700'
+      gradient: 'from-slate-50 to-slate-100',
+      iconBg: 'bg-slate-200',
+      iconColor: 'text-slate-600',
+      valueColor: 'text-slate-800',
+      borderColor: 'border-slate-200'
     },
     {
-      label: 'AI Overviews Found',
+      label: 'AI Overviews',
       value: aiOverviewsFound,
+      subtext: `${aioRate}% coverage`,
       icon: Eye,
-      color: 'green',
-      bgColor: 'bg-green-50',
-      iconBg: 'bg-green-100',
-      iconColor: 'text-green-600',
-      valueColor: 'text-green-700'
+      gradient: 'from-emerald-50 to-teal-50',
+      iconBg: 'bg-emerald-100',
+      iconColor: 'text-emerald-600',
+      valueColor: 'text-emerald-700',
+      borderColor: 'border-emerald-200'
     },
     {
-      label: 'AIO Coverage',
-      value: `${aioRate}%`,
-      icon: TrendingUp,
-      color: 'purple',
-      bgColor: 'bg-purple-50',
-      iconBg: 'bg-purple-100',
-      iconColor: 'text-purple-600',
-      valueColor: 'text-purple-700'
+      label: brandName ? `${brandName} Citations` : 'Brand Citations',
+      value: brandCitations ?? '-',
+      subtext: brandCitations !== undefined ? `${brandCitationRate}% of AIOs` : 'configure brand',
+      icon: Award,
+      gradient: 'from-amber-50 to-orange-50',
+      iconBg: 'bg-amber-100',
+      iconColor: 'text-amber-600',
+      valueColor: 'text-amber-700',
+      borderColor: 'border-amber-200',
+      highlight: true
     },
     {
-      label: 'Sources Identified',
+      label: 'Sources Found',
       value: competitorsIdentified,
+      subtext: 'unique sources',
       icon: Users,
-      color: 'orange',
-      bgColor: 'bg-orange-50',
-      iconBg: 'bg-orange-100',
-      iconColor: 'text-orange-600',
-      valueColor: 'text-orange-700'
+      gradient: 'from-indigo-50 to-purple-50',
+      iconBg: 'bg-indigo-100',
+      iconColor: 'text-indigo-600',
+      valueColor: 'text-indigo-700',
+      borderColor: 'border-indigo-200'
     }
   ];
 
@@ -64,14 +76,21 @@ export function SummaryCards({
       {cards.map((card) => {
         const Icon = card.icon;
         return (
-          <Card key={card.label} className={`${card.bgColor} border-0 shadow-sm`}>
+          <Card
+            key={card.label}
+            className={`bg-gradient-to-br ${card.gradient} border ${card.borderColor} shadow-sm hover:shadow-md transition-shadow overflow-hidden relative`}
+          >
+            {card.highlight && (
+              <div className="absolute top-0 right-0 w-16 h-16 bg-amber-200/30 rounded-bl-full" />
+            )}
             <div className="p-5">
               <div className="flex items-start justify-between">
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">{card.label}</p>
-                  <p className={`text-3xl font-bold mt-1 ${card.valueColor}`}>{card.value}</p>
+                <div className="space-y-1">
+                  <p className="text-sm font-medium text-gray-500">{card.label}</p>
+                  <p className={`text-3xl font-bold ${card.valueColor}`}>{card.value}</p>
+                  <p className="text-xs text-gray-400">{card.subtext}</p>
                 </div>
-                <div className={`p-2.5 rounded-xl ${card.iconBg}`}>
+                <div className={`p-2.5 rounded-xl ${card.iconBg} shadow-sm`}>
                   <Icon className={`h-5 w-5 ${card.iconColor}`} />
                 </div>
               </div>

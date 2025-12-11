@@ -907,6 +907,8 @@ export default function ProjectPage() {
                     totalKeywords={analysis.summary.totalKeywords}
                     aiOverviewsFound={analysis.summary.aiOverviewsFound}
                     competitorsIdentified={analysis.summary.competitorsIdentified}
+                    brandCitations={analysis.competitors.find(c => c.isUserBrand)?.citedCount}
+                    brandName={brandName}
                   />
 
                   {/* Competitor Chart */}

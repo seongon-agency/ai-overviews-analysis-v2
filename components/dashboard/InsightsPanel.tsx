@@ -201,42 +201,48 @@ export function InsightsPanel({ competitors, brandName, totalAIOs }: InsightsPan
   if (insights.length === 0) return null;
 
   return (
-    <Card>
-      <CardHeader className="pb-3">
-        <div className="flex items-center gap-2">
-          <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
-            <Zap className="h-4 w-4 text-white" />
+    <Card className="border-gray-200/80 shadow-sm overflow-hidden">
+      <CardHeader className="pb-4 bg-gradient-to-r from-indigo-50 via-purple-50 to-pink-50 border-b border-gray-100">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-sm">
+              <Zap className="h-5 w-5 text-white" />
+            </div>
+            <div>
+              <CardTitle className="text-lg">Smart Insights</CardTitle>
+              <CardDescription>Actionable recommendations for your brand</CardDescription>
+            </div>
           </div>
-          <div>
-            <CardTitle className="text-lg">AI-Powered Insights</CardTitle>
-            <CardDescription>Actionable recommendations based on your analysis</CardDescription>
+          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/80 border border-gray-200 text-xs font-medium text-gray-600">
+            <Sparkles className="h-3.5 w-3.5 text-purple-500" />
+            {insights.length} insights
           </div>
         </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className="p-5">
         <div className="space-y-3">
           {insights.map((insight, index) => (
             <div
               key={index}
-              className={`rounded-xl border p-4 transition-all hover:shadow-sm ${getBgColor(insight.type)}`}
+              className={`rounded-xl border p-4 transition-all hover:shadow-md ${getBgColor(insight.type)}`}
             >
               <div className="flex items-start gap-3">
-                <div className="flex-shrink-0 mt-0.5">
+                <div className="flex-shrink-0 p-2 rounded-lg bg-white/60 shadow-sm">
                   {getIcon(insight.type)}
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <h4 className="font-medium text-gray-900">{insight.title}</h4>
+                    <h4 className="font-semibold text-gray-900">{insight.title}</h4>
                     {insight.metric && (
-                      <span className="px-2 py-0.5 text-xs font-medium rounded-full bg-white/80 text-gray-700 border">
+                      <span className="px-2.5 py-0.5 text-xs font-semibold rounded-full bg-white shadow-sm text-gray-700 border border-gray-200">
                         {insight.metric}
                       </span>
                     )}
                   </div>
-                  <p className="text-sm text-gray-600 mt-1">{insight.description}</p>
+                  <p className="text-sm text-gray-600 mt-1.5 leading-relaxed">{insight.description}</p>
                   {insight.action && (
-                    <div className="mt-2 flex items-center gap-1.5 text-sm font-medium text-gray-700">
-                      <ArrowRight className="h-3.5 w-3.5" />
+                    <div className="mt-3 flex items-center gap-2 text-sm font-medium text-gray-800 bg-white/50 rounded-lg px-3 py-2 border border-gray-200/50">
+                      <ArrowRight className="h-4 w-4 text-indigo-500" />
                       <span>{insight.action}</span>
                     </div>
                   )}
