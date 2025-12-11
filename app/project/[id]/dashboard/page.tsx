@@ -3,14 +3,29 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import { Project, AnalysisResult } from '@/lib/types';
+import { Project, AnalysisResult, CheckSessionWithStats } from '@/lib/types';
 import { SummaryCards } from '@/components/dashboard/SummaryCards';
 import { CompetitorTable } from '@/components/dashboard/CompetitorTable';
 import { CompetitorChart } from '@/components/dashboard/CompetitorChart';
+import { MetricsTrends } from '@/components/dashboard/MetricsTrends';
 import { Sidebar } from '@/components/Sidebar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ArrowLeft, BarChart3, Download, Loader2, RefreshCw, AlertTriangle } from 'lucide-react';
+
+interface SessionMetrics {
+  sessionId: number;
+  sessionName: string;
+  date: string;
+  shortDate: string;
+  totalKeywords: number;
+  withAIO: number;
+  aioRate: number;
+  brandCitations: number;
+  brandCitationRate: number;
+  avgBrandRank: number | null;
+  topRanked: number;
+}
 
 export default function DashboardPage() {
   const params = useParams();
@@ -23,6 +38,8 @@ export default function DashboardPage() {
   const [brandName, setBrandName] = useState('');
   const [brandDomain, setBrandDomain] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [sessions, setSessions] = useState<CheckSessionWithStats[]>([]);
+  const [sessionMetrics, setSessionMetrics] = useState<SessionMetrics[]>([]);
 
   // Fetch project
   useEffect(() => {

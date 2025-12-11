@@ -86,7 +86,7 @@ export function CompetitorChart({ competitors, brandName, limit = 12 }: Competit
                 );
               }}
             />
-            <Tooltip content={<CustomTooltip />} cursor={{ fill: 'hsl(var(--muted)/0.3)' }} />
+            <Tooltip content={<CustomTooltip />} cursor={{ fill: 'transparent' }} />
             <Bar
               dataKey="citedCount"
               name="Citations"
