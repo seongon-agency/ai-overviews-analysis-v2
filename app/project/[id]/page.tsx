@@ -13,6 +13,7 @@ import { CompetitorChart } from '@/components/dashboard/CompetitorChart';
 import { MetricsTrends } from '@/components/dashboard/MetricsTrends';
 import { InsightsPanel } from '@/components/dashboard/InsightsPanel';
 import { KeywordPerformanceGrid } from '@/components/dashboard/KeywordPerformanceGrid';
+import { RankDistributionChart } from '@/components/dashboard/RankDistributionChart';
 
 // shadcn/ui components
 import { Button } from '@/components/ui/button';
@@ -920,6 +921,15 @@ export default function ProjectPage() {
                       competitors={analysis.competitors}
                       brandName={brandName}
                       totalAIOs={analysis.summary.aiOverviewsFound}
+                    />
+                  )}
+
+                  {/* Rank Distribution Chart */}
+                  {analysis.keywordsAnalysis.length > 0 && (
+                    <RankDistributionChart
+                      keywords={analysis.keywordsAnalysis}
+                      brandName={brandName}
+                      brandDomain={brandDomain}
                     />
                   )}
 
