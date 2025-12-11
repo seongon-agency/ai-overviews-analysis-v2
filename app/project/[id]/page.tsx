@@ -10,6 +10,9 @@ import { SessionComparison } from '@/components/sessions/SessionComparison';
 import { SummaryCards } from '@/components/dashboard/SummaryCards';
 import { CompetitorTable } from '@/components/dashboard/CompetitorTable';
 import { CompetitorChart } from '@/components/dashboard/CompetitorChart';
+import { MetricsTrends } from '@/components/dashboard/MetricsTrends';
+import { InsightsPanel } from '@/components/dashboard/InsightsPanel';
+import { KeywordPerformanceGrid } from '@/components/dashboard/KeywordPerformanceGrid';
 
 // shadcn/ui components
 import { Button } from '@/components/ui/button';
@@ -60,6 +63,19 @@ export default function ProjectPage() {
   const [analysis, setAnalysis] = useState<AnalysisResult | null>(null);
   const [analyzing, setAnalyzing] = useState(false);
   const [analysisError, setAnalysisError] = useState<string | null>(null);
+  const [sessionMetrics, setSessionMetrics] = useState<{
+    sessionId: number;
+    sessionName: string;
+    date: string;
+    shortDate: string;
+    totalKeywords: number;
+    withAIO: number;
+    aioRate: number;
+    brandCitations: number;
+    brandCitationRate: number;
+    avgBrandRank: number | null;
+    topRanked: number;
+  }[]>([]);
 
   // Fetch project data
   const fetchProject = useCallback(async () => {
@@ -123,6 +139,25 @@ export default function ProjectPage() {
       setAnalysis(null);
     }
   }, [selectedSessionId, fetchSessionKeywords]);
+
+  // Fetch trends data for dashboard
+  useEffect(() => {
+    const fetchTrends = async () => {
+      if (!brandDomain || !projectId) return;
+      try {
+        const response = await fetch(
+          `/api/analyze/trends?projectId=${projectId}&brandDomain=${encodeURIComponent(brandDomain)}&limit=10`
+        );
+        const data = await response.json();
+        if (data.success) {
+          setSessionMetrics(data.data.metrics);
+        }
+      } catch (err) {
+        console.error('Error fetching trends:', err);
+      }
+    };
+    fetchTrends();
+  }, [projectId, brandDomain]);
 
   // Update brand info
   const updateBrandInfo = async () => {
@@ -878,6 +913,33 @@ export default function ProjectPage() {
                     competitors={analysis.competitors}
                     brandName={brandName}
                   />
+
+                  {/* AI-Powered Insights */}
+                  {analysis.competitors.length > 0 && (
+                    <InsightsPanel
+                      competitors={analysis.competitors}
+                      brandName={brandName}
+                      totalAIOs={analysis.summary.aiOverviewsFound}
+                    />
+                  )}
+
+                  {/* Performance Trends Over Time */}
+                  {sessionMetrics.length > 0 && (
+                    <MetricsTrends
+                      sessions={sessions}
+                      sessionMetrics={sessionMetrics}
+                      brandName={brandName}
+                    />
+                  )}
+
+                  {/* Keyword Performance Grid */}
+                  {analysis.keywordsAnalysis.length > 0 && (
+                    <KeywordPerformanceGrid
+                      keywords={analysis.keywordsAnalysis}
+                      brandName={brandName}
+                      brandDomain={brandDomain}
+                    />
+                  )}
 
                   {/* Brand Performance */}
                   {brandName && (
