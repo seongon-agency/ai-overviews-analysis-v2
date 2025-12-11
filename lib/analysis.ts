@@ -395,12 +395,8 @@ export function analyzeKeywords(
       mentionRate: totalPrompts > 0 ? data.mentionedInPrompts.size / totalPrompts : 0,
       isUserBrand: data.isUserBrand
     }))
-    // Sort: User's brand first, then by total engagement
-    .sort((a, b) => {
-      if (a.isUserBrand && !b.isUserBrand) return -1;
-      if (!a.isUserBrand && b.isUserBrand) return 1;
-      return (b.citedCount + b.mentionedCount) - (a.citedCount + a.mentionedCount);
-    });
+    // Sort by citation count (descending) - user's brand should be ranked fairly
+    .sort((a, b) => b.citedCount - a.citedCount);
 
   return {
     summary: {
