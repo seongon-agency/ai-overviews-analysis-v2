@@ -29,33 +29,33 @@ export function SummaryCards({
       value: totalKeywords,
       subtext: 'total tracked',
       icon: Search,
-      gradient: 'from-slate-50 to-slate-100',
-      iconBg: 'bg-slate-200',
-      iconColor: 'text-slate-600',
-      valueColor: 'text-slate-800',
-      borderColor: 'border-slate-200'
+      gradient: 'from-[var(--color-canvas-subtle)] to-[var(--color-neutral-muted)]',
+      iconBg: 'bg-[var(--color-neutral-muted)]',
+      iconColor: 'text-[var(--color-fg-muted)]',
+      valueColor: 'text-[var(--color-fg-default)]',
+      borderColor: 'border-[var(--color-border-default)]'
     },
     {
       label: 'AI Overviews',
       value: aiOverviewsFound,
       subtext: `${aioRate}% coverage`,
       icon: Eye,
-      gradient: 'from-emerald-50 to-teal-50',
-      iconBg: 'bg-emerald-100',
-      iconColor: 'text-emerald-600',
-      valueColor: 'text-emerald-700',
-      borderColor: 'border-emerald-200'
+      gradient: 'from-[var(--color-success-subtle)] to-[var(--color-success-subtle)]',
+      iconBg: 'bg-[var(--color-success-subtle)]',
+      iconColor: 'text-[var(--color-success-fg)]',
+      valueColor: 'text-[var(--color-success-fg)]',
+      borderColor: 'border-[var(--color-success-subtle)]'
     },
     {
       label: brandName ? `${brandName} Citations` : 'Brand Citations',
       value: brandCitations ?? '-',
       subtext: brandCitations !== undefined ? `${brandCitationRate}% of AIOs` : 'configure brand',
       icon: Award,
-      gradient: 'from-amber-50 to-orange-50',
-      iconBg: 'bg-amber-100',
-      iconColor: 'text-amber-600',
-      valueColor: 'text-amber-700',
-      borderColor: 'border-amber-200',
+      gradient: 'from-[var(--color-warning-subtle)] to-[var(--color-warning-subtle)]',
+      iconBg: 'bg-[var(--color-warning-subtle)]',
+      iconColor: 'text-[var(--color-warning-fg)]',
+      valueColor: 'text-[var(--color-warning-fg)]',
+      borderColor: 'border-[var(--color-warning-subtle)]',
       highlight: true
     },
     {
@@ -63,11 +63,11 @@ export function SummaryCards({
       value: competitorsIdentified,
       subtext: 'unique sources',
       icon: Users,
-      gradient: 'from-indigo-50 to-purple-50',
-      iconBg: 'bg-indigo-100',
-      iconColor: 'text-indigo-600',
-      valueColor: 'text-indigo-700',
-      borderColor: 'border-indigo-200'
+      gradient: 'from-[var(--color-accent-subtle)] to-[#f3e8ff]',
+      iconBg: 'bg-[var(--color-accent-subtle)]',
+      iconColor: 'text-[var(--color-accent-fg)]',
+      valueColor: 'text-[var(--color-accent-fg)]',
+      borderColor: 'border-[var(--color-accent-subtle)]'
     }
   ];
 
@@ -78,19 +78,19 @@ export function SummaryCards({
         return (
           <Card
             key={card.label}
-            className={`bg-gradient-to-br ${card.gradient} border ${card.borderColor} shadow-sm hover:shadow-md transition-shadow overflow-hidden relative`}
+            className={`bg-gradient-to-br ${card.gradient} border ${card.borderColor} shadow-[var(--color-shadow-small)] hover:shadow-[var(--color-shadow-medium)] transition-shadow overflow-hidden relative`}
           >
             {card.highlight && (
-              <div className="absolute top-0 right-0 w-16 h-16 bg-amber-200/30 rounded-bl-full" />
+              <div className="absolute top-0 right-0 w-16 h-16 bg-[var(--color-warning-subtle)]/30 rounded-bl-full" />
             )}
             <div className="p-5">
               <div className="flex items-start justify-between">
                 <div className="space-y-1">
-                  <p className="text-sm font-medium text-gray-500">{card.label}</p>
+                  <p className="text-sm font-medium text-[var(--color-fg-muted)]">{card.label}</p>
                   <p className={`text-3xl font-bold ${card.valueColor}`}>{card.value}</p>
-                  <p className="text-xs text-gray-400">{card.subtext}</p>
+                  <p className="text-xs text-[var(--color-fg-subtle)]">{card.subtext}</p>
                 </div>
-                <div className={`p-2.5 rounded-xl ${card.iconBg} shadow-sm`}>
+                <div className={`p-2.5 rounded-md ${card.iconBg} shadow-[var(--color-shadow-small)]`}>
                   <Icon className={`h-5 w-5 ${card.iconColor}`} />
                 </div>
               </div>

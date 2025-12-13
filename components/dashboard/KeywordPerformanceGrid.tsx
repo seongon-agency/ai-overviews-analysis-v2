@@ -24,23 +24,23 @@ export function KeywordPerformanceGrid({ keywords, brandName, brandDomain }: Key
       if (!kw.hasAIOverview) {
         status = 'no-aio';
         statusLabel = 'No AIO';
-        statusColor = 'bg-gray-100 text-gray-600';
+        statusColor = 'bg-[var(--color-neutral-muted)] text-[var(--color-fg-muted)]';
       } else if (kw.brandRank === null) {
         status = 'not-cited';
         statusLabel = 'Not Cited';
-        statusColor = 'bg-amber-100 text-amber-700';
+        statusColor = 'bg-[var(--color-warning-subtle)] text-[var(--color-warning-fg)]';
       } else if (kw.brandRank <= 3) {
         status = 'top';
         statusLabel = `#${kw.brandRank}`;
-        statusColor = 'bg-green-100 text-green-700';
+        statusColor = 'bg-[var(--color-success-subtle)] text-[var(--color-success-fg)]';
       } else if (kw.brandRank <= 6) {
         status = 'mid';
         statusLabel = `#${kw.brandRank}`;
-        statusColor = 'bg-blue-100 text-blue-700';
+        statusColor = 'bg-[var(--color-accent-subtle)] text-[var(--color-accent-fg)]';
       } else {
         status = 'low';
         statusLabel = `#${kw.brandRank}`;
-        statusColor = 'bg-purple-100 text-purple-700';
+        statusColor = 'bg-[#f3e8ff] text-[#8250df]';
       }
 
       return {
@@ -90,7 +90,7 @@ export function KeywordPerformanceGrid({ keywords, brandName, brandDomain }: Key
         <div className="flex items-start justify-between">
           <div>
             <CardTitle className="text-lg flex items-center gap-2">
-              <Search className="h-5 w-5 text-indigo-500" />
+              <Search className="h-5 w-5 text-[var(--color-accent-fg)]" />
               Keyword Performance
             </CardTitle>
             <CardDescription>
@@ -98,10 +98,10 @@ export function KeywordPerformanceGrid({ keywords, brandName, brandDomain }: Key
             </CardDescription>
           </div>
           <div className="flex items-center gap-1 text-xs">
-            <span className="px-2 py-1 rounded-full bg-green-100 text-green-700 font-medium">
+            <span className="px-2 py-1 rounded-full bg-[var(--color-success-subtle)] text-[var(--color-success-fg)] font-medium">
               {stats.top3} top 3
             </span>
-            <span className="px-2 py-1 rounded-full bg-blue-100 text-blue-700 font-medium">
+            <span className="px-2 py-1 rounded-full bg-[var(--color-accent-subtle)] text-[var(--color-accent-fg)] font-medium">
               {stats.cited} cited
             </span>
           </div>
@@ -113,10 +113,10 @@ export function KeywordPerformanceGrid({ keywords, brandName, brandDomain }: Key
             <button
               key={btn.key}
               onClick={() => setFilter(btn.key as typeof filter)}
-              className={`px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
+              className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
                 filter === btn.key
-                  ? 'bg-gray-900 text-white'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  ? 'bg-[var(--color-fg-default)] text-[var(--color-canvas-default)]'
+                  : 'bg-[var(--color-neutral-muted)] text-[var(--color-fg-muted)] hover:bg-[var(--color-border-default)]'
               }`}
             >
               {btn.label} ({btn.count})
@@ -129,24 +129,24 @@ export function KeywordPerformanceGrid({ keywords, brandName, brandDomain }: Key
         {/* Performance Legend */}
         <div className="flex flex-wrap gap-3 mb-4 text-xs">
           <div className="flex items-center gap-1.5">
-            <div className="w-2 h-2 rounded-full bg-green-500"></div>
-            <span className="text-gray-600">Top 3</span>
+            <div className="w-2 h-2 rounded-full bg-[var(--color-success-fg)]"></div>
+            <span className="text-[var(--color-fg-muted)]">Top 3</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <div className="w-2 h-2 rounded-full bg-blue-500"></div>
-            <span className="text-gray-600">Rank 4-6</span>
+            <div className="w-2 h-2 rounded-full bg-[var(--color-accent-fg)]"></div>
+            <span className="text-[var(--color-fg-muted)]">Rank 4-6</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <div className="w-2 h-2 rounded-full bg-purple-500"></div>
-            <span className="text-gray-600">Rank 7+</span>
+            <div className="w-2 h-2 rounded-full bg-[#8250df]"></div>
+            <span className="text-[var(--color-fg-muted)]">Rank 7+</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <div className="w-2 h-2 rounded-full bg-amber-500"></div>
-            <span className="text-gray-600">Not Cited</span>
+            <div className="w-2 h-2 rounded-full bg-[var(--color-warning-fg)]"></div>
+            <span className="text-[var(--color-fg-muted)]">Not Cited</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <div className="w-2 h-2 rounded-full bg-gray-400"></div>
-            <span className="text-gray-600">No AIO</span>
+            <div className="w-2 h-2 rounded-full bg-[var(--color-fg-subtle)]"></div>
+            <span className="text-[var(--color-fg-muted)]">No AIO</span>
           </div>
         </div>
 
@@ -155,10 +155,10 @@ export function KeywordPerformanceGrid({ keywords, brandName, brandDomain }: Key
           {displayKeywords.map((kw, index) => (
             <div
               key={index}
-              className="flex items-center justify-between p-3 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors group"
+              className="flex items-center justify-between p-3 rounded-md bg-[var(--color-canvas-subtle)] hover:bg-[var(--color-neutral-muted)] transition-colors group"
             >
               <div className="flex items-center gap-3 min-w-0 flex-1">
-                <div className={`flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold ${kw.statusColor}`}>
+                <div className={`flex-shrink-0 w-8 h-8 rounded-md flex items-center justify-center text-xs font-bold ${kw.statusColor}`}>
                   {kw.status === 'top' && <Award className="w-4 h-4" />}
                   {kw.status === 'mid' && kw.statusLabel}
                   {kw.status === 'low' && kw.statusLabel}
@@ -166,11 +166,11 @@ export function KeywordPerformanceGrid({ keywords, brandName, brandDomain }: Key
                   {kw.status === 'no-aio' && '-'}
                 </div>
                 <div className="min-w-0">
-                  <p className="font-medium text-gray-900 truncate">{kw.keyword}</p>
-                  <div className="flex items-center gap-2 text-xs text-gray-500">
+                  <p className="font-medium text-[var(--color-fg-default)] truncate">{kw.keyword}</p>
+                  <div className="flex items-center gap-2 text-xs text-[var(--color-fg-muted)]">
                     {kw.hasAIOverview ? (
                       <>
-                        <CheckCircle className="w-3 h-3 text-green-500" />
+                        <CheckCircle className="w-3 h-3 text-[var(--color-success-fg)]" />
                         <span>Has AIO</span>
                         {kw.referenceCount > 0 && (
                           <>
@@ -180,7 +180,7 @@ export function KeywordPerformanceGrid({ keywords, brandName, brandDomain }: Key
                         )}
                       </>
                     ) : (
-                      <span className="text-gray-400">No AI Overview</span>
+                      <span className="text-[var(--color-fg-subtle)]">No AI Overview</span>
                     )}
                   </div>
                 </div>
@@ -188,12 +188,12 @@ export function KeywordPerformanceGrid({ keywords, brandName, brandDomain }: Key
 
               <div className="flex items-center gap-2">
                 {kw.status === 'not-cited' && kw.hasAIOverview && (
-                  <span className="text-xs px-2 py-1 rounded-full bg-amber-50 text-amber-600 font-medium">
+                  <span className="text-xs px-2 py-1 rounded-full bg-[var(--color-warning-subtle)] text-[var(--color-warning-fg)] font-medium">
                     Opportunity
                   </span>
                 )}
                 {kw.status === 'top' && (
-                  <span className="text-xs px-2 py-1 rounded-full bg-green-50 text-green-600 font-medium">
+                  <span className="text-xs px-2 py-1 rounded-full bg-[var(--color-success-subtle)] text-[var(--color-success-fg)] font-medium">
                     {kw.statusLabel}
                   </span>
                 )}
@@ -206,7 +206,7 @@ export function KeywordPerformanceGrid({ keywords, brandName, brandDomain }: Key
         {filteredKeywords.length > 20 && (
           <button
             onClick={() => setShowAll(!showAll)}
-            className="mt-4 w-full py-2.5 text-sm font-medium text-gray-600 bg-gray-50 hover:bg-gray-100 rounded-xl transition-colors flex items-center justify-center gap-2"
+            className="mt-4 w-full py-2.5 text-sm font-medium text-[var(--color-fg-muted)] bg-[var(--color-canvas-subtle)] hover:bg-[var(--color-neutral-muted)] rounded-md transition-colors flex items-center justify-center gap-2"
           >
             {showAll ? (
               <>
@@ -223,7 +223,7 @@ export function KeywordPerformanceGrid({ keywords, brandName, brandDomain }: Key
         )}
 
         {filteredKeywords.length === 0 && (
-          <div className="text-center py-8 text-gray-500">
+          <div className="text-center py-8 text-[var(--color-fg-muted)]">
             <p>No keywords match this filter</p>
           </div>
         )}

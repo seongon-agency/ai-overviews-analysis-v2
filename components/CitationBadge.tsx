@@ -24,8 +24,8 @@ export function CitationBadge({
         transition-all duration-150 cursor-pointer
         border
         ${isHighlighted
-          ? 'bg-blue-500 text-white border-blue-600 scale-110'
-          : 'bg-gray-100 text-gray-700 border-gray-300 hover:bg-blue-100 hover:border-blue-300'
+          ? 'bg-[var(--color-accent-emphasis)] text-[var(--color-canvas-default)] border-[var(--color-accent-emphasis)] scale-110'
+          : 'bg-[var(--color-canvas-subtle)] text-[var(--color-fg-default)] border-[var(--color-border-default)] hover:bg-[var(--color-accent-subtle)] hover:border-[var(--color-accent-muted)]'
         }
       `}
       onMouseEnter={onHover}

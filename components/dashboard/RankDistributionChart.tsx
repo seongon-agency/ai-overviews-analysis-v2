@@ -133,7 +133,7 @@ export function RankDistributionChart({ keywords, brandName, brandDomain }: Rank
       <Card>
         <CardHeader>
           <CardTitle className="text-lg flex items-center gap-2">
-            <BarChart3 className="h-5 w-5 text-indigo-500" />
+            <BarChart3 className="h-5 w-5 text-[var(--color-accent-fg)]" />
             Rank Distribution
           </CardTitle>
           <CardDescription>
@@ -142,11 +142,11 @@ export function RankDistributionChart({ keywords, brandName, brandDomain }: Rank
         </CardHeader>
         <CardContent>
           <div className="flex flex-col items-center justify-center py-12 text-center">
-            <div className="h-16 w-16 rounded-2xl bg-gray-50 flex items-center justify-center mb-4">
-              <BarChart3 className="w-8 h-8 text-gray-300" />
+            <div className="h-16 w-16 rounded-md bg-[var(--color-canvas-subtle)] flex items-center justify-center mb-4">
+              <BarChart3 className="w-8 h-8 text-[var(--color-fg-subtle)]" />
             </div>
-            <h3 className="text-gray-900 font-medium mb-1">No citation data</h3>
-            <p className="text-sm text-gray-500 max-w-sm">
+            <h3 className="text-[var(--color-fg-default)] font-medium mb-1">No citation data</h3>
+            <p className="text-sm text-[var(--color-fg-muted)] max-w-sm">
               Your brand needs to be cited in AI Overviews to show rank distribution
             </p>
           </div>
@@ -161,24 +161,24 @@ export function RankDistributionChart({ keywords, brandName, brandDomain }: Rank
     if (active && payload && payload.length) {
       const data = payload[0].payload;
       return (
-        <div className="bg-white border border-gray-200 rounded-xl shadow-lg p-4 text-sm">
-          <p className="font-semibold text-gray-900 mb-2">Position {label}</p>
+        <div className="bg-[var(--color-canvas-default)] border border-[var(--color-border-default)] rounded-md shadow-[var(--color-shadow-large)] p-4 text-sm">
+          <p className="font-semibold text-[var(--color-fg-default)] mb-2">Position {label}</p>
           <div className="space-y-1.5">
             <div className="flex items-center justify-between gap-4">
               <div className="flex items-center gap-2">
-                <div className="w-2.5 h-2.5 rounded-full bg-gray-400" />
-                <span className="text-gray-600">Industry</span>
+                <div className="w-2.5 h-2.5 rounded-full bg-[var(--color-fg-subtle)]" />
+                <span className="text-[var(--color-fg-muted)]">Industry</span>
               </div>
-              <span className="font-medium text-gray-900">
+              <span className="font-medium text-[var(--color-fg-default)]">
                 {data.industry.toFixed(1)}% ({data.industryCount})
               </span>
             </div>
             <div className="flex items-center justify-between gap-4">
               <div className="flex items-center gap-2">
-                <div className="w-2.5 h-2.5 rounded-full bg-amber-500" />
-                <span className="text-gray-600">{brandName}</span>
+                <div className="w-2.5 h-2.5 rounded-full bg-[var(--color-warning-fg)]" />
+                <span className="text-[var(--color-fg-muted)]">{brandName}</span>
               </div>
-              <span className="font-medium text-gray-900">
+              <span className="font-medium text-[var(--color-fg-default)]">
                 {data.brand.toFixed(1)}% ({data.brandCount})
               </span>
             </div>
@@ -190,12 +190,12 @@ export function RankDistributionChart({ keywords, brandName, brandDomain }: Rank
   };
 
   return (
-    <Card className="border-gray-200/80 shadow-sm overflow-hidden">
-      <CardHeader className="pb-3 bg-gradient-to-r from-slate-50 to-gray-50 border-b border-gray-100">
+    <Card className="border-[var(--color-border-default)] shadow-[var(--color-shadow-small)] overflow-hidden">
+      <CardHeader className="pb-3 bg-gradient-to-r from-[var(--color-canvas-subtle)] to-[var(--color-canvas-subtle)] border-b border-[var(--color-border-muted)]">
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-slate-600 to-slate-800 flex items-center justify-center shadow-sm">
-              <BarChart3 className="h-5 w-5 text-white" />
+            <div className="h-10 w-10 rounded-md bg-gradient-to-br from-[var(--color-fg-muted)] to-[var(--color-fg-default)] flex items-center justify-center shadow-[var(--color-shadow-small)]">
+              <BarChart3 className="h-5 w-5 text-[var(--color-canvas-default)]" />
             </div>
             <div>
               <CardTitle className="text-lg">Rank Distribution</CardTitle>
@@ -205,12 +205,12 @@ export function RankDistributionChart({ keywords, brandName, brandDomain }: Rank
             </div>
           </div>
           {/* Performance indicator */}
-          <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium shadow-sm ${
+          <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium shadow-[var(--color-shadow-small)] ${
             stats.performsAboveAvg
-              ? 'bg-green-100 text-green-700 border border-green-200'
+              ? 'bg-[var(--color-success-subtle)] text-[var(--color-success-fg)] border border-[var(--color-success-subtle)]'
               : stats.rankDiff === 0
-                ? 'bg-gray-100 text-gray-600 border border-gray-200'
-                : 'bg-red-100 text-red-700 border border-red-200'
+                ? 'bg-[var(--color-neutral-muted)] text-[var(--color-fg-muted)] border border-[var(--color-border-default)]'
+                : 'bg-[var(--color-danger-subtle)] text-[var(--color-danger-fg)] border border-[var(--color-danger-subtle)]'
           }`}>
             {stats.performsAboveAvg ? (
               <TrendingUp className="h-4 w-4" />
@@ -234,27 +234,27 @@ export function RankDistributionChart({ keywords, brandName, brandDomain }: Rank
       <CardContent className="p-5">
         {/* Stats Summary */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-          <div className="bg-gradient-to-br from-slate-50 to-slate-100 rounded-xl p-4 border border-slate-200">
-            <div className="text-xs text-slate-500 uppercase tracking-wide font-medium mb-1">Industry Avg</div>
-            <div className="text-2xl font-bold text-slate-700">#{stats.industryAvg.toFixed(1)}</div>
-            <div className="text-xs text-slate-400">{stats.industryTotal} citations</div>
+          <div className="bg-gradient-to-br from-[var(--color-canvas-subtle)] to-[var(--color-neutral-muted)] rounded-md p-4 border border-[var(--color-border-default)]">
+            <div className="text-xs text-[var(--color-fg-muted)] uppercase tracking-wide font-medium mb-1">Industry Avg</div>
+            <div className="text-2xl font-bold text-[var(--color-fg-default)]">#{stats.industryAvg.toFixed(1)}</div>
+            <div className="text-xs text-[var(--color-fg-subtle)]">{stats.industryTotal} citations</div>
           </div>
-          <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl p-4 border border-amber-200 relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-12 h-12 bg-amber-200/30 rounded-bl-full" />
-            <div className="text-xs text-amber-600 uppercase tracking-wide font-medium mb-1">Your Avg</div>
-            <div className="text-2xl font-bold text-amber-700">#{stats.brandAvg.toFixed(1)}</div>
-            <div className="text-xs text-amber-500">{stats.brandTotal} citations</div>
+          <div className="bg-gradient-to-br from-[var(--color-warning-subtle)] to-[var(--color-warning-subtle)] rounded-md p-4 border border-[var(--color-warning-subtle)] relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-12 h-12 bg-[var(--color-warning-subtle)]/30 rounded-bl-full" />
+            <div className="text-xs text-[var(--color-warning-fg)] uppercase tracking-wide font-medium mb-1">Your Avg</div>
+            <div className="text-2xl font-bold text-[var(--color-warning-fg)]">#{stats.brandAvg.toFixed(1)}</div>
+            <div className="text-xs text-[var(--color-warning-fg)]">{stats.brandTotal} citations</div>
           </div>
-          <div className="bg-gradient-to-br from-slate-50 to-slate-100 rounded-xl p-4 border border-slate-200">
-            <div className="text-xs text-slate-500 uppercase tracking-wide font-medium mb-1">Industry Top 3</div>
-            <div className="text-2xl font-bold text-slate-700">{stats.industryTop3Pct.toFixed(0)}%</div>
-            <div className="text-xs text-slate-400">of citations</div>
+          <div className="bg-gradient-to-br from-[var(--color-canvas-subtle)] to-[var(--color-neutral-muted)] rounded-md p-4 border border-[var(--color-border-default)]">
+            <div className="text-xs text-[var(--color-fg-muted)] uppercase tracking-wide font-medium mb-1">Industry Top 3</div>
+            <div className="text-2xl font-bold text-[var(--color-fg-default)]">{stats.industryTop3Pct.toFixed(0)}%</div>
+            <div className="text-xs text-[var(--color-fg-subtle)]">of citations</div>
           </div>
-          <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl p-4 border border-amber-200 relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-12 h-12 bg-amber-200/30 rounded-bl-full" />
-            <div className="text-xs text-amber-600 uppercase tracking-wide font-medium mb-1">Your Top 3</div>
-            <div className="text-2xl font-bold text-amber-700">{stats.brandTop3Pct.toFixed(0)}%</div>
-            <div className="text-xs text-amber-500">of citations</div>
+          <div className="bg-gradient-to-br from-[var(--color-warning-subtle)] to-[var(--color-warning-subtle)] rounded-md p-4 border border-[var(--color-warning-subtle)] relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-12 h-12 bg-[var(--color-warning-subtle)]/30 rounded-bl-full" />
+            <div className="text-xs text-[var(--color-warning-fg)] uppercase tracking-wide font-medium mb-1">Your Top 3</div>
+            <div className="text-2xl font-bold text-[var(--color-warning-fg)]">{stats.brandTop3Pct.toFixed(0)}%</div>
+            <div className="text-xs text-[var(--color-warning-fg)]">of citations</div>
           </div>
         </div>
 
@@ -328,12 +328,12 @@ export function RankDistributionChart({ keywords, brandName, brandDomain }: Rank
         {/* Legend */}
         <div className="flex items-center justify-center gap-6 mt-4 text-sm">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-2 rounded-full bg-gradient-to-r from-gray-300 to-gray-400" />
-            <span className="text-gray-600">Industry Distribution</span>
+            <div className="w-8 h-2 rounded-full bg-gradient-to-r from-[var(--color-fg-subtle)] to-[var(--color-fg-muted)]" />
+            <span className="text-[var(--color-fg-muted)]">Industry Distribution</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-8 h-2 rounded-full bg-gradient-to-r from-amber-300 to-amber-500" />
-            <span className="text-gray-600">{brandName}</span>
+            <div className="w-8 h-2 rounded-full bg-gradient-to-r from-[var(--color-warning-fg)] to-[var(--color-warning-fg)]" />
+            <span className="text-[var(--color-fg-muted)]">{brandName}</span>
           </div>
         </div>
       </CardContent>

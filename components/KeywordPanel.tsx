@@ -39,20 +39,20 @@ export function KeywordPanel({
       />
 
       {/* Panel - centered modal with horizontal layout */}
-      <div className="relative w-full max-w-6xl h-[85vh] mx-4 bg-white rounded-xl shadow-2xl flex flex-col animate-fade-in">
+      <div className="relative w-full max-w-6xl h-[85vh] mx-4 bg-[var(--color-canvas-default)] rounded-md shadow-[var(--color-shadow-large)] flex flex-col animate-fade-in">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b bg-gray-50 rounded-t-xl">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--color-border-default)] bg-[var(--color-canvas-subtle)] rounded-t-md">
           <div className="flex-1 min-w-0">
-            <h2 className="text-xl font-semibold text-gray-900 truncate">
+            <h2 className="text-xl font-semibold text-[var(--color-fg-default)] truncate">
               {keyword}
             </h2>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-[var(--color-fg-muted)]">
               AI Overview with {references.length} citation{references.length !== 1 ? 's' : ''}
             </p>
           </div>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-200 rounded-lg transition-colors ml-4"
+            className="p-2 hover:bg-[var(--color-neutral-muted)] rounded-md transition-colors ml-4"
             title="Close (Esc)"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -64,12 +64,12 @@ export function KeywordPanel({
         {/* Content - horizontal split layout */}
         <div className="flex-1 overflow-hidden flex">
           {/* Left side: AI Overview Content (takes more space) */}
-          <div className="flex-[3] overflow-y-auto p-6 border-r">
+          <div className="flex-[3] overflow-y-auto p-6 border-r border-[var(--color-border-default)]">
             <div className="max-w-3xl mx-auto">
-              <div className="text-sm font-medium text-gray-500 uppercase tracking-wide mb-4">
+              <div className="text-sm font-medium text-[var(--color-fg-muted)] uppercase tracking-wide mb-4">
                 AI Overview Content
               </div>
-              <div className="bg-white rounded-lg">
+              <div className="bg-[var(--color-canvas-default)] rounded-md">
                 <AIOContent
                   markdown={aioMarkdown || ''}
                   references={references}
@@ -83,8 +83,8 @@ export function KeywordPanel({
           </div>
 
           {/* Right side: Citations List */}
-          <div className="flex-[1] min-w-[280px] max-w-[360px] overflow-y-auto p-4 bg-gray-50">
-            <div className="text-sm font-medium text-gray-500 uppercase tracking-wide mb-4">
+          <div className="flex-[1] min-w-[280px] max-w-[360px] overflow-y-auto p-4 bg-[var(--color-canvas-subtle)]">
+            <div className="text-sm font-medium text-[var(--color-fg-muted)] uppercase tracking-wide mb-4">
               Sources ({references.length})
             </div>
             <CitationList

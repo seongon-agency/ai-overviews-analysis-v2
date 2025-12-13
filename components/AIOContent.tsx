@@ -47,7 +47,7 @@ export function AIOContent({
         return (
           <mark
             key={`${keyPrefix}-brand-${idx}`}
-            className="bg-yellow-200 text-yellow-900 px-0.5 rounded font-medium"
+            className="bg-[var(--color-warning-subtle)] text-[var(--color-warning-fg)] px-0.5 rounded font-medium"
           >
             {part.text}
           </mark>
@@ -66,7 +66,7 @@ export function AIOContent({
     // Combined pattern for bold, italic, code, and links
     // Order: code first (to not interfere), then bold, then italic, then links
     const patterns = [
-      { regex: /`([^`]+)`/g, render: (m: string) => <code key={`${keyPrefix}-${partKey++}`} className="bg-gray-100 px-1 py-0.5 rounded text-sm font-mono">{m}</code> },
+      { regex: /`([^`]+)`/g, render: (m: string) => <code key={`${keyPrefix}-${partKey++}`} className="bg-[var(--color-canvas-subtle)] px-1 py-0.5 rounded text-sm font-mono">{m}</code> },
       { regex: /\*\*([^*]+)\*\*/g, render: (m: string) => <strong key={`${keyPrefix}-${partKey++}`} className="font-semibold">{m}</strong> },
       { regex: /__([^_]+)__/g, render: (m: string) => <strong key={`${keyPrefix}-${partKey++}`} className="font-semibold">{m}</strong> },
       { regex: /\*([^*]+)\*/g, render: (m: string) => <em key={`${keyPrefix}-${partKey++}`} className="italic">{m}</em> },
@@ -91,7 +91,7 @@ export function AIOContent({
       const innerText = codeMatch[1];
       codeMatches.push({
         placeholder,
-        element: <code key={`${keyPrefix}-code-${codeIdx}`} className="bg-gray-100 px-1 py-0.5 rounded text-sm font-mono">{highlightBrandName(innerText, `${keyPrefix}-code-${codeIdx}`)}</code>
+        element: <code key={`${keyPrefix}-code-${codeIdx}`} className="bg-[var(--color-canvas-subtle)] px-1 py-0.5 rounded text-sm font-mono">{highlightBrandName(innerText, `${keyPrefix}-code-${codeIdx}`)}</code>
       });
       processed = processed.replace(codeMatch[0], placeholder);
       codeIdx++;
@@ -158,22 +158,22 @@ export function AIOContent({
     );
 
     return (
-      <div key={key} className="overflow-x-auto my-3 rounded-lg border border-gray-200 shadow-sm">
+      <div key={key} className="overflow-x-auto my-3 rounded-md border border-[var(--color-border-default)] shadow-[var(--color-shadow-small)]">
         <table className="w-full border-collapse text-sm">
-          <thead className="bg-gray-50">
+          <thead className="bg-[var(--color-canvas-subtle)]">
             <tr>
               {headerCells.map((cell, i) => (
-                <th key={i} className="border-b border-gray-200 px-3 py-2 text-left font-semibold text-gray-700 whitespace-nowrap">
+                <th key={i} className="border-b border-[var(--color-border-default)] px-3 py-2 text-left font-semibold text-[var(--color-fg-default)] whitespace-nowrap">
                   {renderInlineFormatting(cell, `${key}-th-${i}`)}
                 </th>
               ))}
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100">
+          <tbody className="divide-y divide-[var(--color-border-muted)]">
             {bodyRows.map((row, rowIdx) => (
-              <tr key={rowIdx} className="hover:bg-gray-50/50">
+              <tr key={rowIdx} className="hover:bg-[var(--color-canvas-subtle)]">
                 {row.map((cell, cellIdx) => (
-                  <td key={cellIdx} className="px-3 py-2 text-gray-600">
+                  <td key={cellIdx} className="px-3 py-2 text-[var(--color-fg-muted)]">
                     {renderInlineFormatting(cell, `${key}-td-${rowIdx}-${cellIdx}`)}
                   </td>
                 ))}
@@ -233,7 +233,7 @@ export function AIOContent({
       // Handle headers
       if (trimmedLine.startsWith('### ')) {
         result.push(
-          <h4 key={lineKey} className="font-semibold text-base mt-4 mb-2 text-gray-900">
+          <h4 key={lineKey} className="font-semibold text-base mt-4 mb-2 text-[var(--color-fg-default)]">
             {renderInlineFormatting(trimmedLine.slice(4), lineKey)}
           </h4>
         );
@@ -241,7 +241,7 @@ export function AIOContent({
       }
       if (trimmedLine.startsWith('## ')) {
         result.push(
-          <h3 key={lineKey} className="font-semibold text-lg mt-5 mb-2 text-gray-900">
+          <h3 key={lineKey} className="font-semibold text-lg mt-5 mb-2 text-[var(--color-fg-default)]">
             {renderInlineFormatting(trimmedLine.slice(3), lineKey)}
           </h3>
         );
@@ -249,7 +249,7 @@ export function AIOContent({
       }
       if (trimmedLine.startsWith('# ')) {
         result.push(
-          <h2 key={lineKey} className="font-bold text-xl mt-5 mb-3 text-gray-900">
+          <h2 key={lineKey} className="font-bold text-xl mt-5 mb-3 text-[var(--color-fg-default)]">
             {renderInlineFormatting(trimmedLine.slice(2), lineKey)}
           </h2>
         );
@@ -260,7 +260,7 @@ export function AIOContent({
       if (trimmedLine.startsWith('- ') || trimmedLine.startsWith('* ')) {
         result.push(
           <div key={lineKey} className="flex gap-2 ml-4 my-1.5">
-            <span className="text-gray-400 select-none">•</span>
+            <span className="text-[var(--color-fg-subtle)] select-none">•</span>
             <span className="flex-1">{renderInlineFormatting(trimmedLine.slice(2), lineKey)}</span>
           </div>
         );
@@ -272,7 +272,7 @@ export function AIOContent({
       if (numberedMatch) {
         result.push(
           <div key={lineKey} className="flex gap-2 ml-4 my-1.5">
-            <span className="text-gray-500 font-medium min-w-[1.5rem]">{numberedMatch[1]}.</span>
+            <span className="text-[var(--color-fg-muted)] font-medium min-w-[1.5rem]">{numberedMatch[1]}.</span>
             <span className="flex-1">{renderInlineFormatting(numberedMatch[2], lineKey)}</span>
           </div>
         );
@@ -282,7 +282,7 @@ export function AIOContent({
       // Handle blockquotes
       if (trimmedLine.startsWith('> ')) {
         result.push(
-          <blockquote key={lineKey} className="border-l-4 border-gray-300 pl-4 my-2 text-gray-600 italic">
+          <blockquote key={lineKey} className="border-l-4 border-[var(--color-border-default)] pl-4 my-2 text-[var(--color-fg-muted)] italic">
             {renderInlineFormatting(trimmedLine.slice(2), lineKey)}
           </blockquote>
         );
@@ -305,14 +305,14 @@ export function AIOContent({
 
   if (!markdown) {
     return (
-      <div className="text-gray-500 italic">
+      <div className="text-[var(--color-fg-muted)] italic">
         No AI Overview content available
       </div>
     );
   }
 
   return (
-    <div className="text-gray-800 leading-relaxed">
+    <div className="text-[var(--color-fg-default)] leading-relaxed">
       {segments.map((seg, i) => {
         if (seg.type === 'text') {
           return (

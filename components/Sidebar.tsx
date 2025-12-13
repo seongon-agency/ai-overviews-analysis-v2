@@ -6,6 +6,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { Project } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { ThemeToggle } from '@/components/ThemeToggle';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -106,17 +107,19 @@ export function Sidebar({ currentProjectId }: SidebarProps) {
 
   return (
     <>
-      <aside className="fixed left-0 top-0 z-40 h-screen w-64 border-r border-gray-100 bg-white">
+      <aside className="fixed left-0 top-0 z-40 h-screen w-64 border-r border-[var(--color-border-default)] bg-[var(--color-canvas-subtle)]">
         <div className="flex h-full flex-col">
           {/* Logo */}
-          <div className="flex h-16 items-center gap-3 px-6">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 text-white shadow-lg shadow-indigo-200">
-              <Sparkles className="h-5 w-5" />
+          <div className="flex h-14 items-center justify-between px-4 border-b border-[var(--color-border-muted)]">
+            <div className="flex items-center gap-3">
+              <div className="flex h-8 w-8 items-center justify-center rounded-md bg-[var(--color-accent-emphasis)] text-white">
+                <Sparkles className="h-4 w-4" />
+              </div>
+              <div>
+                <h1 className="text-sm font-semibold text-[var(--color-fg-default)]">AIO Analysis</h1>
+              </div>
             </div>
-            <div>
-              <h1 className="text-base font-semibold text-gray-900">AIO Analysis</h1>
-              <p className="text-xs text-gray-400">AI Overview Tracker</p>
-            </div>
+            <ThemeToggle />
           </div>
 
           {/* Navigation */}
@@ -125,11 +128,7 @@ export function Sidebar({ currentProjectId }: SidebarProps) {
             <div className="space-y-1">
               <Link
                 href="/"
-                className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200 ${
-                  isActive('/')
-                    ? 'bg-gray-900 text-white shadow-sm'
-                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                }`}
+                className={`gh-nav-item ${isActive('/') ? 'active' : ''}`}
               >
                 <LayoutDashboard className="h-4 w-4" />
                 Home
@@ -137,15 +136,15 @@ export function Sidebar({ currentProjectId }: SidebarProps) {
             </div>
 
             {/* Projects Section */}
-            <div className="mt-8">
-              <div className="flex items-center justify-between px-3 mb-3">
-                <span className="text-[11px] font-semibold uppercase tracking-wider text-gray-400">
+            <div className="mt-6">
+              <div className="flex items-center justify-between px-3 mb-2">
+                <span className="text-[11px] font-semibold uppercase tracking-wider text-[var(--color-fg-muted)]">
                   Projects
                 </span>
                 <Button
                   variant="ghost"
-                  size="icon"
-                  className="h-6 w-6 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100"
+                  size="icon-sm"
+                  className="h-6 w-6 text-[var(--color-fg-muted)] hover:text-[var(--color-fg-default)]"
                   onClick={() => setShowCreateModal(true)}
                 >
                   <Plus className="h-4 w-4" />
@@ -154,18 +153,18 @@ export function Sidebar({ currentProjectId }: SidebarProps) {
 
               {loading ? (
                 <div className="flex items-center justify-center py-8">
-                  <Loader2 className="h-5 w-5 animate-spin text-gray-300" />
+                  <Loader2 className="h-5 w-5 animate-spin text-[var(--color-fg-muted)]" />
                 </div>
               ) : projects.length === 0 ? (
                 <div className="px-3 py-6 text-center">
-                  <div className="mx-auto w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center mb-3">
-                    <FolderOpen className="h-5 w-5 text-gray-300" />
+                  <div className="mx-auto w-10 h-10 rounded-md bg-[var(--color-neutral-muted)] flex items-center justify-center mb-3">
+                    <FolderOpen className="h-5 w-5 text-[var(--color-fg-muted)]" />
                   </div>
-                  <p className="text-sm text-gray-400 mb-2">No projects yet</p>
+                  <p className="text-sm text-[var(--color-fg-muted)] mb-2">No projects yet</p>
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="text-xs text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50"
+                    className="text-xs text-[var(--color-accent-fg)]"
                     onClick={() => setShowCreateModal(true)}
                   >
                     Create your first project
@@ -179,22 +178,18 @@ export function Sidebar({ currentProjectId }: SidebarProps) {
                       <Link
                         key={project.id}
                         href={`/project/${project.id}`}
-                        className={`group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-all duration-200 ${
-                          isProjectActive
-                            ? 'bg-indigo-50 text-indigo-700 font-medium'
-                            : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                        }`}
+                        className={`gh-nav-item group ${isProjectActive ? 'active' : ''}`}
                       >
-                        <div className={`flex h-7 w-7 items-center justify-center rounded-lg text-xs font-semibold ${
+                        <div className={`flex h-6 w-6 items-center justify-center rounded text-xs font-medium ${
                           isProjectActive
-                            ? 'bg-indigo-100 text-indigo-600'
-                            : 'bg-gray-100 text-gray-500 group-hover:bg-gray-200'
+                            ? 'bg-[var(--color-accent-emphasis)] text-white'
+                            : 'bg-[var(--color-neutral-muted)] text-[var(--color-fg-muted)]'
                         }`}>
                           {project.name.charAt(0).toUpperCase()}
                         </div>
-                        <span className="flex-1 truncate">{project.name}</span>
-                        <ChevronRight className={`h-4 w-4 text-gray-300 transition-all ${
-                          isProjectActive ? 'opacity-100 text-indigo-400' : 'opacity-0 group-hover:opacity-100'
+                        <span className="flex-1 truncate text-sm">{project.name}</span>
+                        <ChevronRight className={`h-4 w-4 text-[var(--color-fg-subtle)] transition-opacity ${
+                          isProjectActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
                         }`} />
                       </Link>
                     );
@@ -206,31 +201,31 @@ export function Sidebar({ currentProjectId }: SidebarProps) {
 
           {/* User Section */}
           {session?.user && (
-            <div className="border-t border-gray-100 p-3">
+            <div className="border-t border-[var(--color-border-muted)] p-3">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <button className="w-full flex items-center gap-3 rounded-xl px-3 py-2.5 hover:bg-gray-50 transition-colors">
-                    <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-gray-700 to-gray-900 text-white text-sm font-medium">
+                  <button className="w-full flex items-center gap-3 rounded-md px-3 py-2 hover:bg-[var(--color-neutral-muted)] transition-colors">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--color-accent-emphasis)] text-white text-sm font-medium">
                       {session.user.name?.[0]?.toUpperCase() || session.user.email?.[0]?.toUpperCase() || 'U'}
                     </div>
                     <div className="flex-1 text-left min-w-0">
-                      <p className="text-sm font-medium text-gray-900 truncate">
+                      <p className="text-sm font-medium text-[var(--color-fg-default)] truncate">
                         {session.user.name || 'User'}
                       </p>
-                      <p className="text-xs text-gray-400 truncate">
+                      <p className="text-xs text-[var(--color-fg-muted)] truncate">
                         {session.user.email}
                       </p>
                     </div>
-                    <MoreHorizontal className="h-4 w-4 text-gray-400" />
+                    <MoreHorizontal className="h-4 w-4 text-[var(--color-fg-muted)]" />
                   </button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56 rounded-xl">
-                  <DropdownMenuItem disabled className="text-gray-500">
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuItem disabled>
                     <User className="mr-2 h-4 w-4" />
                     <span className="truncate">{session.user.email}</span>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleSignOut} className="text-red-600 focus:text-red-600 focus:bg-red-50">
+                  <DropdownMenuItem onClick={handleSignOut} variant="destructive">
                     <LogOut className="mr-2 h-4 w-4" />
                     <span>Sign out</span>
                   </DropdownMenuItem>
@@ -245,19 +240,19 @@ export function Sidebar({ currentProjectId }: SidebarProps) {
       {showCreateModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div
-            className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+            className="absolute inset-0 bg-black/50"
             onClick={() => setShowCreateModal(false)}
           />
-          <div className="relative bg-white rounded-2xl shadow-2xl p-6 w-full max-w-md animate-fade-in">
-            <div className="flex items-center justify-between mb-6">
+          <div className="relative bg-[var(--color-canvas-default)] rounded-md border border-[var(--color-border-default)] shadow-[var(--color-shadow-large)] p-6 w-full max-w-md animate-scale-in">
+            <div className="flex items-center justify-between mb-4">
               <div>
-                <h3 className="text-lg font-semibold text-gray-900">Create Project</h3>
-                <p className="text-sm text-gray-500 mt-0.5">Start tracking a new set of keywords</p>
+                <h3 className="text-base font-semibold text-[var(--color-fg-default)]">Create Project</h3>
+                <p className="text-sm text-[var(--color-fg-muted)] mt-1">Start tracking a new set of keywords</p>
               </div>
               <Button
                 variant="ghost"
-                size="icon"
-                className="h-8 w-8 rounded-lg text-gray-400 hover:text-gray-600"
+                size="icon-sm"
+                className="text-[var(--color-fg-muted)]"
                 onClick={() => setShowCreateModal(false)}
               >
                 <X className="h-4 w-4" />
@@ -267,26 +262,24 @@ export function Sidebar({ currentProjectId }: SidebarProps) {
               value={newProjectName}
               onChange={(e) => setNewProjectName(e.target.value)}
               placeholder="Enter project name..."
-              className="h-11 rounded-xl border-gray-200 focus:border-indigo-300 focus:ring-indigo-200"
               onKeyDown={(e) => e.key === 'Enter' && createProject()}
               autoFocus
             />
-            <div className="flex justify-end gap-2 mt-6">
+            <div className="flex justify-end gap-2 mt-4">
               <Button
-                variant="ghost"
+                variant="outline"
                 onClick={() => setShowCreateModal(false)}
-                className="rounded-xl text-gray-600"
               >
                 Cancel
               </Button>
               <Button
+                variant="primary"
                 onClick={createProject}
                 disabled={creating || !newProjectName.trim()}
-                className="rounded-xl bg-gray-900 hover:bg-gray-800"
               >
                 {creating ? (
                   <>
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    <Loader2 className="h-4 w-4 animate-spin" />
                     Creating...
                   </>
                 ) : (

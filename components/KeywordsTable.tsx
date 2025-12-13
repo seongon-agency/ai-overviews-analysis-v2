@@ -98,11 +98,11 @@ export function KeywordsTable({
 
   const SortIcon = ({ field }: { field: SortField }) => {
     if (sortField !== field) {
-      return <ArrowUpDown className="h-3 w-3 ml-1 text-gray-300" />;
+      return <ArrowUpDown className="h-3 w-3 ml-1 text-[var(--color-border-default)]" />;
     }
     return sortDirection === 'asc'
-      ? <ArrowUp className="h-3 w-3 ml-1 text-indigo-600" />
-      : <ArrowDown className="h-3 w-3 ml-1 text-indigo-600" />;
+      ? <ArrowUp className="h-3 w-3 ml-1 text-[var(--color-accent-fg)]" />
+      : <ArrowDown className="h-3 w-3 ml-1 text-[var(--color-accent-fg)]" />;
   };
 
   // Helper to render change indicator
@@ -112,33 +112,33 @@ export function KeywordsTable({
     switch (kw.changeType) {
       case 'rank_improved':
         return (
-          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700">
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-[var(--color-success-subtle)] text-[var(--color-success-fg)]">
             <ArrowUp className="h-3 w-3" />
             {kw.previousBrandRank && kw.brandRank && `+${kw.previousBrandRank - kw.brandRank}`}
           </span>
         );
       case 'rank_declined':
         return (
-          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-700">
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-[var(--color-danger-subtle)] text-[var(--color-danger-fg)]">
             <ArrowDown className="h-3 w-3" />
             {kw.previousBrandRank && kw.brandRank && `-${kw.brandRank - kw.previousBrandRank}`}
           </span>
         );
       case 'aio_gained':
         return (
-          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-700">
+          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-[var(--color-accent-subtle)] text-[var(--color-accent-fg)]">
             +AIO
           </span>
         );
       case 'aio_lost':
         return (
-          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-700">
+          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-[var(--color-warning-subtle)] text-[var(--color-warning-fg)]">
             -AIO
           </span>
         );
       case 'new':
         return (
-          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-700">
+          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-[var(--color-accent-subtle)] text-[var(--color-accent-fg)]">
             NEW
           </span>
         );
@@ -151,18 +151,18 @@ export function KeywordsTable({
     <div className="w-full space-y-4">
       {/* Filters */}
       <div className="flex flex-wrap gap-4 items-center justify-between">
-        <p className="text-sm text-gray-500">
-          Showing <span className="font-medium text-gray-900">{processedKeywords.length}</span> of <span className="font-medium text-gray-900">{keywords.length}</span> keywords
+        <p className="text-sm text-[var(--color-fg-muted)]">
+          Showing <span className="font-medium text-[var(--color-fg-default)]">{processedKeywords.length}</span> of <span className="font-medium text-[var(--color-fg-default)]">{keywords.length}</span> keywords
         </p>
         <div className="flex flex-wrap gap-2">
           <Button
             variant={filterAIO === true ? "default" : "outline"}
             size="sm"
             onClick={() => setFilterAIO(filterAIO === true ? null : true)}
-            className={`h-8 text-xs rounded-xl ${
+            className={`h-8 text-xs rounded-md ${
               filterAIO === true
-                ? 'bg-emerald-600 hover:bg-emerald-700'
-                : 'border-gray-200 hover:bg-gray-50'
+                ? 'bg-[var(--color-success-emphasis)] hover:bg-[var(--color-success-emphasis)]'
+                : 'border-[var(--color-border-default)] hover:bg-[var(--color-canvas-subtle)]'
             }`}
           >
             <Eye className="h-3 w-3 mr-1.5" />
@@ -172,10 +172,10 @@ export function KeywordsTable({
             variant={filterAIO === false ? "default" : "outline"}
             size="sm"
             onClick={() => setFilterAIO(filterAIO === false ? null : false)}
-            className={`h-8 text-xs rounded-xl ${
+            className={`h-8 text-xs rounded-md ${
               filterAIO === false
-                ? 'bg-gray-600 hover:bg-gray-700'
-                : 'border-gray-200 hover:bg-gray-50'
+                ? 'bg-[var(--color-fg-muted)] hover:bg-[var(--color-fg-muted)]'
+                : 'border-[var(--color-border-default)] hover:bg-[var(--color-canvas-subtle)]'
             }`}
           >
             No AI Overview
@@ -183,16 +183,16 @@ export function KeywordsTable({
           {/* Change filters */}
           {showChanges && hasAnyChanges && (
             <>
-              <span className="text-gray-200">|</span>
+              <span className="text-[var(--color-border-default)]">|</span>
               {changeCounts.rank_improved > 0 && (
                 <Button
                   variant={filterChange === 'rank_improved' ? "default" : "outline"}
                   size="sm"
                   onClick={() => setFilterChange(filterChange === 'rank_improved' ? null : 'rank_improved')}
-                  className={`h-8 text-xs rounded-xl ${
+                  className={`h-8 text-xs rounded-md ${
                     filterChange === 'rank_improved'
-                      ? 'bg-emerald-600 hover:bg-emerald-700'
-                      : 'border-gray-200 hover:bg-gray-50'
+                      ? 'bg-[var(--color-success-emphasis)] hover:bg-[var(--color-success-emphasis)]'
+                      : 'border-[var(--color-border-default)] hover:bg-[var(--color-canvas-subtle)]'
                   }`}
                 >
                   <TrendingUp className="h-3 w-3 mr-1.5" />
@@ -204,10 +204,10 @@ export function KeywordsTable({
                   variant={filterChange === 'rank_declined' ? "default" : "outline"}
                   size="sm"
                   onClick={() => setFilterChange(filterChange === 'rank_declined' ? null : 'rank_declined')}
-                  className={`h-8 text-xs rounded-xl ${
+                  className={`h-8 text-xs rounded-md ${
                     filterChange === 'rank_declined'
-                      ? 'bg-red-600 hover:bg-red-700'
-                      : 'border-gray-200 hover:bg-gray-50'
+                      ? 'bg-[var(--color-danger-emphasis)] hover:bg-[var(--color-danger-emphasis)]'
+                      : 'border-[var(--color-border-default)] hover:bg-[var(--color-canvas-subtle)]'
                   }`}
                 >
                   Declined ({changeCounts.rank_declined})
@@ -218,10 +218,10 @@ export function KeywordsTable({
                   variant={filterChange === 'aio_gained' ? "default" : "outline"}
                   size="sm"
                   onClick={() => setFilterChange(filterChange === 'aio_gained' ? null : 'aio_gained')}
-                  className={`h-8 text-xs rounded-xl ${
+                  className={`h-8 text-xs rounded-md ${
                     filterChange === 'aio_gained'
-                      ? 'bg-blue-600 hover:bg-blue-700'
-                      : 'border-gray-200 hover:bg-gray-50'
+                      ? 'bg-[var(--color-accent-emphasis)] hover:bg-[var(--color-accent-emphasis)]'
+                      : 'border-[var(--color-border-default)] hover:bg-[var(--color-canvas-subtle)]'
                   }`}
                 >
                   +AIO ({changeCounts.aio_gained})
@@ -232,10 +232,10 @@ export function KeywordsTable({
                   variant={filterChange === 'aio_lost' ? "default" : "outline"}
                   size="sm"
                   onClick={() => setFilterChange(filterChange === 'aio_lost' ? null : 'aio_lost')}
-                  className={`h-8 text-xs rounded-xl ${
+                  className={`h-8 text-xs rounded-md ${
                     filterChange === 'aio_lost'
-                      ? 'bg-orange-600 hover:bg-orange-700'
-                      : 'border-gray-200 hover:bg-gray-50'
+                      ? 'bg-[var(--color-warning-emphasis)] hover:bg-[var(--color-warning-emphasis)]'
+                      : 'border-[var(--color-border-default)] hover:bg-[var(--color-canvas-subtle)]'
                   }`}
                 >
                   -AIO ({changeCounts.aio_lost})
@@ -248,19 +248,19 @@ export function KeywordsTable({
 
       {/* Previous session info banner */}
       {showChanges && previousSessionName && hasAnyChanges && (
-        <div className="px-4 py-3 bg-indigo-50 border border-indigo-100 rounded-xl text-sm text-indigo-700 flex items-center gap-2">
+        <div className="px-4 py-3 bg-[var(--color-accent-subtle)] border border-[var(--color-accent-muted)] rounded-md text-sm text-[var(--color-accent-fg)] flex items-center gap-2">
           <Sparkles className="h-4 w-4" />
           Comparing to: <span className="font-semibold">{previousSessionName}</span>
         </div>
       )}
 
       {/* Table */}
-      <div className="rounded-xl border border-gray-200 overflow-hidden">
+      <div className="gh-box rounded-md border border-[var(--color-border-default)] overflow-hidden">
         <table className="w-full">
           <thead>
-            <tr className="bg-gray-50/80">
+            <tr className="bg-[var(--color-canvas-subtle)]">
               <th
-                className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
+                className="px-4 py-3 text-left text-xs font-semibold text-[var(--color-fg-muted)] uppercase tracking-wider cursor-pointer hover:bg-[var(--color-neutral-muted)] transition-colors"
                 onClick={() => handleSort('keyword')}
               >
                 <div className="flex items-center">
@@ -268,13 +268,13 @@ export function KeywordsTable({
                 </div>
               </th>
               {rankHistory && (
-                <th className="w-20 px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                <th className="w-20 px-4 py-3 text-center text-xs font-semibold text-[var(--color-fg-muted)] uppercase tracking-wider">
                   Trend
                 </th>
               )}
               {showChanges && (
                 <th
-                  className="w-24 px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
+                  className="w-24 px-4 py-3 text-center text-xs font-semibold text-[var(--color-fg-muted)] uppercase tracking-wider cursor-pointer hover:bg-[var(--color-neutral-muted)] transition-colors"
                   onClick={() => handleSort('change')}
                 >
                   <div className="flex items-center justify-center">
@@ -282,11 +282,11 @@ export function KeywordsTable({
                   </div>
                 </th>
               )}
-              <th className="w-20 px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">
+              <th className="w-20 px-4 py-3 text-center text-xs font-semibold text-[var(--color-fg-muted)] uppercase tracking-wider">
                 AIO
               </th>
               <th
-                className="w-24 px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
+                className="w-24 px-4 py-3 text-center text-xs font-semibold text-[var(--color-fg-muted)] uppercase tracking-wider cursor-pointer hover:bg-[var(--color-neutral-muted)] transition-colors"
                 onClick={() => handleSort('referenceCount')}
               >
                 <div className="flex items-center justify-center">
@@ -294,33 +294,33 @@ export function KeywordsTable({
                 </div>
               </th>
               <th
-                className="w-28 px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
+                className="w-28 px-4 py-3 text-center text-xs font-semibold text-[var(--color-fg-muted)] uppercase tracking-wider cursor-pointer hover:bg-[var(--color-neutral-muted)] transition-colors"
                 onClick={() => handleSort('brandRank')}
               >
                 <div className="flex items-center justify-center">
                   Brand Cited <SortIcon field="brandRank" />
                 </div>
               </th>
-              <th className="w-24 px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">
+              <th className="w-24 px-4 py-3 text-center text-xs font-semibold text-[var(--color-fg-muted)] uppercase tracking-wider">
                 Mentioned
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100">
+          <tbody className="divide-y divide-[var(--color-border-muted)]">
             {processedKeywords.map((kw) => (
               <tr
                 key={kw.id}
                 className={`cursor-pointer transition-all duration-150 ${
                   kw.changeType === 'rank_improved' || kw.changeType === 'aio_gained'
-                    ? 'bg-emerald-50/50 hover:bg-emerald-100/50'
+                    ? 'bg-[var(--color-success-subtle)] hover:bg-[var(--color-success-subtle)]'
                     : kw.changeType === 'rank_declined' || kw.changeType === 'aio_lost'
-                    ? 'bg-red-50/50 hover:bg-red-100/50'
-                    : 'hover:bg-gray-50'
+                    ? 'bg-[var(--color-danger-subtle)] hover:bg-[var(--color-danger-subtle)]'
+                    : 'hover:bg-[var(--color-canvas-subtle)]'
                 }`}
                 onClick={() => setSelectedKeyword(kw)}
               >
                 <td className="px-4 py-3">
-                  <span className="font-medium text-gray-900 hover:text-indigo-600 transition-colors">
+                  <span className="font-medium text-[var(--color-fg-default)] hover:text-[var(--color-accent-fg)] transition-colors">
                     {kw.keyword}
                   </span>
                 </td>
@@ -329,45 +329,45 @@ export function KeywordsTable({
                     {rankHistory.get(kw.keyword) && rankHistory.get(kw.keyword)!.length >= 2 ? (
                       <RankSparkline data={rankHistory.get(kw.keyword)!} />
                     ) : (
-                      <span className="text-gray-300">-</span>
+                      <span className="text-[var(--color-border-default)]">-</span>
                     )}
                   </td>
                 )}
                 {showChanges && (
                   <td className="px-4 py-3 text-center">
-                    {renderChangeIndicator(kw) || <span className="text-gray-300">-</span>}
+                    {renderChangeIndicator(kw) || <span className="text-[var(--color-border-default)]">-</span>}
                   </td>
                 )}
                 <td className="px-4 py-3 text-center">
                   {kw.hasAIOverview ? (
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700">
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[var(--color-success-subtle)] text-[var(--color-success-fg)]">
                       Yes
                     </span>
                   ) : (
-                    <span className="text-gray-300">-</span>
+                    <span className="text-[var(--color-border-default)]">-</span>
                   )}
                 </td>
-                <td className="px-4 py-3 text-center text-gray-500">
-                  {kw.referenceCount || <span className="text-gray-300">-</span>}
+                <td className="px-4 py-3 text-center text-[var(--color-fg-muted)]">
+                  {kw.referenceCount || <span className="text-[var(--color-border-default)]">-</span>}
                 </td>
                 <td className="px-4 py-3 text-center">
                   {kw.brandRank ? (
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-700">
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[var(--color-warning-subtle)] text-[var(--color-warning-fg)]">
                       #{kw.brandRank}
                     </span>
                   ) : (
-                    <span className="text-gray-300">-</span>
+                    <span className="text-[var(--color-border-default)]">-</span>
                   )}
                 </td>
                 <td className="px-4 py-3 text-center">
                   {kw.brandMentioned ? (
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-700">
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[var(--color-accent-subtle)] text-[var(--color-accent-fg)]">
                       Yes
                     </span>
                   ) : kw.hasAIOverview ? (
-                    <span className="text-gray-400">No</span>
+                    <span className="text-[var(--color-fg-subtle)]">No</span>
                   ) : (
-                    <span className="text-gray-300">-</span>
+                    <span className="text-[var(--color-border-default)]">-</span>
                   )}
                 </td>
               </tr>
@@ -377,10 +377,10 @@ export function KeywordsTable({
 
         {processedKeywords.length === 0 && (
           <div className="p-12 text-center">
-            <div className="h-12 w-12 rounded-xl bg-gray-100 flex items-center justify-center mx-auto mb-3">
-              <Search className="h-6 w-6 text-gray-400" />
+            <div className="h-12 w-12 rounded-md bg-[var(--color-canvas-subtle)] flex items-center justify-center mx-auto mb-3">
+              <Search className="h-6 w-6 text-[var(--color-fg-subtle)]" />
             </div>
-            <p className="text-gray-500">No keywords found matching the filter criteria</p>
+            <p className="text-[var(--color-fg-muted)]">No keywords found matching the filter criteria</p>
           </div>
         )}
       </div>

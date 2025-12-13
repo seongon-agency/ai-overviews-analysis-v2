@@ -156,9 +156,9 @@ export function KeywordDetailPanel({
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center">
         <div className="absolute inset-0 bg-black/50" onClick={onClose} />
-        <div className="relative bg-white rounded-xl p-8 text-center shadow-2xl">
-          <Loader2 className="h-8 w-8 mx-auto mb-3 animate-spin text-muted-foreground" />
-          <p className="text-muted-foreground">Loading keyword history...</p>
+        <div className="relative bg-[var(--color-canvas-default)] rounded-md p-8 text-center shadow-[var(--color-shadow-large)]">
+          <Loader2 className="h-8 w-8 mx-auto mb-3 animate-spin text-[var(--color-fg-muted)]" />
+          <p className="text-[var(--color-fg-muted)]">Loading keyword history...</p>
         </div>
       </div>
     );
@@ -173,32 +173,32 @@ export function KeywordDetailPanel({
       />
 
       {/* Panel */}
-      <div className="relative w-full max-w-6xl h-[85vh] mx-4 bg-white rounded-xl shadow-2xl flex flex-col overflow-hidden">
+      <div className="relative w-full max-w-6xl h-[85vh] mx-4 bg-[var(--color-canvas-default)] rounded-md shadow-[var(--color-shadow-large)] flex flex-col overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--color-border-default)]">
           <div className="flex-1 min-w-0">
-            <h2 className="text-xl font-semibold truncate">{keyword.keyword}</h2>
+            <h2 className="text-xl font-semibold truncate text-[var(--color-fg-default)]">{keyword.keyword}</h2>
             <div className="flex items-center gap-3 mt-1">
               {keyword.hasAIOverview ? (
-                <Badge variant="secondary" className="bg-green-100 text-green-700">
+                <Badge variant="secondary" className="bg-[var(--color-success-subtle)] text-[var(--color-success-fg)]">
                   Has AI Overview
                 </Badge>
               ) : (
-                <Badge variant="secondary" className="bg-muted text-muted-foreground">
+                <Badge variant="secondary" className="bg-[var(--color-neutral-muted)] text-[var(--color-fg-muted)]">
                   No AI Overview
                 </Badge>
               )}
               {keyword.brandRank && (
-                <Badge variant="secondary" className="bg-amber-100 text-amber-800">
+                <Badge variant="secondary" className="bg-[var(--color-warning-subtle)] text-[var(--color-warning-fg)]">
                   Brand Rank #{keyword.brandRank}
                 </Badge>
               )}
               {keyword.brandMentioned && (
-                <Badge variant="secondary" className="bg-purple-100 text-purple-700">
+                <Badge variant="secondary" className="bg-[var(--color-accent-subtle)] text-[var(--color-accent-fg)]">
                   Brand Mentioned
                 </Badge>
               )}
-              <span className="text-sm text-muted-foreground">
+              <span className="text-sm text-[var(--color-fg-muted)]">
                 {keyword.referenceCount} citation{keyword.referenceCount !== 1 ? 's' : ''}
               </span>
             </div>
@@ -209,7 +209,7 @@ export function KeywordDetailPanel({
         </div>
 
         {history.length === 0 ? (
-          <div className="flex-1 flex items-center justify-center text-muted-foreground">
+          <div className="flex-1 flex items-center justify-center text-[var(--color-fg-muted)]">
             <div className="text-center">
               <Eye className="h-12 w-12 mx-auto mb-3 opacity-50" />
               <p>No history found for this keyword</p>
@@ -218,14 +218,14 @@ export function KeywordDetailPanel({
         ) : (
           <div className="flex-1 flex overflow-hidden">
             {/* History sidebar on the left */}
-            <div className="w-80 border-r overflow-y-auto p-4 bg-gray-50/50">
-              <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wide mb-4">
+            <div className="w-80 border-r border-[var(--color-border-default)] overflow-y-auto p-4 bg-[var(--color-canvas-subtle)]">
+              <h3 className="text-sm font-medium text-[var(--color-fg-muted)] uppercase tracking-wide mb-4">
                 {history.length} Session{history.length !== 1 ? 's' : ''}
               </h3>
 
               <div className="relative">
                 {/* Timeline line */}
-                <div className="absolute left-4 top-6 bottom-6 w-0.5 bg-gray-200" />
+                <div className="absolute left-4 top-6 bottom-6 w-0.5 bg-[var(--color-border-default)]" />
 
                 {history.map((entry, index) => {
                   const change = getChangeFromPrevious(index);
@@ -243,13 +243,13 @@ export function KeywordDetailPanel({
                       <div
                         className={`absolute left-2 w-5 h-5 rounded-full border-2 transition-all ${
                           entry.hasAIOverview
-                            ? 'bg-green-100 border-green-500'
-                            : 'bg-gray-100 border-gray-400'
-                        } ${isSelected ? 'ring-2 ring-primary ring-offset-2' : ''}`}
+                            ? 'bg-[var(--color-success-subtle)] border-[var(--color-success-emphasis)]'
+                            : 'bg-[var(--color-canvas-subtle)] border-[var(--color-border-default)]'
+                        } ${isSelected ? 'ring-2 ring-[var(--color-accent-emphasis)] ring-offset-2' : ''}`}
                       />
 
-                      <div className={`p-3 rounded-lg transition-colors ${
-                        isSelected ? 'bg-blue-50 border border-blue-200' : 'bg-white border border-gray-100'
+                      <div className={`p-3 rounded-md transition-colors ${
+                        isSelected ? 'bg-[var(--color-accent-subtle)] border border-[var(--color-accent-muted)]' : 'bg-[var(--color-canvas-default)] border border-[var(--color-border-muted)]'
                       }`}>
                         <div className="flex items-center justify-between gap-2">
                           <span className="text-sm font-medium truncate">
@@ -259,10 +259,10 @@ export function KeywordDetailPanel({
                             <Badge
                               variant="secondary"
                               className={`text-xs shrink-0 ${
-                                change === 'improved' ? 'bg-green-100 text-green-700' :
-                                change === 'declined' ? 'bg-red-100 text-red-700' :
-                                change === 'gained' ? 'bg-blue-100 text-blue-700' :
-                                'bg-orange-100 text-orange-700'
+                                change === 'improved' ? 'bg-[var(--color-success-subtle)] text-[var(--color-success-fg)]' :
+                                change === 'declined' ? 'bg-[var(--color-danger-subtle)] text-[var(--color-danger-fg)]' :
+                                change === 'gained' ? 'bg-[var(--color-accent-subtle)] text-[var(--color-accent-fg)]' :
+                                'bg-[var(--color-warning-subtle)] text-[var(--color-warning-fg)]'
                               }`}
                             >
                               {change === 'improved' && <ArrowUp className="h-3 w-3 mr-0.5" />}
@@ -273,21 +273,21 @@ export function KeywordDetailPanel({
                             </Badge>
                           )}
                         </div>
-                        <div className="flex items-center gap-1 text-xs text-muted-foreground mt-1">
+                        <div className="flex items-center gap-1 text-xs text-[var(--color-fg-muted)] mt-1">
                           <Clock className="h-3 w-3" />
                           {formatDate(entry.sessionDate)}
                         </div>
                         <div className="flex items-center gap-3 mt-2 text-xs">
-                          <span className={entry.hasAIOverview ? 'text-green-600' : 'text-muted-foreground'}>
+                          <span className={entry.hasAIOverview ? 'text-[var(--color-success-fg)]' : 'text-[var(--color-fg-muted)]'}>
                             {entry.hasAIOverview ? 'Has AIO' : 'No AIO'}
                           </span>
                           {entry.brandRank && (
-                            <span className="text-amber-700">
+                            <span className="text-[var(--color-warning-fg)]">
                               Brand #{entry.brandRank}
                             </span>
                           )}
                           {entry.referenceCount > 0 && (
-                            <span className="text-muted-foreground">
+                            <span className="text-[var(--color-fg-muted)]">
                               {entry.referenceCount} refs
                             </span>
                           )}
@@ -304,12 +304,12 @@ export function KeywordDetailPanel({
               {selectedEntry ? (
                 <>
                   {/* Session header */}
-                  <div className="flex items-center justify-between px-6 py-4 border-b bg-gray-50/30">
+                  <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--color-border-default)] bg-[var(--color-canvas-subtle)]">
                     <div>
-                      <h3 className="text-lg font-semibold">
+                      <h3 className="text-lg font-semibold text-[var(--color-fg-default)]">
                         {selectedEntry.sessionName || `Session ${selectedEntry.sessionId}`}
                       </h3>
-                      <p className="text-sm text-muted-foreground">
+                      <p className="text-sm text-[var(--color-fg-muted)]">
                         {formatDate(selectedEntry.sessionDate)}
                       </p>
                     </div>
@@ -325,26 +325,26 @@ export function KeywordDetailPanel({
                   </div>
 
                   {/* Stats */}
-                  <div className="grid grid-cols-3 gap-4 px-6 py-4 border-b">
-                    <Card className="p-3 bg-gray-50">
-                      <div className="text-sm text-muted-foreground">AI Overview</div>
+                  <div className="grid grid-cols-3 gap-4 px-6 py-4 border-b border-[var(--color-border-default)]">
+                    <Card className="p-3 bg-[var(--color-canvas-subtle)]">
+                      <div className="text-sm text-[var(--color-fg-muted)]">AI Overview</div>
                       <div className={`text-lg font-semibold ${
-                        selectedEntry.hasAIOverview ? 'text-green-600' : 'text-muted-foreground'
+                        selectedEntry.hasAIOverview ? 'text-[var(--color-success-fg)]' : 'text-[var(--color-fg-muted)]'
                       }`}>
                         {selectedEntry.hasAIOverview ? 'Yes' : 'No'}
                       </div>
                     </Card>
-                    <Card className="p-3 bg-gray-50">
-                      <div className="text-sm text-muted-foreground">Brand Rank</div>
+                    <Card className="p-3 bg-[var(--color-canvas-subtle)]">
+                      <div className="text-sm text-[var(--color-fg-muted)]">Brand Rank</div>
                       <div className={`text-lg font-semibold ${
-                        selectedEntry.brandRank ? 'text-amber-700' : 'text-muted-foreground'
+                        selectedEntry.brandRank ? 'text-[var(--color-warning-fg)]' : 'text-[var(--color-fg-muted)]'
                       }`}>
                         {selectedEntry.brandRank ? `#${selectedEntry.brandRank}` : 'Not cited'}
                       </div>
                     </Card>
-                    <Card className="p-3 bg-gray-50">
-                      <div className="text-sm text-muted-foreground">References</div>
-                      <div className="text-lg font-semibold">
+                    <Card className="p-3 bg-[var(--color-canvas-subtle)]">
+                      <div className="text-sm text-[var(--color-fg-muted)]">References</div>
+                      <div className="text-lg font-semibold text-[var(--color-fg-default)]">
                         {selectedEntry.referenceCount}
                       </div>
                     </Card>
@@ -356,7 +356,7 @@ export function KeywordDetailPanel({
                       <div className="flex h-full">
                         {/* AI Overview Content */}
                         <div className="flex-1 overflow-y-auto p-6">
-                          <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wide mb-3">
+                          <h4 className="text-sm font-medium text-[var(--color-fg-muted)] uppercase tracking-wide mb-3">
                             AI Overview Content
                           </h4>
                           <div className="max-w-3xl">
@@ -372,8 +372,8 @@ export function KeywordDetailPanel({
                         </div>
 
                         {/* Citations Sidebar */}
-                        <div className="w-72 border-l overflow-y-auto p-4 bg-gray-50/50">
-                          <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wide mb-3">
+                        <div className="w-72 border-l border-[var(--color-border-default)] overflow-y-auto p-4 bg-[var(--color-canvas-subtle)]">
+                          <h4 className="text-sm font-medium text-[var(--color-fg-muted)] uppercase tracking-wide mb-3">
                             Citation Sources
                           </h4>
                           <CitationList
@@ -386,7 +386,7 @@ export function KeywordDetailPanel({
                       </div>
                     ) : selectedEntry.references.length > 0 ? (
                       <div className="p-6">
-                        <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wide mb-3">
+                        <h4 className="text-sm font-medium text-[var(--color-fg-muted)] uppercase tracking-wide mb-3">
                           Citation Sources
                         </h4>
                         <div className="space-y-2">
@@ -397,23 +397,23 @@ export function KeywordDetailPanel({
                               <Card
                                 key={idx}
                                 className={`p-3 ${
-                                  isBrand ? 'bg-amber-50 border-amber-200' : 'bg-white'
+                                  isBrand ? 'bg-[var(--color-warning-subtle)] border-[var(--color-warning-muted)]' : 'bg-[var(--color-canvas-default)]'
                                 }`}
                               >
                                 <div className="flex items-center gap-3">
-                                  <div className="w-6 h-6 flex items-center justify-center bg-gray-100 rounded text-xs font-medium">
+                                  <div className="w-6 h-6 flex items-center justify-center bg-[var(--color-canvas-subtle)] rounded text-xs font-medium">
                                     {ref.rank}
                                   </div>
                                   <div className="flex-1 min-w-0">
                                     <div className="text-sm font-medium truncate">
                                       {ref.source || ref.domain}
                                     </div>
-                                    <div className="text-xs text-muted-foreground truncate">
+                                    <div className="text-xs text-[var(--color-fg-muted)] truncate">
                                       {ref.domain}
                                     </div>
                                   </div>
                                   {isBrand && (
-                                    <Badge variant="secondary" className="bg-amber-200 text-amber-800 shrink-0">
+                                    <Badge variant="secondary" className="bg-[var(--color-warning-emphasis)] text-[var(--color-canvas-default)] shrink-0">
                                       Your Brand
                                     </Badge>
                                   )}
@@ -422,7 +422,7 @@ export function KeywordDetailPanel({
                                       href={ref.url}
                                       target="_blank"
                                       rel="noopener noreferrer"
-                                      className="text-muted-foreground hover:text-primary"
+                                      className="text-[var(--color-fg-muted)] hover:text-[var(--color-accent-fg)]"
                                     >
                                       <ExternalLink className="h-4 w-4" />
                                     </a>
@@ -434,7 +434,7 @@ export function KeywordDetailPanel({
                         </div>
                       </div>
                     ) : (
-                      <div className="flex-1 flex items-center justify-center text-muted-foreground">
+                      <div className="flex-1 flex items-center justify-center text-[var(--color-fg-muted)]">
                         <div className="text-center">
                           <Quote className="h-12 w-12 mx-auto mb-3 opacity-50" />
                           <p>No AI Overview content for this session</p>
@@ -444,7 +444,7 @@ export function KeywordDetailPanel({
                   </div>
                 </>
               ) : (
-                <div className="flex-1 flex items-center justify-center text-muted-foreground">
+                <div className="flex-1 flex items-center justify-center text-[var(--color-fg-muted)]">
                   Select a session to view details
                 </div>
               )}

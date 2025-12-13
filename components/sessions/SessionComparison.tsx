@@ -140,10 +140,10 @@ export function SessionComparison({
 
   if (loading) {
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-        <div className="bg-white rounded-xl p-8 text-center">
-          <div className="inline-block w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" />
-          <p className="mt-2 text-gray-600">Loading comparison...</p>
+      <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
+        <div className="gh-box rounded-md p-8 text-center" style={{ backgroundColor: 'var(--color-canvas-default)' }}>
+          <div className="inline-block w-8 h-8 border-4 border-t-transparent rounded-full animate-spin" style={{ borderColor: 'var(--color-accent-emphasis)' }} />
+          <p className="mt-2" style={{ color: 'var(--color-fg-muted)' }}>Loading comparison...</p>
         </div>
       </div>
     );
@@ -151,16 +151,16 @@ export function SessionComparison({
 
   if (!data) {
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-        <div className="bg-white rounded-xl p-8 text-center max-w-md">
-          <p className="text-red-600 font-medium">Failed to load comparison data</p>
+      <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
+        <div className="gh-box rounded-md p-8 text-center max-w-md" style={{ backgroundColor: 'var(--color-canvas-default)' }}>
+          <p className="font-medium" style={{ color: 'var(--color-danger-fg)' }}>Failed to load comparison data</p>
           {error && (
-            <p className="text-sm text-gray-600 mt-2">{error}</p>
+            <p className="text-sm mt-2" style={{ color: 'var(--color-fg-muted)' }}>{error}</p>
           )}
-          <p className="text-sm text-gray-500 mt-2">
+          <p className="text-sm mt-2" style={{ color: 'var(--color-fg-muted)' }}>
             Session IDs: {sessionIds.join(', ')}
           </p>
-          <button onClick={onClose} className="mt-4 px-4 py-2 bg-gray-100 rounded-lg hover:bg-gray-200">
+          <button onClick={onClose} className="mt-4 px-4 py-2 rounded-md" style={{ backgroundColor: 'var(--color-neutral-muted)' }}>
             Close
           </button>
         </div>
@@ -182,20 +182,24 @@ export function SessionComparison({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div className="absolute inset-0 bg-black/50" onClick={onClose} />
+      <div className="absolute inset-0" style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }} onClick={onClose} />
 
-      <div className="relative w-full max-w-7xl h-[90vh] mx-4 bg-white rounded-xl shadow-2xl flex flex-col">
+      <div className="relative w-full max-w-7xl h-[90vh] mx-4 rounded-md flex flex-col" style={{
+        backgroundColor: 'var(--color-canvas-default)',
+        boxShadow: 'var(--color-shadow-large)'
+      }}>
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b">
+        <div className="flex items-center justify-between px-6 py-4" style={{ borderBottom: '1px solid var(--color-border-default)' }}>
           <div>
-            <h2 className="text-xl font-semibold text-gray-900">Session Comparison</h2>
-            <p className="text-sm text-gray-500">
+            <h2 className="text-xl font-semibold" style={{ color: 'var(--color-fg-default)' }}>Session Comparison</h2>
+            <p className="text-sm" style={{ color: 'var(--color-fg-muted)' }}>
               Comparing {data.sessions.length} sessions across {data.keywords.length} keywords
             </p>
           </div>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-2 rounded-md transition-colors"
+            style={{ color: 'var(--color-fg-muted)' }}
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -204,48 +208,52 @@ export function SessionComparison({
         </div>
 
         {/* Summary */}
-        <div className="px-6 py-3 border-b bg-gray-50 flex items-center gap-6 text-sm">
-          <span className="text-gray-600">Changes from first to last:</span>
+        <div className="px-6 py-3 flex items-center gap-6 text-sm" style={{
+          borderBottom: '1px solid var(--color-border-default)',
+          backgroundColor: 'var(--color-canvas-subtle)'
+        }}>
+          <span style={{ color: 'var(--color-fg-muted)' }}>Changes from first to last:</span>
           {summary.improved > 0 && (
-            <span className="flex items-center gap-1 text-green-600">
-              <span className="w-2 h-2 rounded-full bg-green-500" />
+            <span className="flex items-center gap-1" style={{ color: 'var(--color-success-fg)' }}>
+              <span className="w-2 h-2 rounded-full" style={{ backgroundColor: 'var(--color-success-emphasis)' }} />
               {summary.improved} rank improved
             </span>
           )}
           {summary.declined > 0 && (
-            <span className="flex items-center gap-1 text-red-600">
-              <span className="w-2 h-2 rounded-full bg-red-500" />
+            <span className="flex items-center gap-1" style={{ color: 'var(--color-danger-fg)' }}>
+              <span className="w-2 h-2 rounded-full" style={{ backgroundColor: 'var(--color-danger-emphasis)' }} />
               {summary.declined} rank declined
             </span>
           )}
           {summary.gained > 0 && (
-            <span className="flex items-center gap-1 text-blue-600">
-              <span className="w-2 h-2 rounded-full bg-blue-500" />
+            <span className="flex items-center gap-1" style={{ color: 'var(--color-accent-fg)' }}>
+              <span className="w-2 h-2 rounded-full" style={{ backgroundColor: 'var(--color-accent-emphasis)' }} />
               {summary.gained} AIO gained
             </span>
           )}
           {summary.lost > 0 && (
-            <span className="flex items-center gap-1 text-orange-600">
-              <span className="w-2 h-2 rounded-full bg-orange-500" />
+            <span className="flex items-center gap-1" style={{ color: 'var(--color-warning-fg)' }}>
+              <span className="w-2 h-2 rounded-full" style={{ backgroundColor: 'var(--color-warning-emphasis)' }} />
               {summary.lost} AIO lost
             </span>
           )}
           {summary.new > 0 && (
-            <span className="flex items-center gap-1 text-purple-600">
-              <span className="w-2 h-2 rounded-full bg-purple-500" />
+            <span className="flex items-center gap-1" style={{ color: 'var(--color-accent-fg)' }}>
+              <span className="w-2 h-2 rounded-full" style={{ backgroundColor: 'var(--color-accent-emphasis)' }} />
               {summary.new} new
             </span>
           )}
         </div>
 
         {/* Filters */}
-        <div className="px-6 py-3 border-b flex items-center gap-4">
+        <div className="px-6 py-3 flex items-center gap-4" style={{ borderBottom: '1px solid var(--color-border-default)' }}>
           <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-600">Filter:</span>
+            <span className="text-sm" style={{ color: 'var(--color-fg-muted)' }}>Filter:</span>
             <select
               value={filter}
               onChange={e => setFilter(e.target.value as typeof filter)}
-              className="px-2 py-1 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="px-2 py-1 text-sm rounded-md focus:outline-none"
+              style={{ border: '1px solid var(--color-border-default)' }}
             >
               <option value="all">All keywords ({data.keywords.length})</option>
               <option value="aio_only">Has AIO</option>
@@ -253,17 +261,18 @@ export function SessionComparison({
             </select>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-600">Sort:</span>
+            <span className="text-sm" style={{ color: 'var(--color-fg-muted)' }}>Sort:</span>
             <select
               value={sortBy}
               onChange={e => setSortBy(e.target.value as typeof sortBy)}
-              className="px-2 py-1 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="px-2 py-1 text-sm rounded-md focus:outline-none"
+              style={{ border: '1px solid var(--color-border-default)' }}
             >
               <option value="keyword">Alphabetical</option>
               <option value="change">By change type</option>
             </select>
           </div>
-          <span className="text-sm text-gray-500">
+          <span className="text-sm" style={{ color: 'var(--color-fg-muted)' }}>
             Showing {filteredKeywords.length} keywords
           </span>
         </div>
@@ -271,20 +280,33 @@ export function SessionComparison({
         {/* Matrix table */}
         <div className="flex-1 overflow-auto">
           <table className="w-full text-sm">
-            <thead className="sticky top-0 bg-white shadow-sm z-10">
+            <thead className="sticky top-0 z-10" style={{
+              backgroundColor: 'var(--color-canvas-default)',
+              boxShadow: 'var(--color-shadow-small)'
+            }}>
               <tr>
-                <th className="text-left p-3 font-medium text-gray-700 bg-gray-50 min-w-[200px]">
+                <th className="text-left p-3 font-medium min-w-[200px]" style={{
+                  color: 'var(--color-fg-muted)',
+                  backgroundColor: 'var(--color-canvas-subtle)'
+                }}>
                   Keyword
                 </th>
-                <th className="text-center p-3 font-medium text-gray-700 bg-gray-50 w-20">
+                <th className="text-center p-3 font-medium w-20" style={{
+                  color: 'var(--color-fg-muted)',
+                  backgroundColor: 'var(--color-canvas-subtle)'
+                }}>
                   Change
                 </th>
                 {data.sessions.map(session => (
                   <th
                     key={session.id}
-                    className="text-center p-3 font-medium text-gray-700 bg-gray-50 min-w-[100px]"
+                    className="text-center p-3 font-medium min-w-[100px]"
+                    style={{
+                      color: 'var(--color-fg-muted)',
+                      backgroundColor: 'var(--color-canvas-subtle)'
+                    }}
                   >
-                    <div className="text-xs text-gray-500">{formatDate(session.created_at)}</div>
+                    <div className="text-xs" style={{ color: 'var(--color-fg-muted)' }}>{formatDate(session.created_at)}</div>
                     <div className="truncate" title={session.name || undefined}>
                       {session.name || `Session ${session.id}`}
                     </div>
@@ -297,36 +319,48 @@ export function SessionComparison({
                 const change = getChangeIndicator(keyword);
 
                 return (
-                  <tr key={keyword} className="border-b hover:bg-gray-50">
-                    <td className="p-3 font-medium text-gray-900">
+                  <tr key={keyword} style={{ borderBottom: '1px solid var(--color-border-default)' }}>
+                    <td className="p-3 font-medium" style={{ color: 'var(--color-fg-default)' }}>
                       {keyword}
                     </td>
                     <td className="p-3 text-center">
                       {change === 'improved' && (
-                        <span className="inline-flex items-center gap-1 text-green-600" title="Rank improved">
+                        <span className="inline-flex items-center gap-1" style={{ color: 'var(--color-success-fg)' }} title="Rank improved">
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
                           </svg>
                         </span>
                       )}
                       {change === 'declined' && (
-                        <span className="inline-flex items-center gap-1 text-red-600" title="Rank declined">
+                        <span className="inline-flex items-center gap-1" style={{ color: 'var(--color-danger-fg)' }} title="Rank declined">
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
                           </svg>
                         </span>
                       )}
                       {change === 'gained' && (
-                        <span className="px-1.5 py-0.5 text-xs bg-blue-100 text-blue-700 rounded">+AIO</span>
+                        <span className="px-1.5 py-0.5 text-xs rounded-md" style={{
+                          backgroundColor: 'var(--color-accent-subtle)',
+                          color: 'var(--color-accent-fg)'
+                        }}>+AIO</span>
                       )}
                       {change === 'lost' && (
-                        <span className="px-1.5 py-0.5 text-xs bg-orange-100 text-orange-700 rounded">-AIO</span>
+                        <span className="px-1.5 py-0.5 text-xs rounded-md" style={{
+                          backgroundColor: 'var(--color-warning-subtle)',
+                          color: 'var(--color-warning-fg)'
+                        }}>-AIO</span>
                       )}
                       {change === 'new' && (
-                        <span className="px-1.5 py-0.5 text-xs bg-purple-100 text-purple-700 rounded">New</span>
+                        <span className="px-1.5 py-0.5 text-xs rounded-md" style={{
+                          backgroundColor: 'var(--color-accent-subtle)',
+                          color: 'var(--color-accent-fg)'
+                        }}>New</span>
                       )}
                       {change === 'removed' && (
-                        <span className="px-1.5 py-0.5 text-xs bg-gray-100 text-gray-700 rounded">Removed</span>
+                        <span className="px-1.5 py-0.5 text-xs rounded-md" style={{
+                          backgroundColor: 'var(--color-neutral-muted)',
+                          color: 'var(--color-fg-muted)'
+                        }}>Removed</span>
                       )}
                     </td>
                     {data.sessions.map(session => {
@@ -334,7 +368,7 @@ export function SessionComparison({
 
                       if (!cellData) {
                         return (
-                          <td key={session.id} className="p-3 text-center text-gray-300">
+                          <td key={session.id} className="p-3 text-center" style={{ color: 'var(--color-neutral-muted)' }}>
                             -
                           </td>
                         );
@@ -343,27 +377,31 @@ export function SessionComparison({
                       return (
                         <td
                           key={session.id}
-                          className="p-3 text-center cursor-pointer hover:bg-blue-50"
+                          className="p-3 text-center cursor-pointer"
                           onClick={() => onViewKeyword(keyword, session.id)}
                         >
                           {cellData.hasAIO ? (
                             <div>
-                              <span className="text-green-600 font-medium">AIO</span>
+                              <span className="font-medium" style={{ color: 'var(--color-success-fg)' }}>AIO</span>
                               {cellData.brandRank && (
-                                <span className={`ml-1 px-1.5 py-0.5 text-xs rounded ${
-                                  cellData.brandRank <= 3
-                                    ? 'bg-yellow-100 text-yellow-800'
-                                    : 'bg-gray-100 text-gray-600'
-                                }`}>
+                                <span className={`ml-1 px-1.5 py-0.5 text-xs rounded-md`}
+                                  style={cellData.brandRank <= 3 ? {
+                                    backgroundColor: 'var(--color-warning-subtle)',
+                                    color: 'var(--color-warning-fg)'
+                                  } : {
+                                    backgroundColor: 'var(--color-neutral-muted)',
+                                    color: 'var(--color-fg-muted)'
+                                  }}
+                                >
                                   #{cellData.brandRank}
                                 </span>
                               )}
-                              <div className="text-xs text-gray-400">
+                              <div className="text-xs" style={{ color: 'var(--color-fg-subtle)' }}>
                                 {cellData.referenceCount} refs
                               </div>
                             </div>
                           ) : (
-                            <span className="text-gray-400">No AIO</span>
+                            <span style={{ color: 'var(--color-fg-subtle)' }}>No AIO</span>
                           )}
                         </td>
                       );
@@ -376,14 +414,21 @@ export function SessionComparison({
         </div>
 
         {/* Legend */}
-        <div className="px-6 py-3 border-t bg-gray-50 flex items-center gap-6 text-xs text-gray-500">
+        <div className="px-6 py-3 flex items-center gap-6 text-xs" style={{
+          borderTop: '1px solid var(--color-border-default)',
+          backgroundColor: 'var(--color-canvas-subtle)',
+          color: 'var(--color-fg-muted)'
+        }}>
           <span>Legend:</span>
           <span className="flex items-center gap-1">
-            <span className="px-1.5 py-0.5 bg-yellow-100 text-yellow-800 rounded">#1-3</span>
+            <span className="px-1.5 py-0.5 rounded-md" style={{
+              backgroundColor: 'var(--color-warning-subtle)',
+              color: 'var(--color-warning-fg)'
+            }}>#1-3</span>
             = Brand in top 3
           </span>
           <span className="flex items-center gap-1">
-            <span className="text-green-600">AIO</span>
+            <span style={{ color: 'var(--color-success-fg)' }}>AIO</span>
             = Has AI Overview
           </span>
           <span>Click any cell to view details</span>

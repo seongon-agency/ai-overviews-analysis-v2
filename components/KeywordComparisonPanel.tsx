@@ -87,37 +87,37 @@ function SessionCard({
 
   return (
     <div
-      className={`flex-shrink-0 w-[calc(50vw-48px)] max-w-[700px] min-w-[450px] h-full flex flex-col rounded-2xl overflow-hidden transition-all ${
+      className={`flex-shrink-0 w-[calc(50vw-48px)] max-w-[700px] min-w-[450px] h-full flex flex-col rounded-md overflow-hidden transition-all ${
         isPinned
-          ? 'bg-white ring-2 ring-indigo-400 shadow-xl shadow-indigo-100/50'
-          : 'bg-white border border-gray-200 shadow-lg hover:shadow-xl'
+          ? 'bg-[var(--color-canvas-default)] ring-2 ring-[var(--color-accent-emphasis)] shadow-[var(--color-shadow-large)]'
+          : 'bg-[var(--color-canvas-default)] border border-[var(--color-border-default)] shadow-[var(--color-shadow-medium)] hover:shadow-[var(--color-shadow-large)]'
       }`}
     >
       {/* Card Header */}
-      <div className={`px-5 py-4 ${isPinned ? 'bg-gradient-to-r from-indigo-50 to-purple-50' : 'bg-gradient-to-r from-gray-50 to-slate-50'}`}>
+      <div className={`px-5 py-4 ${isPinned ? 'bg-[var(--color-accent-subtle)]' : 'bg-[var(--color-canvas-subtle)]'}`}>
         <div className="flex items-center justify-between gap-3">
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
-              <h3 className="font-semibold text-gray-900 truncate">
+              <h3 className="font-semibold text-[var(--color-fg-default)] truncate">
                 {entry.sessionName || `Session ${entry.sessionId}`}
               </h3>
               {isLatest && (
-                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-500 text-white">
+                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-[var(--color-success-emphasis)] text-[var(--color-canvas-default)]">
                   Latest
                 </span>
               )}
               {isPinned && (
-                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-indigo-500 text-white">
+                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-[var(--color-accent-emphasis)] text-[var(--color-canvas-default)]">
                   Pinned
                 </span>
               )}
               {changeFromPrevious && changeFromPrevious !== 'same' && (
                 <span
                   className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
-                    changeFromPrevious === 'improved' ? 'bg-emerald-500 text-white' :
-                    changeFromPrevious === 'declined' ? 'bg-red-500 text-white' :
-                    changeFromPrevious === 'gained' ? 'bg-blue-500 text-white' :
-                    'bg-orange-500 text-white'
+                    changeFromPrevious === 'improved' ? 'bg-[var(--color-success-emphasis)] text-[var(--color-canvas-default)]' :
+                    changeFromPrevious === 'declined' ? 'bg-[var(--color-danger-emphasis)] text-[var(--color-canvas-default)]' :
+                    changeFromPrevious === 'gained' ? 'bg-[var(--color-accent-emphasis)] text-[var(--color-canvas-default)]' :
+                    'bg-[var(--color-warning-emphasis)] text-[var(--color-canvas-default)]'
                   }`}
                 >
                   {changeFromPrevious === 'improved' ? '↑ Rank Up' :
@@ -126,10 +126,10 @@ function SessionCard({
                 </span>
               )}
             </div>
-            <div className="flex items-center gap-1.5 text-sm text-gray-500 mt-1.5">
+            <div className="flex items-center gap-1.5 text-sm text-[var(--color-fg-muted)] mt-1.5">
               <Clock className="h-3.5 w-3.5" />
               <span>{formatDate(entry.sessionDate)}</span>
-              <span className="text-gray-300">•</span>
+              <span className="text-[var(--color-border-default)]">•</span>
               <span>{formatTime(entry.sessionDate)}</span>
             </div>
           </div>
@@ -137,7 +137,7 @@ function SessionCard({
             variant={isPinned ? "default" : "outline"}
             size="sm"
             onClick={isPinned ? onUnpin : onPin}
-            className={`h-9 px-3 gap-1.5 rounded-xl ${isPinned ? 'bg-indigo-600 hover:bg-indigo-700' : 'border-gray-200'}`}
+            className={`h-9 px-3 gap-1.5 rounded-md ${isPinned ? 'bg-[var(--color-accent-emphasis)] hover:bg-[var(--color-accent-emphasis)]' : 'border-[var(--color-border-default)]'}`}
           >
             {isPinned ? <PinOff className="h-4 w-4" /> : <Pin className="h-4 w-4" />}
             <span className="text-xs">{isPinned ? 'Unpin' : 'Pin'}</span>
@@ -148,19 +148,19 @@ function SessionCard({
         <div className="flex items-center gap-2 mt-3">
           <div className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium ${
             entry.hasAIOverview
-              ? 'bg-emerald-100 text-emerald-700'
-              : 'bg-gray-100 text-gray-500'
+              ? 'bg-[var(--color-success-subtle)] text-[var(--color-success-fg)]'
+              : 'bg-[var(--color-neutral-muted)] text-[var(--color-fg-muted)]'
           }`}>
             <Sparkles className="h-3 w-3" />
             {entry.hasAIOverview ? 'Has AI Overview' : 'No AI Overview'}
           </div>
           {entry.brandRank && (
-            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-amber-100 text-amber-700">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-[var(--color-warning-subtle)] text-[var(--color-warning-fg)]">
               <Hash className="h-3 w-3" />
               Brand Rank #{entry.brandRank}
             </div>
           )}
-          <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-slate-100 text-slate-600">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-[var(--color-neutral-muted)] text-[var(--color-fg-muted)]">
             <FileText className="h-3 w-3" />
             {entry.referenceCount} citation{entry.referenceCount !== 1 ? 's' : ''}
           </div>
@@ -168,9 +168,9 @@ function SessionCard({
       </div>
 
       {/* Card Content - split into AIO content and citations sidebar */}
-      <div className="flex-1 flex overflow-hidden border-t border-gray-100">
+      <div className="flex-1 flex overflow-hidden border-t border-[var(--color-border-muted)]">
         {/* AI Overview Content */}
-        <div className="flex-1 overflow-y-auto p-5 bg-white">
+        <div className="flex-1 overflow-y-auto p-5 bg-[var(--color-canvas-default)]">
           {entry.hasAIOverview && entry.aioMarkdown ? (
             <AIOContent
               markdown={entry.aioMarkdown}
@@ -183,11 +183,11 @@ function SessionCard({
           ) : (
             <div className="flex items-center justify-center h-full">
               <div className="text-center">
-                <div className="h-16 w-16 rounded-2xl bg-gray-100 flex items-center justify-center mx-auto mb-4">
-                  <FileText className="h-8 w-8 text-gray-300" />
+                <div className="h-16 w-16 rounded-md bg-[var(--color-canvas-subtle)] flex items-center justify-center mx-auto mb-4">
+                  <FileText className="h-8 w-8 text-[var(--color-border-default)]" />
                 </div>
-                <p className="font-medium text-gray-900">No AI Overview</p>
-                <p className="text-sm text-gray-500 mt-1">This keyword didn&apos;t trigger an AI Overview in this session</p>
+                <p className="font-medium text-[var(--color-fg-default)]">No AI Overview</p>
+                <p className="text-sm text-[var(--color-fg-muted)] mt-1">This keyword didn&apos;t trigger an AI Overview in this session</p>
               </div>
             </div>
           )}
@@ -195,10 +195,10 @@ function SessionCard({
 
         {/* Citations Sidebar on right */}
         {entry.references.length > 0 && (
-          <div className="w-64 border-l border-gray-100 bg-gray-50/50 overflow-y-auto flex-shrink-0">
+          <div className="w-64 border-l border-[var(--color-border-muted)] bg-[var(--color-canvas-subtle)] overflow-y-auto flex-shrink-0">
             <div className="p-4">
-              <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 flex items-center gap-2">
-                <span className="w-5 h-5 bg-gray-200 rounded-lg flex items-center justify-center text-gray-600 text-[10px] font-bold">#</span>
+              <h4 className="text-xs font-semibold text-[var(--color-fg-muted)] uppercase tracking-wider mb-3 flex items-center gap-2">
+                <span className="w-5 h-5 bg-[var(--color-neutral-muted)] rounded-md flex items-center justify-center text-[var(--color-fg-muted)] text-[10px] font-bold">#</span>
                 Citations ({entry.references.length})
               </h4>
               <div className="space-y-2">
@@ -213,37 +213,37 @@ function SessionCard({
                         if (el) citationRefs.current.set(ref.rank, el);
                       }}
                       className={`
-                        group flex items-start gap-2.5 p-2.5 rounded-xl text-xs cursor-pointer
+                        group flex items-start gap-2.5 p-2.5 rounded-md text-xs cursor-pointer
                         transition-all duration-200
                         ${isHighlighted
-                          ? 'bg-indigo-100 ring-2 ring-indigo-400 shadow-sm'
-                          : 'hover:bg-white hover:shadow-sm'
+                          ? 'bg-[var(--color-accent-subtle)] ring-2 ring-[var(--color-accent-emphasis)] shadow-[var(--color-shadow-small)]'
+                          : 'hover:bg-[var(--color-canvas-default)] hover:shadow-[var(--color-shadow-small)]'
                         }
-                        ${isBrand ? 'bg-amber-50 border-l-2 border-amber-400' : ''}
+                        ${isBrand ? 'bg-[var(--color-warning-subtle)] border-l-2 border-[var(--color-warning-emphasis)]' : ''}
                       `}
                       onMouseEnter={() => setHighlightedCitation(ref.rank)}
                       onMouseLeave={() => setHighlightedCitation(null)}
                     >
                       <span
                         className={`
-                          w-6 h-6 flex items-center justify-center rounded-lg text-xs font-bold flex-shrink-0 transition-colors
+                          w-6 h-6 flex items-center justify-center rounded-md text-xs font-bold flex-shrink-0 transition-colors
                           ${isHighlighted
-                            ? 'bg-indigo-600 text-white'
-                            : 'bg-gray-200 text-gray-600 group-hover:bg-gray-300'
+                            ? 'bg-[var(--color-accent-emphasis)] text-[var(--color-canvas-default)]'
+                            : 'bg-[var(--color-neutral-muted)] text-[var(--color-fg-muted)] group-hover:bg-[var(--color-border-default)]'
                           }
                         `}
                       >
                         {ref.rank}
                       </span>
                       <div className="flex-1 min-w-0">
-                        <div className="font-medium text-gray-900 truncate leading-tight">
+                        <div className="font-medium text-[var(--color-fg-default)] truncate leading-tight">
                           {ref.source || ref.domain}
                         </div>
-                        <div className="text-gray-500 truncate mt-0.5 flex items-center gap-1">
+                        <div className="text-[var(--color-fg-muted)] truncate mt-0.5 flex items-center gap-1">
                           {ref.domain}
                         </div>
                         {isBrand && (
-                          <span className="inline-block mt-1 text-[10px] bg-amber-200 text-amber-800 px-1.5 py-0.5 rounded-md font-medium">
+                          <span className="inline-block mt-1 text-[10px] bg-[var(--color-warning-emphasis)] text-[var(--color-canvas-default)] px-1.5 py-0.5 rounded-md font-medium">
                             Your Brand
                           </span>
                         )}
@@ -252,7 +252,7 @@ function SessionCard({
                         href={ref.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-gray-400 hover:text-indigo-600 flex-shrink-0 p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                        className="text-[var(--color-fg-subtle)] hover:text-[var(--color-accent-fg)] flex-shrink-0 p-1 opacity-0 group-hover:opacity-100 transition-opacity"
                         onClick={(e) => e.stopPropagation()}
                       >
                         <ExternalLink className="h-3.5 w-3.5" />
@@ -404,9 +404,9 @@ export function KeywordComparisonPanel({
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center">
         <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
-        <div className="relative bg-white rounded-2xl p-8 text-center shadow-2xl">
-          <Loader2 className="h-8 w-8 mx-auto mb-3 animate-spin text-indigo-600" />
-          <p className="text-gray-500">Loading keyword history...</p>
+        <div className="relative bg-[var(--color-canvas-default)] rounded-md p-8 text-center shadow-[var(--color-shadow-large)]">
+          <Loader2 className="h-8 w-8 mx-auto mb-3 animate-spin text-[var(--color-accent-fg)]" />
+          <p className="text-[var(--color-fg-muted)]">Loading keyword history...</p>
         </div>
       </div>
     );
@@ -418,27 +418,27 @@ export function KeywordComparisonPanel({
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
 
       {/* Panel */}
-      <div className="relative w-full max-w-[1600px] h-[90vh] bg-gradient-to-br from-gray-50 to-slate-100 rounded-3xl shadow-2xl flex flex-col overflow-hidden">
+      <div className="relative w-full max-w-[1600px] h-[90vh] bg-[var(--color-canvas-subtle)] rounded-md shadow-[var(--color-shadow-large)] flex flex-col overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-5 border-b border-gray-200 bg-white">
+        <div className="flex items-center justify-between px-6 py-5 border-b border-[var(--color-border-default)] bg-[var(--color-canvas-default)]">
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
-                <Sparkles className="h-5 w-5 text-white" />
+              <div className="h-10 w-10 rounded-md bg-[var(--color-accent-emphasis)] flex items-center justify-center">
+                <Sparkles className="h-5 w-5 text-[var(--color-canvas-default)]" />
               </div>
               <div>
-                <h2 className="text-xl font-bold text-gray-900 truncate">{keyword.keyword}</h2>
+                <h2 className="text-xl font-bold text-[var(--color-fg-default)] truncate">{keyword.keyword}</h2>
                 <div className="flex items-center gap-3 mt-0.5">
-                  <span className="text-sm text-gray-500">
+                  <span className="text-sm text-[var(--color-fg-muted)]">
                     {history.length} session{history.length !== 1 ? 's' : ''} tracked
                   </span>
                   {pinnedSessionIds.size > 0 && (
-                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium border border-indigo-200 text-indigo-600 bg-indigo-50">
+                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium border border-[var(--color-accent-muted)] text-[var(--color-accent-fg)] bg-[var(--color-accent-subtle)]">
                       {pinnedSessionIds.size} pinned
                     </span>
                   )}
                   {keyword.hasAIOverview && (
-                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700">
+                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-[var(--color-success-subtle)] text-[var(--color-success-fg)]">
                       Has AIO
                     </span>
                   )}
@@ -446,7 +446,7 @@ export function KeywordComparisonPanel({
               </div>
             </div>
           </div>
-          <Button variant="outline" size="icon" onClick={onClose} className="h-10 w-10 rounded-xl border-gray-200">
+          <Button variant="outline" size="icon" onClick={onClose} className="h-10 w-10 rounded-md border-[var(--color-border-default)]">
             <X className="h-5 w-5" />
           </Button>
         </div>
@@ -454,11 +454,11 @@ export function KeywordComparisonPanel({
         {history.length === 0 ? (
           <div className="flex-1 flex items-center justify-center">
             <div className="text-center">
-              <div className="h-20 w-20 rounded-2xl bg-gray-100 flex items-center justify-center mx-auto mb-4">
-                <FileText className="h-10 w-10 text-gray-300" />
+              <div className="h-20 w-20 rounded-md bg-[var(--color-canvas-subtle)] flex items-center justify-center mx-auto mb-4">
+                <FileText className="h-10 w-10 text-[var(--color-border-default)]" />
               </div>
-              <p className="text-lg font-medium text-gray-900">No history found</p>
-              <p className="text-gray-500 mt-1">This keyword doesn&apos;t have any session data yet</p>
+              <p className="text-lg font-medium text-[var(--color-fg-default)]">No history found</p>
+              <p className="text-[var(--color-fg-muted)] mt-1">This keyword doesn&apos;t have any session data yet</p>
             </div>
           </div>
         ) : (
@@ -466,7 +466,7 @@ export function KeywordComparisonPanel({
             {/* Pinned Cards Section */}
             {pinnedEntries.length > 0 && (
               <>
-                <div className="flex-shrink-0 flex gap-4 p-4 bg-indigo-50/50">
+                <div className="flex-shrink-0 flex gap-4 p-4 bg-[var(--color-accent-subtle)]">
                   {pinnedEntries.map((entry) => {
                     const originalIndex = history.findIndex((h) => h.sessionId === entry.sessionId);
                     return (
@@ -485,7 +485,7 @@ export function KeywordComparisonPanel({
                   })}
                 </div>
                 {/* Divider */}
-                <div className="w-px bg-gray-200 flex-shrink-0" />
+                <div className="w-px bg-[var(--color-border-default)] flex-shrink-0" />
               </>
             )}
 
@@ -518,11 +518,11 @@ export function KeywordComparisonPanel({
 
             {/* Show message if all are pinned */}
             {unpinnedEntries.length === 0 && pinnedEntries.length > 0 && (
-              <div className="flex-1 flex items-center justify-center bg-gray-50/50">
+              <div className="flex-1 flex items-center justify-center bg-[var(--color-canvas-subtle)]">
                 <div className="text-center">
-                  <Pin className="h-8 w-8 mx-auto mb-2 text-gray-300" />
-                  <p className="text-gray-600">All sessions are pinned</p>
-                  <p className="text-sm text-gray-400">Unpin some to see them in the scrollable area</p>
+                  <Pin className="h-8 w-8 mx-auto mb-2 text-[var(--color-border-default)]" />
+                  <p className="text-[var(--color-fg-muted)]">All sessions are pinned</p>
+                  <p className="text-sm text-[var(--color-fg-subtle)]">Unpin some to see them in the scrollable area</p>
                 </div>
               </div>
             )}
@@ -530,11 +530,11 @@ export function KeywordComparisonPanel({
         )}
 
         {/* Footer with instructions */}
-        <div className="px-6 py-3 border-t border-gray-200 bg-white">
-          <div className="flex items-center justify-between text-xs text-gray-500">
+        <div className="px-6 py-3 border-t border-[var(--color-border-default)] bg-[var(--color-canvas-default)]">
+          <div className="flex items-center justify-between text-xs text-[var(--color-fg-muted)]">
             <div className="flex items-center gap-6">
               <span className="flex items-center gap-1.5">
-                <Pin className="h-3.5 w-3.5 text-indigo-500" />
+                <Pin className="h-3.5 w-3.5 text-[var(--color-accent-fg)]" />
                 <span>Pin sessions to compare side-by-side</span>
               </span>
               <span className="flex items-center gap-1.5">
@@ -542,7 +542,7 @@ export function KeywordComparisonPanel({
                 <span>Scroll to browse history</span>
               </span>
             </div>
-            <span className="text-gray-400">Press <kbd className="px-1.5 py-0.5 bg-gray-100 border border-gray-200 rounded-md text-gray-600 font-mono text-[10px]">ESC</kbd> to close</span>
+            <span className="text-[var(--color-fg-subtle)]">Press <kbd className="px-1.5 py-0.5 bg-[var(--color-canvas-subtle)] border border-[var(--color-border-default)] rounded-md text-[var(--color-fg-muted)] font-mono text-[10px]">ESC</kbd> to close</span>
           </div>
         </div>
       </div>

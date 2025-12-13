@@ -70,32 +70,32 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50/30 px-4 py-12">
+    <div className="min-h-screen flex items-center justify-center bg-[var(--color-canvas-subtle)] px-4 py-8">
       <div className="w-full max-w-md">
         {/* Logo */}
-        <div className="flex flex-col items-center mb-8">
-          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 text-white shadow-lg shadow-indigo-200 mb-4">
-            <Sparkles className="h-7 w-7" />
+        <div className="flex flex-col items-center mb-6">
+          <div className="flex h-12 w-12 items-center justify-center rounded-md bg-[var(--color-accent-emphasis)] text-white mb-4">
+            <Sparkles className="h-6 w-6" />
           </div>
-          <h1 className="text-2xl font-bold text-gray-900">Create an account</h1>
-          <p className="text-gray-500 mt-1">Enter your details to get started</p>
+          <h1 className="text-xl font-semibold text-[var(--color-fg-default)]">Create an account</h1>
+          <p className="text-sm text-[var(--color-fg-muted)] mt-1">Enter your details to get started</p>
         </div>
 
         {/* Card */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8">
+        <div className="gh-box p-6">
           {error && (
-            <div className="mb-6 p-4 rounded-xl bg-red-50 border border-red-100 text-red-600 text-sm">
+            <div className="mb-4 p-3 rounded-md bg-[var(--color-danger-subtle)] border border-[var(--color-danger-emphasis)] text-[var(--color-danger-fg)] text-sm">
               {error}
             </div>
           )}
 
           <Button
             variant="outline"
-            className="w-full h-12 rounded-xl border-gray-200 hover:bg-gray-50 hover:border-gray-300 transition-all"
+            className="w-full h-10"
             onClick={handleGoogleSignup}
             disabled={loading}
           >
-            <svg className="mr-3 h-5 w-5" viewBox="0 0 24 24">
+            <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
               <path
                 d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
                 fill="#4285F4"
@@ -116,20 +116,20 @@ export default function SignupPage() {
             Continue with Google
           </Button>
 
-          <div className="relative my-6">
+          <div className="relative my-5">
             <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t border-gray-100" />
+              <span className="w-full border-t border-[var(--color-border-muted)]" />
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-white px-3 text-gray-400 font-medium">
+              <span className="bg-[var(--color-canvas-default)] px-3 text-[var(--color-fg-subtle)] font-medium">
                 Or continue with email
               </span>
             </div>
           </div>
 
           <form onSubmit={handleEmailSignup} className="space-y-4">
-            <div className="space-y-2">
-              <label htmlFor="name" className="text-sm font-medium text-gray-700">
+            <div className="space-y-1.5">
+              <label htmlFor="name" className="text-sm font-medium text-[var(--color-fg-default)]">
                 Name
               </label>
               <Input
@@ -140,11 +140,10 @@ export default function SignupPage() {
                 onChange={(e) => setName(e.target.value)}
                 required
                 disabled={loading}
-                className="h-12 rounded-xl border-gray-200 focus:border-indigo-300 focus:ring-indigo-200"
               />
             </div>
-            <div className="space-y-2">
-              <label htmlFor="email" className="text-sm font-medium text-gray-700">
+            <div className="space-y-1.5">
+              <label htmlFor="email" className="text-sm font-medium text-[var(--color-fg-default)]">
                 Email
               </label>
               <Input
@@ -155,11 +154,10 @@ export default function SignupPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 disabled={loading}
-                className="h-12 rounded-xl border-gray-200 focus:border-indigo-300 focus:ring-indigo-200"
               />
             </div>
-            <div className="space-y-2">
-              <label htmlFor="password" className="text-sm font-medium text-gray-700">
+            <div className="space-y-1.5">
+              <label htmlFor="password" className="text-sm font-medium text-[var(--color-fg-default)]">
                 Password
               </label>
               <Input
@@ -170,11 +168,10 @@ export default function SignupPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 disabled={loading}
-                className="h-12 rounded-xl border-gray-200 focus:border-indigo-300 focus:ring-indigo-200"
               />
             </div>
-            <div className="space-y-2">
-              <label htmlFor="confirmPassword" className="text-sm font-medium text-gray-700">
+            <div className="space-y-1.5">
+              <label htmlFor="confirmPassword" className="text-sm font-medium text-[var(--color-fg-default)]">
                 Confirm Password
               </label>
               <Input
@@ -184,12 +181,12 @@ export default function SignupPage() {
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
                 disabled={loading}
-                className="h-12 rounded-xl border-gray-200 focus:border-indigo-300 focus:ring-indigo-200"
               />
             </div>
             <Button
               type="submit"
-              className="w-full h-12 rounded-xl bg-gray-900 hover:bg-gray-800 transition-colors mt-2"
+              variant="primary"
+              className="w-full"
               disabled={loading}
             >
               {loading ? (
@@ -205,9 +202,9 @@ export default function SignupPage() {
         </div>
 
         {/* Footer */}
-        <p className="text-center text-sm text-gray-500 mt-6">
+        <p className="text-center text-sm text-[var(--color-fg-muted)] mt-4">
           Already have an account?{" "}
-          <Link href="/login" className="text-indigo-600 hover:text-indigo-700 font-medium">
+          <Link href="/login" className="text-[var(--color-accent-fg)] hover:underline font-medium">
             Sign in
           </Link>
         </p>

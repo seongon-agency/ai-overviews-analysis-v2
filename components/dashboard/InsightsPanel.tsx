@@ -175,46 +175,46 @@ export function InsightsPanel({ competitors, brandName, totalAIOs }: InsightsPan
   const getIcon = (type: string) => {
     switch (type) {
       case 'success':
-        return <CheckCircle2 className="h-5 w-5 text-green-500" />;
+        return <CheckCircle2 className="h-5 w-5 text-[var(--color-success-fg)]" />;
       case 'warning':
-        return <AlertCircle className="h-5 w-5 text-amber-500" />;
+        return <AlertCircle className="h-5 w-5 text-[var(--color-warning-fg)]" />;
       case 'opportunity':
-        return <Sparkles className="h-5 w-5 text-purple-500" />;
+        return <Sparkles className="h-5 w-5 text-[#8250df]" />;
       default:
-        return <Lightbulb className="h-5 w-5 text-blue-500" />;
+        return <Lightbulb className="h-5 w-5 text-[var(--color-accent-fg)]" />;
     }
   };
 
   const getBgColor = (type: string) => {
     switch (type) {
       case 'success':
-        return 'bg-green-50 border-green-100';
+        return 'bg-[var(--color-success-subtle)] border-[var(--color-success-subtle)]';
       case 'warning':
-        return 'bg-amber-50 border-amber-100';
+        return 'bg-[var(--color-warning-subtle)] border-[var(--color-warning-subtle)]';
       case 'opportunity':
-        return 'bg-purple-50 border-purple-100';
+        return 'bg-[#f3e8ff] border-[#f3e8ff]';
       default:
-        return 'bg-blue-50 border-blue-100';
+        return 'bg-[var(--color-accent-subtle)] border-[var(--color-accent-subtle)]';
     }
   };
 
   if (insights.length === 0) return null;
 
   return (
-    <Card className="border-gray-200/80 shadow-sm overflow-hidden">
-      <CardHeader className="pb-4 bg-gradient-to-r from-indigo-50 via-purple-50 to-pink-50 border-b border-gray-100">
+    <Card className="border-[var(--color-border-default)] shadow-[var(--color-shadow-small)] overflow-hidden">
+      <CardHeader className="pb-4 bg-gradient-to-r from-[var(--color-accent-subtle)] via-[#f3e8ff] to-[#fae8ff] border-b border-[var(--color-border-muted)]">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-sm">
-              <Zap className="h-5 w-5 text-white" />
+            <div className="h-10 w-10 rounded-md bg-gradient-to-br from-[var(--color-accent-emphasis)] to-[#8250df] flex items-center justify-center shadow-[var(--color-shadow-small)]">
+              <Zap className="h-5 w-5 text-[var(--color-canvas-default)]" />
             </div>
             <div>
               <CardTitle className="text-lg">Smart Insights</CardTitle>
               <CardDescription>Actionable recommendations for your brand</CardDescription>
             </div>
           </div>
-          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/80 border border-gray-200 text-xs font-medium text-gray-600">
-            <Sparkles className="h-3.5 w-3.5 text-purple-500" />
+          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[var(--color-canvas-default)]/80 border border-[var(--color-border-default)] text-xs font-medium text-[var(--color-fg-muted)]">
+            <Sparkles className="h-3.5 w-3.5 text-[#8250df]" />
             {insights.length} insights
           </div>
         </div>
@@ -224,25 +224,25 @@ export function InsightsPanel({ competitors, brandName, totalAIOs }: InsightsPan
           {insights.map((insight, index) => (
             <div
               key={index}
-              className={`rounded-xl border p-4 transition-all hover:shadow-md ${getBgColor(insight.type)}`}
+              className={`rounded-md border p-4 transition-all hover:shadow-[var(--color-shadow-medium)] ${getBgColor(insight.type)}`}
             >
               <div className="flex items-start gap-3">
-                <div className="flex-shrink-0 p-2 rounded-lg bg-white/60 shadow-sm">
+                <div className="flex-shrink-0 p-2 rounded-md bg-[var(--color-canvas-default)]/60 shadow-[var(--color-shadow-small)]">
                   {getIcon(insight.type)}
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <h4 className="font-semibold text-gray-900">{insight.title}</h4>
+                    <h4 className="font-semibold text-[var(--color-fg-default)]">{insight.title}</h4>
                     {insight.metric && (
-                      <span className="px-2.5 py-0.5 text-xs font-semibold rounded-full bg-white shadow-sm text-gray-700 border border-gray-200">
+                      <span className="px-2.5 py-0.5 text-xs font-semibold rounded-full bg-[var(--color-canvas-default)] shadow-[var(--color-shadow-small)] text-[var(--color-fg-default)] border border-[var(--color-border-default)]">
                         {insight.metric}
                       </span>
                     )}
                   </div>
-                  <p className="text-sm text-gray-600 mt-1.5 leading-relaxed">{insight.description}</p>
+                  <p className="text-sm text-[var(--color-fg-muted)] mt-1.5 leading-relaxed">{insight.description}</p>
                   {insight.action && (
-                    <div className="mt-3 flex items-center gap-2 text-sm font-medium text-gray-800 bg-white/50 rounded-lg px-3 py-2 border border-gray-200/50">
-                      <ArrowRight className="h-4 w-4 text-indigo-500" />
+                    <div className="mt-3 flex items-center gap-2 text-sm font-medium text-[var(--color-fg-default)] bg-[var(--color-canvas-default)]/50 rounded-md px-3 py-2 border border-[var(--color-border-default)]/50">
+                      <ArrowRight className="h-4 w-4 text-[var(--color-accent-fg)]" />
                       <span>{insight.action}</span>
                     </div>
                   )}

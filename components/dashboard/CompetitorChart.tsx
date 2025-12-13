@@ -32,27 +32,27 @@ export function CompetitorChart({ competitors, brandName, limit = 12 }: Competit
       const data = payload[0].payload;
       const rank = sortedCompetitors.findIndex(c => c.brand === data.brand) + 1;
       return (
-        <div className="bg-white/95 backdrop-blur border border-gray-200 rounded-xl shadow-xl p-4 text-sm min-w-[180px]">
+        <div className="bg-[var(--color-canvas-default)]/95 backdrop-blur border border-[var(--color-border-default)] rounded-md shadow-[var(--color-shadow-large)] p-4 text-sm min-w-[180px]">
           <div className="flex items-center gap-2 mb-2">
-            {rank <= 3 && <Trophy className={`h-4 w-4 ${rank === 1 ? 'text-amber-500' : rank === 2 ? 'text-gray-400' : 'text-amber-700'}`} />}
-            <p className="font-semibold text-gray-900">{data.brand}</p>
+            {rank <= 3 && <Trophy className={`h-4 w-4 ${rank === 1 ? 'text-[var(--color-warning-fg)]' : rank === 2 ? 'text-[var(--color-fg-subtle)]' : 'text-[var(--color-warning-fg)]'}`} />}
+            <p className="font-semibold text-[var(--color-fg-default)]">{data.brand}</p>
           </div>
           <div className="space-y-1.5">
             <div className="flex justify-between">
-              <span className="text-gray-500">Rank</span>
-              <span className="font-semibold text-gray-900">#{rank}</span>
+              <span className="text-[var(--color-fg-muted)]">Rank</span>
+              <span className="font-semibold text-[var(--color-fg-default)]">#{rank}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-500">Citations</span>
-              <span className="font-semibold text-indigo-600">{data.citedCount}</span>
+              <span className="text-[var(--color-fg-muted)]">Citations</span>
+              <span className="font-semibold text-[var(--color-accent-fg)]">{data.citedCount}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-500">Avg position</span>
-              <span className="font-medium text-gray-700">{data.averageRank > 0 ? `#${data.averageRank.toFixed(1)}` : '-'}</span>
+              <span className="text-[var(--color-fg-muted)]">Avg position</span>
+              <span className="font-medium text-[var(--color-fg-default)]">{data.averageRank > 0 ? `#${data.averageRank.toFixed(1)}` : '-'}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-500">Citation rate</span>
-              <span className="font-medium text-gray-700">{(data.promptCitedRate * 100).toFixed(1)}%</span>
+              <span className="text-[var(--color-fg-muted)]">Citation rate</span>
+              <span className="font-medium text-[var(--color-fg-default)]">{(data.promptCitedRate * 100).toFixed(1)}%</span>
             </div>
           </div>
         </div>
@@ -62,12 +62,12 @@ export function CompetitorChart({ competitors, brandName, limit = 12 }: Competit
   };
 
   return (
-    <Card className="overflow-hidden border-gray-200/80 shadow-sm">
-      <CardHeader className="pb-3 bg-gradient-to-r from-gray-50 to-white border-b border-gray-100">
+    <Card className="overflow-hidden border-[var(--color-border-default)] shadow-[var(--color-shadow-small)]">
+      <CardHeader className="pb-3 bg-gradient-to-r from-[var(--color-canvas-subtle)] to-[var(--color-canvas-default)] border-b border-[var(--color-border-muted)]">
         <div className="flex items-center justify-between">
           <div>
             <CardTitle className="text-lg flex items-center gap-2">
-              <Trophy className="h-5 w-5 text-amber-500" />
+              <Trophy className="h-5 w-5 text-[var(--color-warning-fg)]" />
               Top Cited Sources
             </CardTitle>
             <CardDescription className="mt-1">
@@ -75,9 +75,9 @@ export function CompetitorChart({ competitors, brandName, limit = 12 }: Competit
             </CardDescription>
           </div>
           {userBrand && (
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-50 border border-amber-200">
-              <Medal className="h-4 w-4 text-amber-600" />
-              <span className="text-sm font-medium text-amber-700">
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[var(--color-warning-subtle)] border border-[var(--color-warning-subtle)]">
+              <Medal className="h-4 w-4 text-[var(--color-warning-fg)]" />
+              <span className="text-sm font-medium text-[var(--color-warning-fg)]">
                 Your rank: #{userBrandRank}
               </span>
             </div>
@@ -180,22 +180,22 @@ export function CompetitorChart({ competitors, brandName, limit = 12 }: Competit
         </ResponsiveContainer>
 
         {/* Legend */}
-        <div className="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between">
+        <div className="mt-4 pt-4 border-t border-[var(--color-border-muted)] flex items-center justify-between">
           <div className="flex items-center gap-4 text-sm">
             <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-sm bg-indigo-500"></div>
-              <span className="text-gray-500">Competitors</span>
+              <div className="w-3 h-3 rounded-sm bg-[var(--color-accent-emphasis)]"></div>
+              <span className="text-[var(--color-fg-muted)]">Competitors</span>
             </div>
             {userBrand && (
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-sm bg-amber-400"></div>
-                <span className="text-gray-500">Your brand</span>
+                <div className="w-3 h-3 rounded-sm bg-[var(--color-warning-fg)]"></div>
+                <span className="text-[var(--color-fg-muted)]">Your brand</span>
               </div>
             )}
           </div>
           {userBrand && (
-            <span className="text-sm text-gray-500">
-              <span className="font-medium text-gray-700">{userBrand.citedCount}</span> citations
+            <span className="text-sm text-[var(--color-fg-muted)]">
+              <span className="font-medium text-[var(--color-fg-default)]">{userBrand.citedCount}</span> citations
             </span>
           )}
         </div>

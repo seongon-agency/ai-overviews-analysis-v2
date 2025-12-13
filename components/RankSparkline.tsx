@@ -26,7 +26,12 @@ export function RankSparkline({ data, width = 60, height = 24 }: RankSparklinePr
   // Determine trend color
   const firstRank = chartData[0]?.rank || 0;
   const lastRank = chartData[chartData.length - 1]?.rank || 0;
-  const color = lastRank < firstRank ? '#22c55e' : lastRank > firstRank ? '#ef4444' : '#9ca3af';
+  // Use semantic colors: success for improvement, danger for decline, neutral for no change
+  const color = lastRank < firstRank
+    ? 'hsl(var(--success))'
+    : lastRank > firstRank
+    ? 'hsl(var(--danger))'
+    : 'hsl(var(--muted-foreground))';
 
   return (
     <div style={{ width, height }} className="inline-block">

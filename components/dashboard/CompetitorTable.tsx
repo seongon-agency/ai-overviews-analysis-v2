@@ -71,13 +71,13 @@ export function CompetitorTable({ competitors }: CompetitorTableProps) {
 
   // Get citation rate color based on percentage
   const getCitationRateColor = (rate: number) => {
-    if (rate >= 0.3) return 'text-green-600 bg-green-50';
-    if (rate >= 0.1) return 'text-blue-600 bg-blue-50';
+    if (rate >= 0.3) return 'text-[var(--color-success-fg)] bg-[var(--color-success-subtle)]';
+    if (rate >= 0.1) return 'text-[var(--color-accent-fg)] bg-[var(--color-accent-subtle)]';
     return 'text-muted-foreground bg-muted/30';
   };
 
   return (
-    <div className="rounded-xl border overflow-hidden bg-white">
+    <div className="rounded-md border overflow-hidden bg-[var(--color-canvas-default)]">
       <Table>
         <TableHeader>
           <TableRow className="hover:bg-transparent bg-muted/30">
@@ -121,13 +121,13 @@ export function CompetitorTable({ competitors }: CompetitorTableProps) {
           {sortedCompetitors.map((competitor, index) => (
             <TableRow
               key={competitor.brand}
-              className={`transition-colors ${isUserBrand(competitor) ? 'bg-amber-50 hover:bg-amber-100/70' : 'hover:bg-muted/30'}`}
+              className={`transition-colors ${isUserBrand(competitor) ? 'bg-[var(--color-warning-subtle)] hover:bg-[var(--color-warning-subtle)]/70' : 'hover:bg-muted/30'}`}
             >
               <TableCell className="text-center">
                 <span className={`inline-flex items-center justify-center w-7 h-7 rounded-full text-sm font-medium ${
-                  index === 0 ? 'bg-amber-100 text-amber-700' :
-                  index === 1 ? 'bg-gray-100 text-gray-600' :
-                  index === 2 ? 'bg-orange-100 text-orange-700' :
+                  index === 0 ? 'bg-[var(--color-warning-subtle)] text-[var(--color-warning-fg)]' :
+                  index === 1 ? 'bg-[var(--color-neutral-muted)] text-[var(--color-fg-muted)]' :
+                  index === 2 ? 'bg-[var(--color-warning-subtle)] text-[var(--color-warning-fg)]' :
                   'text-muted-foreground'
                 }`}>
                   {index + 1}
@@ -135,11 +135,11 @@ export function CompetitorTable({ competitors }: CompetitorTableProps) {
               </TableCell>
               <TableCell>
                 <div className="flex items-center gap-2">
-                  <span className={`font-medium ${isUserBrand(competitor) ? 'text-amber-900' : ''}`}>
+                  <span className={`font-medium ${isUserBrand(competitor) ? 'text-[var(--color-warning-fg)]' : ''}`}>
                     {competitor.brand}
                   </span>
                   {isUserBrand(competitor) && (
-                    <Badge className="bg-amber-200 text-amber-800 hover:bg-amber-200 border-0 text-xs px-2">
+                    <Badge className="bg-[var(--color-warning-subtle)] text-[var(--color-warning-fg)] hover:bg-[var(--color-warning-subtle)] border-0 text-xs px-2">
                       You
                     </Badge>
                   )}
@@ -147,7 +147,7 @@ export function CompetitorTable({ competitors }: CompetitorTableProps) {
               </TableCell>
               <TableCell className="text-center">
                 <span className={`inline-flex items-center justify-center min-w-[2.5rem] px-2 py-1 rounded-md font-semibold ${
-                  isUserBrand(competitor) ? 'bg-amber-200 text-amber-800' : 'bg-blue-100 text-blue-700'
+                  isUserBrand(competitor) ? 'bg-[var(--color-warning-subtle)] text-[var(--color-warning-fg)]' : 'bg-[var(--color-accent-subtle)] text-[var(--color-accent-fg)]'
                 }`}>
                   {competitor.citedCount}
                 </span>

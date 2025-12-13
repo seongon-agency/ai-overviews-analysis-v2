@@ -45,7 +45,7 @@ export function MetricsTrends({ sessions, sessionMetrics, brandName }: MetricsTr
       <Card>
         <CardHeader>
           <CardTitle className="text-lg flex items-center gap-2">
-            <Activity className="h-5 w-5 text-indigo-500" />
+            <Activity className="h-5 w-5 text-[var(--color-accent-fg)]" />
             Performance Trends
           </CardTitle>
           <CardDescription>
@@ -54,11 +54,11 @@ export function MetricsTrends({ sessions, sessionMetrics, brandName }: MetricsTr
         </CardHeader>
         <CardContent>
           <div className="flex flex-col items-center justify-center py-12 text-center">
-            <div className="h-16 w-16 rounded-2xl bg-gray-50 flex items-center justify-center mb-4">
-              <BarChart3 className="w-8 h-8 text-gray-300" />
+            <div className="h-16 w-16 rounded-md bg-[var(--color-canvas-subtle)] flex items-center justify-center mb-4">
+              <BarChart3 className="w-8 h-8 text-[var(--color-fg-subtle)]" />
             </div>
-            <h3 className="text-gray-900 font-medium mb-1">Not enough data yet</h3>
-            <p className="text-sm text-gray-500 max-w-sm">
+            <h3 className="text-[var(--color-fg-default)] font-medium mb-1">Not enough data yet</h3>
+            <p className="text-sm text-[var(--color-fg-muted)] max-w-sm">
               Run at least 2 analysis sessions to see performance trends over time
             </p>
           </div>
@@ -93,21 +93,21 @@ export function MetricsTrends({ sessions, sessionMetrics, brandName }: MetricsTr
   const TrendIcon = ({ direction }: { direction: string }) => {
     switch (direction) {
       case 'up':
-        return <TrendingUp className="h-4 w-4 text-green-500" />;
+        return <TrendingUp className="h-4 w-4 text-[var(--color-success-fg)]" />;
       case 'down':
-        return <TrendingDown className="h-4 w-4 text-red-500" />;
+        return <TrendingDown className="h-4 w-4 text-[var(--color-danger-fg)]" />;
       default:
-        return <Minus className="h-4 w-4 text-gray-400" />;
+        return <Minus className="h-4 w-4 text-[var(--color-fg-subtle)]" />;
     }
   };
 
   const TrendBadge = ({ trend, label, inverted = false }: { trend: ReturnType<typeof calculateTrend>; label: string; inverted?: boolean }) => {
     const isPositive = inverted ? trend.direction === 'down' : trend.direction === 'up';
     const colorClass = trend.direction === 'stable'
-      ? 'bg-gray-100 text-gray-600'
+      ? 'bg-[var(--color-neutral-muted)] text-[var(--color-fg-muted)]'
       : isPositive
-        ? 'bg-green-100 text-green-700'
-        : 'bg-red-100 text-red-700';
+        ? 'bg-[var(--color-success-subtle)] text-[var(--color-success-fg)]'
+        : 'bg-[var(--color-danger-subtle)] text-[var(--color-danger-fg)]';
 
     return (
       <div className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${colorClass}`}>
@@ -121,16 +121,16 @@ export function MetricsTrends({ sessions, sessionMetrics, brandName }: MetricsTr
   const CustomTooltip = ({ active, payload, label }: { active?: boolean; payload?: Array<{ name: string; value: number; color: string }>; label?: string }) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-white border border-gray-200 rounded-xl shadow-lg p-4 text-sm">
-          <p className="font-semibold text-gray-900 mb-2">{label}</p>
+        <div className="bg-[var(--color-canvas-default)] border border-[var(--color-border-default)] rounded-md shadow-[var(--color-shadow-large)] p-4 text-sm">
+          <p className="font-semibold text-[var(--color-fg-default)] mb-2">{label}</p>
           <div className="space-y-1.5">
             {payload.map((entry, index) => (
               <div key={index} className="flex items-center justify-between gap-4">
                 <div className="flex items-center gap-2">
                   <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: entry.color }} />
-                  <span className="text-gray-600">{entry.name}</span>
+                  <span className="text-[var(--color-fg-muted)]">{entry.name}</span>
                 </div>
-                <span className="font-medium text-gray-900">
+                <span className="font-medium text-[var(--color-fg-default)]">
                   {entry.name.includes('Rate') || entry.name.includes('%')
                     ? `${entry.value.toFixed(1)}%`
                     : entry.name.includes('Rank')
@@ -150,15 +150,15 @@ export function MetricsTrends({ sessions, sessionMetrics, brandName }: MetricsTr
     <div className="space-y-6">
       {/* Trend Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-100">
+        <Card className="bg-gradient-to-br from-[var(--color-accent-subtle)] to-[var(--color-accent-subtle)] border-[var(--color-accent-subtle)]">
           <CardContent className="p-5">
             <div className="flex items-start justify-between">
               <div>
-                <p className="text-sm font-medium text-blue-600">AI Overview Rate</p>
-                <p className="text-3xl font-bold text-gray-900 mt-1">{latest.aioRate.toFixed(1)}%</p>
+                <p className="text-sm font-medium text-[var(--color-accent-fg)]">AI Overview Rate</p>
+                <p className="text-3xl font-bold text-[var(--color-fg-default)] mt-1">{latest.aioRate.toFixed(1)}%</p>
               </div>
-              <div className="h-10 w-10 rounded-xl bg-blue-100 flex items-center justify-center">
-                <Zap className="h-5 w-5 text-blue-600" />
+              <div className="h-10 w-10 rounded-md bg-[var(--color-accent-subtle)] flex items-center justify-center">
+                <Zap className="h-5 w-5 text-[var(--color-accent-fg)]" />
               </div>
             </div>
             <div className="mt-3">
@@ -167,15 +167,15 @@ export function MetricsTrends({ sessions, sessionMetrics, brandName }: MetricsTr
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-purple-50 to-pink-50 border-purple-100">
+        <Card className="bg-gradient-to-br from-[#f3e8ff] to-[#fae8ff] border-[#f3e8ff]">
           <CardContent className="p-5">
             <div className="flex items-start justify-between">
               <div>
-                <p className="text-sm font-medium text-purple-600">Brand Citation Rate</p>
-                <p className="text-3xl font-bold text-gray-900 mt-1">{latest.brandCitationRate.toFixed(1)}%</p>
+                <p className="text-sm font-medium text-[#8250df]">Brand Citation Rate</p>
+                <p className="text-3xl font-bold text-[var(--color-fg-default)] mt-1">{latest.brandCitationRate.toFixed(1)}%</p>
               </div>
-              <div className="h-10 w-10 rounded-xl bg-purple-100 flex items-center justify-center">
-                <Target className="h-5 w-5 text-purple-600" />
+              <div className="h-10 w-10 rounded-md bg-[#f3e8ff] flex items-center justify-center">
+                <Target className="h-5 w-5 text-[#8250df]" />
               </div>
             </div>
             <div className="mt-3">
@@ -184,24 +184,24 @@ export function MetricsTrends({ sessions, sessionMetrics, brandName }: MetricsTr
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-amber-50 to-orange-50 border-amber-100">
+        <Card className="bg-gradient-to-br from-[var(--color-warning-subtle)] to-[var(--color-warning-subtle)] border-[var(--color-warning-subtle)]">
           <CardContent className="p-5">
             <div className="flex items-start justify-between">
               <div>
-                <p className="text-sm font-medium text-amber-600">Average Rank</p>
-                <p className="text-3xl font-bold text-gray-900 mt-1">
+                <p className="text-sm font-medium text-[var(--color-warning-fg)]">Average Rank</p>
+                <p className="text-3xl font-bold text-[var(--color-fg-default)] mt-1">
                   {latest.avgBrandRank ? `#${latest.avgBrandRank.toFixed(1)}` : '-'}
                 </p>
               </div>
-              <div className="h-10 w-10 rounded-xl bg-amber-100 flex items-center justify-center">
-                <Activity className="h-5 w-5 text-amber-600" />
+              <div className="h-10 w-10 rounded-md bg-[var(--color-warning-subtle)] flex items-center justify-center">
+                <Activity className="h-5 w-5 text-[var(--color-warning-fg)]" />
               </div>
             </div>
             <div className="mt-3">
               {rankTrend ? (
                 <TrendBadge trend={rankTrend} label="vs last" inverted />
               ) : (
-                <span className="text-xs text-gray-500">No rank data</span>
+                <span className="text-xs text-[var(--color-fg-muted)]">No rank data</span>
               )}
             </div>
           </CardContent>
