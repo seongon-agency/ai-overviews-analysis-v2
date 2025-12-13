@@ -179,7 +179,7 @@ export function InsightsPanel({ competitors, brandName, totalAIOs }: InsightsPan
       case 'warning':
         return <AlertCircle className="h-5 w-5 text-[var(--color-warning-fg)]" />;
       case 'opportunity':
-        return <Sparkles className="h-5 w-5 text-[#8250df]" />;
+        return <Sparkles className="h-5 w-5 text-[var(--color-purple-fg)]" />;
       default:
         return <Lightbulb className="h-5 w-5 text-[var(--color-accent-fg)]" />;
     }
@@ -192,7 +192,7 @@ export function InsightsPanel({ competitors, brandName, totalAIOs }: InsightsPan
       case 'warning':
         return 'bg-[var(--color-warning-subtle)] border-[var(--color-warning-subtle)]';
       case 'opportunity':
-        return 'bg-[#f3e8ff] border-[#f3e8ff]';
+        return 'bg-[var(--color-purple-subtle)] border-[var(--color-purple-subtle)]';
       default:
         return 'bg-[var(--color-accent-subtle)] border-[var(--color-accent-subtle)]';
     }
@@ -202,10 +202,10 @@ export function InsightsPanel({ competitors, brandName, totalAIOs }: InsightsPan
 
   return (
     <Card className="border-[var(--color-border-default)] shadow-[var(--color-shadow-small)] overflow-hidden">
-      <CardHeader className="pb-4 bg-gradient-to-r from-[var(--color-accent-subtle)] via-[#f3e8ff] to-[#fae8ff] border-b border-[var(--color-border-muted)]">
+      <CardHeader className="pb-4 bg-gradient-to-r from-[var(--color-accent-subtle)] via-[var(--color-purple-subtle)] to-[var(--color-purple-subtle)] border-b border-[var(--color-border-muted)]">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-md bg-gradient-to-br from-[var(--color-accent-emphasis)] to-[#8250df] flex items-center justify-center shadow-[var(--color-shadow-small)]">
+            <div className="h-10 w-10 rounded-md bg-gradient-to-br from-[var(--color-accent-emphasis)] to-[var(--color-purple-emphasis)] flex items-center justify-center shadow-[var(--color-shadow-small)]">
               <Zap className="h-5 w-5 text-[var(--color-canvas-default)]" />
             </div>
             <div>
@@ -214,7 +214,7 @@ export function InsightsPanel({ competitors, brandName, totalAIOs }: InsightsPan
             </div>
           </div>
           <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[var(--color-canvas-default)]/80 border border-[var(--color-border-default)] text-xs font-medium text-[var(--color-fg-muted)]">
-            <Sparkles className="h-3.5 w-3.5 text-[#8250df]" />
+            <Sparkles className="h-3.5 w-3.5 text-[var(--color-purple-fg)]" />
             {insights.length} insights
           </div>
         </div>

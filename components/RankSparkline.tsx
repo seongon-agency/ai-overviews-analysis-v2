@@ -28,10 +28,10 @@ export function RankSparkline({ data, width = 60, height = 24 }: RankSparklinePr
   const lastRank = chartData[chartData.length - 1]?.rank || 0;
   // Use semantic colors: success for improvement, danger for decline, neutral for no change
   const color = lastRank < firstRank
-    ? 'hsl(var(--success))'
+    ? 'hsl(var(--chart-success))'
     : lastRank > firstRank
-    ? 'hsl(var(--danger))'
-    : 'hsl(var(--muted-foreground))';
+    ? 'hsl(var(--chart-danger))'
+    : 'hsl(var(--chart-fg-muted))';
 
   return (
     <div style={{ width, height }} className="inline-block">

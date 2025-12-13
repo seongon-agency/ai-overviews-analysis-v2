@@ -271,15 +271,15 @@ export function RankDistributionChart({ keywords, brandName, brandDomain }: Rank
                 <stop offset="95%" stopColor="hsl(45 93% 55%)" stopOpacity={0.2} />
               </linearGradient>
             </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
+            <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--chart-border))" vertical={false} />
             <XAxis
               dataKey="rank"
-              tick={{ fontSize: 12, fill: 'hsl(var(--muted-foreground))' }}
+              tick={{ fontSize: 12, fill: 'hsl(var(--chart-fg-muted))' }}
               axisLine={false}
               tickLine={false}
             />
             <YAxis
-              tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }}
+              tick={{ fontSize: 11, fill: 'hsl(var(--chart-fg-muted))' }}
               axisLine={false}
               tickLine={false}
               tickFormatter={(value) => `${value}%`}

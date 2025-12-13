@@ -96,7 +96,7 @@ export function CompetitorChart({ competitors, brandName, limit = 12 }: Competit
               type="number"
               axisLine={false}
               tickLine={false}
-              tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }}
+              tick={{ fontSize: 11, fill: 'hsl(var(--chart-fg-muted))' }}
             />
             <YAxis
               type="category"
@@ -115,7 +115,7 @@ export function CompetitorChart({ competitors, brandName, limit = 12 }: Competit
                       y={y}
                       dy={4}
                       textAnchor="end"
-                      fill={isUser ? 'hsl(45 93% 40%)' : 'hsl(var(--foreground))'}
+                      fill={isUser ? 'hsl(45 93% 40%)' : 'hsl(var(--chart-fg))'}
                       fontSize={12}
                       fontWeight={isUser ? 600 : 400}
                     >
@@ -126,7 +126,7 @@ export function CompetitorChart({ competitors, brandName, limit = 12 }: Competit
                       y={y}
                       dy={4}
                       textAnchor="end"
-                      fill={rank <= 3 ? 'hsl(45 93% 45%)' : 'hsl(var(--muted-foreground))'}
+                      fill={rank <= 3 ? 'hsl(45 93% 45%)' : 'hsl(var(--chart-fg-muted))'}
                       fontSize={10}
                       fontWeight={rank <= 3 ? 600 : 400}
                     >
@@ -171,7 +171,7 @@ export function CompetitorChart({ competitors, brandName, limit = 12 }: Competit
               <LabelList
                 dataKey="citedCount"
                 position="right"
-                fill="hsl(var(--foreground))"
+                fill="hsl(var(--chart-fg))"
                 fontSize={12}
                 fontWeight={600}
               />

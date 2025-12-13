@@ -167,15 +167,15 @@ export function MetricsTrends({ sessions, sessionMetrics, brandName }: MetricsTr
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-[#f3e8ff] to-[#fae8ff] border-[#f3e8ff]">
+        <Card className="bg-gradient-to-br from-[var(--color-purple-subtle)] to-[var(--color-purple-subtle)] border-[var(--color-purple-subtle)]">
           <CardContent className="p-5">
             <div className="flex items-start justify-between">
               <div>
-                <p className="text-sm font-medium text-[#8250df]">Brand Citation Rate</p>
+                <p className="text-sm font-medium text-[var(--color-purple-fg)]">Brand Citation Rate</p>
                 <p className="text-3xl font-bold text-[var(--color-fg-default)] mt-1">{latest.brandCitationRate.toFixed(1)}%</p>
               </div>
-              <div className="h-10 w-10 rounded-md bg-[#f3e8ff] flex items-center justify-center">
-                <Target className="h-5 w-5 text-[#8250df]" />
+              <div className="h-10 w-10 rounded-md bg-[var(--color-purple-subtle)] flex items-center justify-center">
+                <Target className="h-5 w-5 text-[var(--color-purple-fg)]" />
               </div>
             </div>
             <div className="mt-3">
@@ -229,15 +229,15 @@ export function MetricsTrends({ sessions, sessionMetrics, brandName }: MetricsTr
                     <stop offset="95%" stopColor="hsl(280 65% 60%)" stopOpacity={0} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--chart-border))" vertical={false} />
                 <XAxis
                   dataKey="shortDate"
-                  tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }}
+                  tick={{ fontSize: 11, fill: 'hsl(var(--chart-fg-muted))' }}
                   axisLine={false}
                   tickLine={false}
                 />
                 <YAxis
-                  tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }}
+                  tick={{ fontSize: 11, fill: 'hsl(var(--chart-fg-muted))' }}
                   axisLine={false}
                   tickLine={false}
                   tickFormatter={(value) => `${value}%`}
@@ -285,17 +285,17 @@ export function MetricsTrends({ sessions, sessionMetrics, brandName }: MetricsTr
           <CardContent>
             <ResponsiveContainer width="100%" height={280}>
               <LineChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--chart-border))" vertical={false} />
                 <XAxis
                   dataKey="shortDate"
-                  tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }}
+                  tick={{ fontSize: 11, fill: 'hsl(var(--chart-fg-muted))' }}
                   axisLine={false}
                   tickLine={false}
                 />
                 <YAxis
                   yAxisId="rank"
                   orientation="left"
-                  tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }}
+                  tick={{ fontSize: 11, fill: 'hsl(var(--chart-fg-muted))' }}
                   axisLine={false}
                   tickLine={false}
                   reversed
@@ -305,7 +305,7 @@ export function MetricsTrends({ sessions, sessionMetrics, brandName }: MetricsTr
                 <YAxis
                   yAxisId="count"
                   orientation="right"
-                  tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }}
+                  tick={{ fontSize: 11, fill: 'hsl(var(--chart-fg-muted))' }}
                   axisLine={false}
                   tickLine={false}
                 />
@@ -368,15 +368,15 @@ export function MetricsTrends({ sessions, sessionMetrics, brandName }: MetricsTr
                   <stop offset="95%" stopColor="hsl(45 93% 55%)" stopOpacity={0} />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
+              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--chart-border))" vertical={false} />
               <XAxis
                 dataKey="shortDate"
-                tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }}
+                tick={{ fontSize: 11, fill: 'hsl(var(--chart-fg-muted))' }}
                 axisLine={false}
                 tickLine={false}
               />
               <YAxis
-                tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }}
+                tick={{ fontSize: 11, fill: 'hsl(var(--chart-fg-muted))' }}
                 axisLine={false}
                 tickLine={false}
               />

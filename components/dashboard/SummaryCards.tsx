@@ -63,7 +63,7 @@ export function SummaryCards({
       value: competitorsIdentified,
       subtext: 'unique sources',
       icon: Users,
-      gradient: 'from-[var(--color-accent-subtle)] to-[#f3e8ff]',
+      gradient: 'from-[var(--color-accent-subtle)] to-[var(--color-purple-subtle)]',
       iconBg: 'bg-[var(--color-accent-subtle)]',
       iconColor: 'text-[var(--color-accent-fg)]',
       valueColor: 'text-[var(--color-accent-fg)]',

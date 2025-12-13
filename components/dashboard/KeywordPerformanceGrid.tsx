@@ -40,7 +40,7 @@ export function KeywordPerformanceGrid({ keywords, brandName, brandDomain }: Key
       } else {
         status = 'low';
         statusLabel = `#${kw.brandRank}`;
-        statusColor = 'bg-[#f3e8ff] text-[#8250df]';
+        statusColor = 'bg-[var(--color-purple-subtle)] text-[var(--color-purple-fg)]';
       }
 
       return {
@@ -137,7 +137,7 @@ export function KeywordPerformanceGrid({ keywords, brandName, brandDomain }: Key
             <span className="text-[var(--color-fg-muted)]">Rank 4-6</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <div className="w-2 h-2 rounded-full bg-[#8250df]"></div>
+            <div className="w-2 h-2 rounded-full bg-[var(--color-purple-fg)]"></div>
             <span className="text-[var(--color-fg-muted)]">Rank 7+</span>
           </div>
           <div className="flex items-center gap-1.5">
