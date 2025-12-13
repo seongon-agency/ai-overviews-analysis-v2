@@ -586,7 +586,11 @@
 
   /* Card hover effect */
   .card-hover {
-    @apply transition-all duration-200 hover:shadow-gh-md hover:-translate-y-0.5;
+    @apply transition-all duration-200;
+  }
+  .card-hover:hover {
+    box-shadow: var(--color-shadow-medium);
+    transform: translateY(-2px);
   }
 }
 
