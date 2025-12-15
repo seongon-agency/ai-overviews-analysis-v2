@@ -26,7 +26,7 @@ export async function fetchKeyword(
       keyword,
       location_code: parseInt(locationCode, 10),
       language_code: languageCode,
-      depth: 10,
+      depth: 20,
       group_organic_results: true,
       load_async_ai_overview: true,
     }]),

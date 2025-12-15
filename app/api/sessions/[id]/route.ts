@@ -32,7 +32,7 @@ function extractOrganicResults(rawApiResult: string | null): OrganicResult[] {
         description: item.description || ''
       }))
       .sort((a, b) => a.rank - b.rank)
-      .slice(0, 10); // Top 10 organic results
+      .slice(0, 20); // Top 20 organic results
 
     return organicItems;
   } catch {
