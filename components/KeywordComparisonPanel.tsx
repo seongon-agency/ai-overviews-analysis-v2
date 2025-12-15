@@ -8,7 +8,7 @@ import { AIOContent } from './AIOContent';
 import { Button } from '@/components/ui/button';
 
 // Icons
-import { X, Loader2, Pin, PinOff, ExternalLink, Clock, Sparkles, FileText, Hash } from 'lucide-react';
+import { X, Loader2, Pin, PinOff, ExternalLink, Clock, Sparkles, FileText, Hash, ChevronLeft, ChevronRight, Search } from 'lucide-react';
 
 interface HistoryEntry {
   sessionId: number;
@@ -53,6 +53,8 @@ function SessionCard({
   changeFromPrevious: 'improved' | 'declined' | 'gained' | 'lost' | 'same' | null;
 }) {
   const [highlightedCitation, setHighlightedCitation] = useState<number | null>(null);
+  const [citationsCollapsed, setCitationsCollapsed] = useState(false);
+  const [organicCollapsed, setOrganicCollapsed] = useState(false);
   const citationRefs = useRef<Map<number, HTMLDivElement>>(new Map());
 
   const handleCitationClick = useCallback((num: number) => {
@@ -89,7 +91,7 @@ function SessionCard({
 
   return (
     <div
-      className={`flex-shrink-0 w-[calc(50vw-48px)] max-w-[700px] min-w-[450px] h-full flex flex-col rounded-md overflow-hidden transition-all ${
+      className={`flex-shrink-0 w-[calc(60vw-48px)] max-w-[900px] min-w-[500px] h-full flex flex-col rounded-md overflow-hidden transition-all ${
         isPinned
           ? 'bg-[var(--color-canvas-default)] ring-2 ring-[var(--color-accent-emphasis)] shadow-[var(--color-shadow-large)]'
           : 'bg-[var(--color-canvas-default)] border border-[var(--color-border-default)] shadow-[var(--color-shadow-medium)] hover:shadow-[var(--color-shadow-large)]'
@@ -203,133 +205,179 @@ function SessionCard({
 
         {/* AIO Citations Sidebar */}
         {entry.references.length > 0 && (
-          <div className="w-56 border-l border-[var(--color-border-muted)] bg-[var(--color-canvas-subtle)] overflow-y-auto flex-shrink-0">
-            <div className="p-3">
-              <h4 className="text-xs font-semibold text-[var(--color-fg-muted)] uppercase tracking-wider mb-3 flex items-center gap-2">
-                <span className="w-5 h-5 bg-[var(--color-warning-subtle)] rounded-md flex items-center justify-center text-[var(--color-warning-fg)] text-[10px] font-bold">#</span>
-                AIO Citations ({entry.references.length})
-              </h4>
-              <div className="space-y-1.5">
-                {entry.references.map((ref) => {
-                  const isHighlighted = highlightedCitation === ref.rank;
-                  const isBrand = isBrandCitation(ref);
+          <div className={`${citationsCollapsed ? 'w-10' : 'w-52'} border-l border-[var(--color-border-muted)] bg-[var(--color-canvas-subtle)] overflow-hidden flex-shrink-0 transition-all duration-200 flex flex-col`}>
+            {/* Toggle Button */}
+            <button
+              onClick={() => setCitationsCollapsed(!citationsCollapsed)}
+              className="w-full p-2 flex items-center justify-center gap-1 hover:bg-[var(--color-canvas-default)] transition-colors border-b border-[var(--color-border-muted)]"
+              title={citationsCollapsed ? 'Expand AIO Citations' : 'Collapse AIO Citations'}
+            >
+              {citationsCollapsed ? (
+                <ChevronLeft className="h-4 w-4 text-[var(--color-fg-muted)]" />
+              ) : (
+                <>
+                  <span className="w-5 h-5 bg-[var(--color-warning-subtle)] rounded flex items-center justify-center text-[var(--color-warning-fg)] text-[10px] font-bold">#</span>
+                  <span className="text-xs font-medium text-[var(--color-fg-muted)] flex-1 text-left">AIO ({entry.references.length})</span>
+                  <ChevronRight className="h-4 w-4 text-[var(--color-fg-muted)]" />
+                </>
+              )}
+            </button>
 
-                  return (
-                    <div
-                      key={ref.rank}
-                      ref={(el) => {
-                        if (el) citationRefs.current.set(ref.rank, el);
-                      }}
-                      className={`
-                        group flex items-start gap-2 p-2 rounded-md text-xs cursor-pointer
-                        transition-all duration-200
-                        ${isHighlighted
-                          ? 'bg-[var(--color-accent-subtle)] ring-2 ring-[var(--color-accent-emphasis)] shadow-[var(--color-shadow-small)]'
-                          : 'hover:bg-[var(--color-canvas-default)] hover:shadow-[var(--color-shadow-small)]'
-                        }
-                        ${isBrand ? 'bg-[var(--color-warning-subtle)] border-l-2 border-[var(--color-warning-emphasis)]' : ''}
-                      `}
-                      onMouseEnter={() => setHighlightedCitation(ref.rank)}
-                      onMouseLeave={() => setHighlightedCitation(null)}
-                    >
-                      <span
-                        className={`
-                          w-5 h-5 flex items-center justify-center rounded text-[10px] font-bold flex-shrink-0 transition-colors
-                          ${isHighlighted
-                            ? 'bg-[var(--color-accent-emphasis)] text-[var(--color-canvas-default)]'
-                            : 'bg-[var(--color-neutral-muted)] text-[var(--color-fg-muted)] group-hover:bg-[var(--color-border-default)]'
-                          }
-                        `}
-                      >
-                        {ref.rank}
-                      </span>
-                      <div className="flex-1 min-w-0">
-                        <div className="font-medium text-[var(--color-fg-default)] truncate leading-tight text-[11px]">
-                          {ref.source || ref.domain}
-                        </div>
-                        {isBrand && (
-                          <span className="inline-block mt-0.5 text-[9px] bg-[var(--color-warning-emphasis)] text-[var(--color-canvas-default)] px-1 py-0.5 rounded font-medium">
-                            Your Brand
-                          </span>
-                        )}
-                      </div>
-                      <a
-                        href={ref.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-[var(--color-fg-subtle)] hover:text-[var(--color-accent-fg)] flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity"
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        <ExternalLink className="h-3 w-3" />
-                      </a>
-                    </div>
-                  );
-                })}
+            {/* Collapsed indicator */}
+            {citationsCollapsed ? (
+              <div className="flex-1 flex flex-col items-center py-3 gap-2">
+                <span className="w-6 h-6 bg-[var(--color-warning-subtle)] rounded flex items-center justify-center text-[var(--color-warning-fg)] text-xs font-bold">
+                  {entry.references.length}
+                </span>
+                <span className="text-[9px] text-[var(--color-fg-muted)] [writing-mode:vertical-lr] rotate-180">Citations</span>
               </div>
-            </div>
+            ) : (
+              <div className="flex-1 overflow-y-auto p-2">
+                <div className="space-y-1">
+                  {entry.references.map((ref) => {
+                    const isHighlighted = highlightedCitation === ref.rank;
+                    const isBrand = isBrandCitation(ref);
+
+                    return (
+                      <div
+                        key={ref.rank}
+                        ref={(el) => {
+                          if (el) citationRefs.current.set(ref.rank, el);
+                        }}
+                        className={`
+                          group flex items-start gap-2 p-2 rounded-md text-xs cursor-pointer
+                          transition-all duration-200
+                          ${isHighlighted
+                            ? 'bg-[var(--color-accent-subtle)] ring-2 ring-[var(--color-accent-emphasis)] shadow-[var(--color-shadow-small)]'
+                            : 'hover:bg-[var(--color-canvas-default)] hover:shadow-[var(--color-shadow-small)]'
+                          }
+                          ${isBrand ? 'bg-[var(--color-warning-subtle)] border-l-2 border-[var(--color-warning-emphasis)]' : ''}
+                        `}
+                        onMouseEnter={() => setHighlightedCitation(ref.rank)}
+                        onMouseLeave={() => setHighlightedCitation(null)}
+                      >
+                        <span
+                          className={`
+                            w-5 h-5 flex items-center justify-center rounded text-[10px] font-bold flex-shrink-0 transition-colors
+                            ${isHighlighted
+                              ? 'bg-[var(--color-accent-emphasis)] text-[var(--color-canvas-default)]'
+                              : 'bg-[var(--color-neutral-muted)] text-[var(--color-fg-muted)] group-hover:bg-[var(--color-border-default)]'
+                            }
+                          `}
+                        >
+                          {ref.rank}
+                        </span>
+                        <div className="flex-1 min-w-0">
+                          <div className="font-medium text-[var(--color-fg-default)] truncate leading-tight text-[11px]">
+                            {ref.source || ref.domain}
+                          </div>
+                          {isBrand && (
+                            <span className="inline-block mt-0.5 text-[9px] bg-[var(--color-warning-emphasis)] text-[var(--color-canvas-default)] px-1 py-0.5 rounded font-medium">
+                              Your Brand
+                            </span>
+                          )}
+                        </div>
+                        <a
+                          href={ref.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[var(--color-fg-subtle)] hover:text-[var(--color-accent-fg)] flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <ExternalLink className="h-3 w-3" />
+                        </a>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </div>
         )}
 
         {/* Organic Results Sidebar */}
         {entry.organicResults.length > 0 && (
-          <div className="w-56 border-l border-[var(--color-border-muted)] bg-[var(--color-canvas-default)] overflow-y-auto flex-shrink-0">
-            <div className="p-3">
-              <h4 className="text-xs font-semibold text-[var(--color-fg-muted)] uppercase tracking-wider mb-3 flex items-center gap-2">
-                <span className="w-5 h-5 bg-[var(--color-accent-subtle)] rounded-md flex items-center justify-center text-[var(--color-accent-fg)] text-[10px] font-bold">#</span>
-                Organic ({entry.organicResults.length})
-              </h4>
-              <div className="space-y-1.5">
-                {entry.organicResults.map((result) => {
-                  const isBrand = brandDomain && result.domain.toLowerCase().includes(brandDomain.toLowerCase());
+          <div className={`${organicCollapsed ? 'w-10' : 'w-52'} border-l border-[var(--color-border-muted)] bg-[var(--color-canvas-default)] overflow-hidden flex-shrink-0 transition-all duration-200 flex flex-col`}>
+            {/* Toggle Button */}
+            <button
+              onClick={() => setOrganicCollapsed(!organicCollapsed)}
+              className="w-full p-2 flex items-center justify-center gap-1 hover:bg-[var(--color-canvas-subtle)] transition-colors border-b border-[var(--color-border-muted)]"
+              title={organicCollapsed ? 'Expand Organic Results' : 'Collapse Organic Results'}
+            >
+              {organicCollapsed ? (
+                <ChevronLeft className="h-4 w-4 text-[var(--color-fg-muted)]" />
+              ) : (
+                <>
+                  <Search className="h-4 w-4 text-[var(--color-accent-fg)]" />
+                  <span className="text-xs font-medium text-[var(--color-fg-muted)] flex-1 text-left">Organic ({entry.organicResults.length})</span>
+                  <ChevronRight className="h-4 w-4 text-[var(--color-fg-muted)]" />
+                </>
+              )}
+            </button>
 
-                  return (
-                    <div
-                      key={result.rank}
-                      className={`
-                        group flex items-start gap-2 p-2 rounded-md text-xs
-                        transition-all duration-200
-                        hover:bg-[var(--color-canvas-subtle)] hover:shadow-[var(--color-shadow-small)]
-                        ${isBrand ? 'bg-[var(--color-warning-subtle)] border-l-2 border-[var(--color-warning-emphasis)]' : ''}
-                      `}
-                    >
-                      <span
+            {/* Collapsed indicator */}
+            {organicCollapsed ? (
+              <div className="flex-1 flex flex-col items-center py-3 gap-2">
+                <span className="w-6 h-6 bg-[var(--color-accent-subtle)] rounded flex items-center justify-center text-[var(--color-accent-fg)] text-xs font-bold">
+                  {entry.organicResults.length}
+                </span>
+                <span className="text-[9px] text-[var(--color-fg-muted)] [writing-mode:vertical-lr] rotate-180">Organic</span>
+              </div>
+            ) : (
+              <div className="flex-1 overflow-y-auto p-2">
+                <div className="space-y-1">
+                  {entry.organicResults.map((result) => {
+                    const isBrand = brandDomain && result.domain.toLowerCase().includes(brandDomain.toLowerCase());
+
+                    return (
+                      <div
+                        key={result.rank}
                         className={`
-                          w-5 h-5 flex items-center justify-center rounded text-[10px] font-bold flex-shrink-0 transition-colors
-                          ${isBrand
-                            ? 'bg-[var(--color-warning-emphasis)] text-[var(--color-canvas-default)]'
-                            : 'bg-[var(--color-neutral-muted)] text-[var(--color-fg-muted)] group-hover:bg-[var(--color-border-default)]'
-                          }
+                          group flex items-start gap-2 p-2 rounded-md text-xs
+                          transition-all duration-200
+                          hover:bg-[var(--color-canvas-subtle)] hover:shadow-[var(--color-shadow-small)]
+                          ${isBrand ? 'bg-[var(--color-warning-subtle)] border-l-2 border-[var(--color-warning-emphasis)]' : ''}
                         `}
                       >
-                        {result.rank}
-                      </span>
-                      <div className="flex-1 min-w-0">
-                        <div className="font-medium text-[var(--color-fg-default)] truncate leading-tight text-[11px]">
-                          {result.title || result.domain}
+                        <span
+                          className={`
+                            w-5 h-5 flex items-center justify-center rounded text-[10px] font-bold flex-shrink-0 transition-colors
+                            ${isBrand
+                              ? 'bg-[var(--color-warning-emphasis)] text-[var(--color-canvas-default)]'
+                              : 'bg-[var(--color-neutral-muted)] text-[var(--color-fg-muted)] group-hover:bg-[var(--color-border-default)]'
+                            }
+                          `}
+                        >
+                          {result.rank}
+                        </span>
+                        <div className="flex-1 min-w-0">
+                          <div className="font-medium text-[var(--color-fg-default)] truncate leading-tight text-[11px]">
+                            {result.title || result.domain}
+                          </div>
+                          <div className="text-[var(--color-fg-muted)] truncate text-[10px]">
+                            {result.domain}
+                          </div>
+                          {isBrand && (
+                            <span className="inline-block mt-0.5 text-[9px] bg-[var(--color-warning-emphasis)] text-[var(--color-canvas-default)] px-1 py-0.5 rounded font-medium">
+                              Your Site
+                            </span>
+                          )}
                         </div>
-                        <div className="text-[var(--color-fg-muted)] truncate text-[10px]">
-                          {result.domain}
-                        </div>
-                        {isBrand && (
-                          <span className="inline-block mt-0.5 text-[9px] bg-[var(--color-warning-emphasis)] text-[var(--color-canvas-default)] px-1 py-0.5 rounded font-medium">
-                            Your Site
-                          </span>
-                        )}
+                        <a
+                          href={result.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[var(--color-fg-subtle)] hover:text-[var(--color-accent-fg)] flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <ExternalLink className="h-3 w-3" />
+                        </a>
                       </div>
-                      <a
-                        href={result.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-[var(--color-fg-subtle)] hover:text-[var(--color-accent-fg)] flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity"
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        <ExternalLink className="h-3 w-3" />
-                      </a>
-                    </div>
-                  );
-                })}
+                    );
+                  })}
+                </div>
               </div>
-            </div>
+            )}
           </div>
         )}
       </div>
