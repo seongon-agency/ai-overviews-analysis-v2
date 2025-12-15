@@ -9,9 +9,50 @@ import {
   getKeywordResultsForSessions,
   verifyProjectOwnership
 } from '@/lib/database';
-import { Reference, KeywordRecord, CheckSession } from '@/lib/types';
-import { findBrandInReferences, isBrandMentionedInText } from '@/lib/analysis';
+import { Reference, KeywordRecord, CheckSession, OrganicResult, SERPItem } from '@/lib/types';
+import { findBrandInReferences, isBrandMentionedInText, brandMatchesDomain } from '@/lib/analysis';
 import { getUserId } from '@/lib/auth-utils';
+
+// Helper to extract organic results from raw API response
+function extractOrganicResults(rawApiResult: string | null): OrganicResult[] {
+  if (!rawApiResult) return [];
+
+  try {
+    const apiResult = JSON.parse(rawApiResult);
+    const items: SERPItem[] = apiResult.items || [];
+
+    // Filter organic results and map to our format
+    const organicItems = items
+      .filter(item => item.type === 'organic')
+      .map((item, idx) => ({
+        rank: item.rank_group || idx + 1,
+        domain: item.domain || '',
+        title: item.title || '',
+        url: item.url || '',
+        description: item.description || ''
+      }))
+      .sort((a, b) => a.rank - b.rank)
+      .slice(0, 10); // Top 10 organic results
+
+    return organicItems;
+  } catch {
+    return [];
+  }
+}
+
+// Find brand position in organic results
+function findBrandInOrganicResults(
+  organicResults: OrganicResult[],
+  brandDomain: string
+): number | null {
+  if (!brandDomain || organicResults.length === 0) return null;
+
+  const matchIndex = organicResults.findIndex(result =>
+    brandMatchesDomain(brandDomain, result.domain, result.url)
+  );
+
+  return matchIndex >= 0 ? organicResults[matchIndex].rank : null;
+}
 
 // GET /api/sessions/[id] - Get session details with keywords
 export async function GET(
@@ -140,6 +181,10 @@ export async function GET(
       // Check if brand is mentioned in AIO text content
       const brandMentioned = isBrandMentionedInText(kw.aio_markdown, brandName);
 
+      // Extract organic search results
+      const organicResults = extractOrganicResults(kw.raw_api_result);
+      const organicBrandRank = findBrandInOrganicResults(organicResults, brandDomain);
+
       // Calculate change from previous session
       let changeType: string | null = null;
       let previousBrandRank: number | null = null;
@@ -178,7 +223,10 @@ export async function GET(
         createdAt: kw.created_at,
         // Change tracking fields
         changeType,
-        previousBrandRank
+        previousBrandRank,
+        // Organic search results
+        organicResults,
+        organicBrandRank
       };
     });
 

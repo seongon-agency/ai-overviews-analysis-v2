@@ -40,6 +40,15 @@ export interface Reference {
   url: string;
 }
 
+// Organic search result
+export interface OrganicResult {
+  rank: number;
+  domain: string;
+  title: string;
+  url: string;
+  description: string;
+}
+
 // Database models
 export interface Project {
   id: number;
@@ -96,6 +105,9 @@ export interface KeywordRecord {
   // Change tracking (compared to previous session)
   changeType?: string | null;
   previousBrandRank?: number | null;
+  // Organic search results
+  organicResults?: OrganicResult[];
+  organicBrandRank?: number | null; // Brand's position in organic results
 }
 
 // Keyword history entry for timeline view
@@ -108,6 +120,8 @@ export interface KeywordHistoryEntry {
   references: Reference[];
   referenceCount: number;
   brandRank: number | null;
+  organicResults?: OrganicResult[];
+  organicBrandRank?: number | null;
 }
 
 // Keyword with full history

@@ -1,9 +1,10 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { KeywordRecord, Reference } from '@/lib/types';
+import { KeywordRecord, Reference, OrganicResult } from '@/lib/types';
 import { AIOContent } from './AIOContent';
 import { CitationList } from './CitationList';
+import { OrganicResultsList } from './OrganicResultsList';
 
 // shadcn/ui components
 import { Button } from '@/components/ui/button';
@@ -23,6 +24,8 @@ interface HistoryEntry {
   references: Reference[];
   referenceCount: number;
   brandRank: number | null;
+  organicResults: OrganicResult[];
+  organicBrandRank: number | null;
 }
 
 interface KeywordDetailPanelProps {
@@ -81,7 +84,9 @@ export function KeywordDetailPanel({
               aioMarkdown: keywordData.aioMarkdown,
               references: keywordData.references,
               referenceCount: keywordData.referenceCount,
-              brandRank: keywordData.brandRank
+              brandRank: keywordData.brandRank,
+              organicResults: keywordData.organicResults || [],
+              organicBrandRank: keywordData.organicBrandRank ?? null
             });
           }
         }
@@ -325,7 +330,7 @@ export function KeywordDetailPanel({
                   </div>
 
                   {/* Stats */}
-                  <div className="grid grid-cols-3 gap-4 px-6 py-4 border-b border-[var(--color-border-default)]">
+                  <div className="grid grid-cols-4 gap-4 px-6 py-4 border-b border-[var(--color-border-default)]">
                     <Card className="p-3 bg-[var(--color-canvas-subtle)]">
                       <div className="text-sm text-[var(--color-fg-muted)]">AI Overview</div>
                       <div className={`text-lg font-semibold ${
@@ -335,7 +340,7 @@ export function KeywordDetailPanel({
                       </div>
                     </Card>
                     <Card className="p-3 bg-[var(--color-canvas-subtle)]">
-                      <div className="text-sm text-[var(--color-fg-muted)]">Brand Rank</div>
+                      <div className="text-sm text-[var(--color-fg-muted)]">AIO Rank</div>
                       <div className={`text-lg font-semibold ${
                         selectedEntry.brandRank ? 'text-[var(--color-warning-fg)]' : 'text-[var(--color-fg-muted)]'
                       }`}>
@@ -343,7 +348,15 @@ export function KeywordDetailPanel({
                       </div>
                     </Card>
                     <Card className="p-3 bg-[var(--color-canvas-subtle)]">
-                      <div className="text-sm text-[var(--color-fg-muted)]">References</div>
+                      <div className="text-sm text-[var(--color-fg-muted)]">Organic Rank</div>
+                      <div className={`text-lg font-semibold ${
+                        selectedEntry.organicBrandRank ? 'text-[var(--color-accent-fg)]' : 'text-[var(--color-fg-muted)]'
+                      }`}>
+                        {selectedEntry.organicBrandRank ? `#${selectedEntry.organicBrandRank}` : 'Not ranked'}
+                      </div>
+                    </Card>
+                    <Card className="p-3 bg-[var(--color-canvas-subtle)]">
+                      <div className="text-sm text-[var(--color-fg-muted)]">Citations</div>
                       <div className="text-lg font-semibold text-[var(--color-fg-default)]">
                         {selectedEntry.referenceCount}
                       </div>
@@ -371,66 +384,96 @@ export function KeywordDetailPanel({
                           </div>
                         </div>
 
-                        {/* Citations Sidebar */}
-                        <div className="w-72 border-l border-[var(--color-border-default)] overflow-y-auto p-4 bg-[var(--color-canvas-subtle)]">
-                          <h4 className="text-sm font-medium text-[var(--color-fg-muted)] uppercase tracking-wide mb-3">
-                            Citation Sources
-                          </h4>
-                          <CitationList
-                            references={selectedEntry.references}
-                            highlightedCitation={highlightedCitation}
-                            onCitationHover={setHighlightedCitation}
-                            brandDomain={brandDomain}
-                          />
+                        {/* Right Sidebar - Citations & Organic Results */}
+                        <div className="w-80 border-l border-[var(--color-border-default)] overflow-y-auto p-4 bg-[var(--color-canvas-subtle)]">
+                          {/* Citations Section */}
+                          <div className="mb-6">
+                            <h4 className="text-sm font-medium text-[var(--color-fg-muted)] uppercase tracking-wide mb-3">
+                              AIO Citations
+                            </h4>
+                            <CitationList
+                              references={selectedEntry.references}
+                              highlightedCitation={highlightedCitation}
+                              onCitationHover={setHighlightedCitation}
+                              brandDomain={brandDomain}
+                            />
+                          </div>
+
+                          {/* Organic Results Section */}
+                          {selectedEntry.organicResults.length > 0 && (
+                            <div className="pt-4 border-t border-[var(--color-border-default)]">
+                              <OrganicResultsList
+                                results={selectedEntry.organicResults}
+                                brandDomain={brandDomain}
+                              />
+                            </div>
+                          )}
                         </div>
                       </div>
-                    ) : selectedEntry.references.length > 0 ? (
+                    ) : (selectedEntry.references.length > 0 || selectedEntry.organicResults.length > 0) ? (
                       <div className="p-6">
-                        <h4 className="text-sm font-medium text-[var(--color-fg-muted)] uppercase tracking-wide mb-3">
-                          Citation Sources
-                        </h4>
-                        <div className="space-y-2">
-                          {selectedEntry.references.map((ref, idx) => {
-                            const isBrand = brandDomain && ref.domain.toLowerCase().includes(brandDomain.toLowerCase());
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          {/* Citations Column */}
+                          {selectedEntry.references.length > 0 && (
+                            <div>
+                              <h4 className="text-sm font-medium text-[var(--color-fg-muted)] uppercase tracking-wide mb-3">
+                                AIO Citations
+                              </h4>
+                              <div className="space-y-2">
+                                {selectedEntry.references.map((ref, idx) => {
+                                  const isBrand = brandDomain && ref.domain.toLowerCase().includes(brandDomain.toLowerCase());
 
-                            return (
-                              <Card
-                                key={idx}
-                                className={`p-3 ${
-                                  isBrand ? 'bg-[var(--color-warning-subtle)] border-[var(--color-warning-muted)]' : 'bg-[var(--color-canvas-default)]'
-                                }`}
-                              >
-                                <div className="flex items-center gap-3">
-                                  <div className="w-6 h-6 flex items-center justify-center bg-[var(--color-canvas-subtle)] rounded text-xs font-medium">
-                                    {ref.rank}
-                                  </div>
-                                  <div className="flex-1 min-w-0">
-                                    <div className="text-sm font-medium truncate">
-                                      {ref.source || ref.domain}
-                                    </div>
-                                    <div className="text-xs text-[var(--color-fg-muted)] truncate">
-                                      {ref.domain}
-                                    </div>
-                                  </div>
-                                  {isBrand && (
-                                    <Badge variant="secondary" className="bg-[var(--color-warning-emphasis)] text-[var(--color-canvas-default)] shrink-0">
-                                      Your Brand
-                                    </Badge>
-                                  )}
-                                  {ref.url && (
-                                    <a
-                                      href={ref.url}
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      className="text-[var(--color-fg-muted)] hover:text-[var(--color-accent-fg)]"
+                                  return (
+                                    <Card
+                                      key={idx}
+                                      className={`p-3 ${
+                                        isBrand ? 'bg-[var(--color-warning-subtle)] border-[var(--color-warning-muted)]' : 'bg-[var(--color-canvas-default)]'
+                                      }`}
                                     >
-                                      <ExternalLink className="h-4 w-4" />
-                                    </a>
-                                  )}
-                                </div>
-                              </Card>
-                            );
-                          })}
+                                      <div className="flex items-center gap-3">
+                                        <div className="w-6 h-6 flex items-center justify-center bg-[var(--color-canvas-subtle)] rounded text-xs font-medium">
+                                          {ref.rank}
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                          <div className="text-sm font-medium truncate">
+                                            {ref.source || ref.domain}
+                                          </div>
+                                          <div className="text-xs text-[var(--color-fg-muted)] truncate">
+                                            {ref.domain}
+                                          </div>
+                                        </div>
+                                        {isBrand && (
+                                          <Badge variant="secondary" className="bg-[var(--color-warning-emphasis)] text-[var(--color-canvas-default)] shrink-0">
+                                            Your Brand
+                                          </Badge>
+                                        )}
+                                        {ref.url && (
+                                          <a
+                                            href={ref.url}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="text-[var(--color-fg-muted)] hover:text-[var(--color-accent-fg)]"
+                                          >
+                                            <ExternalLink className="h-4 w-4" />
+                                          </a>
+                                        )}
+                                      </div>
+                                    </Card>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Organic Results Column */}
+                          {selectedEntry.organicResults.length > 0 && (
+                            <div>
+                              <OrganicResultsList
+                                results={selectedEntry.organicResults}
+                                brandDomain={brandDomain}
+                              />
+                            </div>
+                          )}
                         </div>
                       </div>
                     ) : (
