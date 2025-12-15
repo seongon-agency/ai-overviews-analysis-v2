@@ -22,7 +22,7 @@ interface KeywordsTableProps {
   onViewSession?: (sessionId: number) => void;
 }
 
-type SortField = 'keyword' | 'referenceCount' | 'brandRank' | 'change';
+type SortField = 'keyword' | 'referenceCount' | 'brandRank' | 'organicRank' | 'change';
 
 export function KeywordsTable({
   keywords,
@@ -69,6 +69,13 @@ export function KeywordsTable({
         else if (a.brandRank === null) comparison = 1;
         else if (b.brandRank === null) comparison = -1;
         else comparison = a.brandRank - b.brandRank;
+      } else if (sortField === 'organicRank') {
+        const aRank = a.organicBrandRank ?? null;
+        const bRank = b.organicBrandRank ?? null;
+        if (aRank === null && bRank === null) comparison = 0;
+        else if (aRank === null) comparison = 1;
+        else if (bRank === null) comparison = -1;
+        else comparison = aRank - bRank;
       } else if (sortField === 'change') {
         const priorityA = a.changeType ? (changePriority[a.changeType] || 99) : 99;
         const priorityB = b.changeType ? (changePriority[b.changeType] || 99) : 99;
@@ -298,7 +305,15 @@ export function KeywordsTable({
                 onClick={() => handleSort('brandRank')}
               >
                 <div className="flex items-center justify-center">
-                  Brand Cited <SortIcon field="brandRank" />
+                  AIO Rank <SortIcon field="brandRank" />
+                </div>
+              </th>
+              <th
+                className="w-28 px-4 py-3 text-center text-xs font-semibold text-[var(--color-fg-muted)] uppercase tracking-wider cursor-pointer hover:bg-[var(--color-neutral-muted)] transition-colors"
+                onClick={() => handleSort('organicRank')}
+              >
+                <div className="flex items-center justify-center">
+                  Organic <SortIcon field="organicRank" />
                 </div>
               </th>
               <th className="w-24 px-4 py-3 text-center text-xs font-semibold text-[var(--color-fg-muted)] uppercase tracking-wider">
@@ -354,6 +369,15 @@ export function KeywordsTable({
                   {kw.brandRank ? (
                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[var(--color-warning-subtle)] text-[var(--color-warning-fg)]">
                       #{kw.brandRank}
+                    </span>
+                  ) : (
+                    <span className="text-[var(--color-border-default)]">-</span>
+                  )}
+                </td>
+                <td className="px-4 py-3 text-center">
+                  {kw.organicBrandRank ? (
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[var(--color-accent-subtle)] text-[var(--color-accent-fg)]">
+                      #{kw.organicBrandRank}
                     </span>
                   ) : (
                     <span className="text-[var(--color-border-default)]">-</span>

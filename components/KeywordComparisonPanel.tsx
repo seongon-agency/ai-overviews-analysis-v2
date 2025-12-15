@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { KeywordRecord, Reference } from '@/lib/types';
+import { KeywordRecord, Reference, OrganicResult } from '@/lib/types';
 import { AIOContent } from './AIOContent';
 
 // shadcn/ui components
@@ -19,6 +19,8 @@ interface HistoryEntry {
   references: Reference[];
   referenceCount: number;
   brandRank: number | null;
+  organicResults: OrganicResult[];
+  organicBrandRank: number | null;
 }
 
 interface KeywordComparisonPanelProps {
@@ -145,7 +147,7 @@ function SessionCard({
         </div>
 
         {/* Quick Stats Pills */}
-        <div className="flex items-center gap-2 mt-3">
+        <div className="flex items-center gap-2 mt-3 flex-wrap">
           <div className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium ${
             entry.hasAIOverview
               ? 'bg-[var(--color-success-subtle)] text-[var(--color-success-fg)]'
@@ -157,7 +159,13 @@ function SessionCard({
           {entry.brandRank && (
             <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-[var(--color-warning-subtle)] text-[var(--color-warning-fg)]">
               <Hash className="h-3 w-3" />
-              Brand Rank #{entry.brandRank}
+              AIO #{entry.brandRank}
+            </div>
+          )}
+          {entry.organicBrandRank && (
+            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-[var(--color-accent-subtle)] text-[var(--color-accent-fg)]">
+              <Hash className="h-3 w-3" />
+              Organic #{entry.organicBrandRank}
             </div>
           )}
           <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-[var(--color-neutral-muted)] text-[var(--color-fg-muted)]">
@@ -193,75 +201,139 @@ function SessionCard({
           )}
         </div>
 
-        {/* Citations Sidebar on right */}
-        {entry.references.length > 0 && (
-          <div className="w-64 border-l border-[var(--color-border-muted)] bg-[var(--color-canvas-subtle)] overflow-y-auto flex-shrink-0">
-            <div className="p-4">
-              <h4 className="text-xs font-semibold text-[var(--color-fg-muted)] uppercase tracking-wider mb-3 flex items-center gap-2">
-                <span className="w-5 h-5 bg-[var(--color-neutral-muted)] rounded-md flex items-center justify-center text-[var(--color-fg-muted)] text-[10px] font-bold">#</span>
-                Citations ({entry.references.length})
-              </h4>
-              <div className="space-y-2">
-                {entry.references.map((ref) => {
-                  const isHighlighted = highlightedCitation === ref.rank;
-                  const isBrand = isBrandCitation(ref);
+        {/* Right Sidebar - Citations & Organic Results */}
+        {(entry.references.length > 0 || entry.organicResults.length > 0) && (
+          <div className="w-72 border-l border-[var(--color-border-muted)] bg-[var(--color-canvas-subtle)] overflow-y-auto flex-shrink-0">
+            {/* AIO Citations Section */}
+            {entry.references.length > 0 && (
+              <div className="p-4 border-b border-[var(--color-border-muted)]">
+                <h4 className="text-xs font-semibold text-[var(--color-fg-muted)] uppercase tracking-wider mb-3 flex items-center gap-2">
+                  <span className="w-5 h-5 bg-[var(--color-warning-subtle)] rounded-md flex items-center justify-center text-[var(--color-warning-fg)] text-[10px] font-bold">#</span>
+                  AIO Citations ({entry.references.length})
+                </h4>
+                <div className="space-y-2">
+                  {entry.references.map((ref) => {
+                    const isHighlighted = highlightedCitation === ref.rank;
+                    const isBrand = isBrandCitation(ref);
 
-                  return (
-                    <div
-                      key={ref.rank}
-                      ref={(el) => {
-                        if (el) citationRefs.current.set(ref.rank, el);
-                      }}
-                      className={`
-                        group flex items-start gap-2.5 p-2.5 rounded-md text-xs cursor-pointer
-                        transition-all duration-200
-                        ${isHighlighted
-                          ? 'bg-[var(--color-accent-subtle)] ring-2 ring-[var(--color-accent-emphasis)] shadow-[var(--color-shadow-small)]'
-                          : 'hover:bg-[var(--color-canvas-default)] hover:shadow-[var(--color-shadow-small)]'
-                        }
-                        ${isBrand ? 'bg-[var(--color-warning-subtle)] border-l-2 border-[var(--color-warning-emphasis)]' : ''}
-                      `}
-                      onMouseEnter={() => setHighlightedCitation(ref.rank)}
-                      onMouseLeave={() => setHighlightedCitation(null)}
-                    >
-                      <span
+                    return (
+                      <div
+                        key={ref.rank}
+                        ref={(el) => {
+                          if (el) citationRefs.current.set(ref.rank, el);
+                        }}
                         className={`
-                          w-6 h-6 flex items-center justify-center rounded-md text-xs font-bold flex-shrink-0 transition-colors
+                          group flex items-start gap-2.5 p-2.5 rounded-md text-xs cursor-pointer
+                          transition-all duration-200
                           ${isHighlighted
-                            ? 'bg-[var(--color-accent-emphasis)] text-[var(--color-canvas-default)]'
-                            : 'bg-[var(--color-neutral-muted)] text-[var(--color-fg-muted)] group-hover:bg-[var(--color-border-default)]'
+                            ? 'bg-[var(--color-accent-subtle)] ring-2 ring-[var(--color-accent-emphasis)] shadow-[var(--color-shadow-small)]'
+                            : 'hover:bg-[var(--color-canvas-default)] hover:shadow-[var(--color-shadow-small)]'
                           }
+                          ${isBrand ? 'bg-[var(--color-warning-subtle)] border-l-2 border-[var(--color-warning-emphasis)]' : ''}
+                        `}
+                        onMouseEnter={() => setHighlightedCitation(ref.rank)}
+                        onMouseLeave={() => setHighlightedCitation(null)}
+                      >
+                        <span
+                          className={`
+                            w-6 h-6 flex items-center justify-center rounded-md text-xs font-bold flex-shrink-0 transition-colors
+                            ${isHighlighted
+                              ? 'bg-[var(--color-accent-emphasis)] text-[var(--color-canvas-default)]'
+                              : 'bg-[var(--color-neutral-muted)] text-[var(--color-fg-muted)] group-hover:bg-[var(--color-border-default)]'
+                            }
+                          `}
+                        >
+                          {ref.rank}
+                        </span>
+                        <div className="flex-1 min-w-0">
+                          <div className="font-medium text-[var(--color-fg-default)] truncate leading-tight">
+                            {ref.source || ref.domain}
+                          </div>
+                          <div className="text-[var(--color-fg-muted)] truncate mt-0.5 flex items-center gap-1">
+                            {ref.domain}
+                          </div>
+                          {isBrand && (
+                            <span className="inline-block mt-1 text-[10px] bg-[var(--color-warning-emphasis)] text-[var(--color-canvas-default)] px-1.5 py-0.5 rounded-md font-medium">
+                              Your Brand
+                            </span>
+                          )}
+                        </div>
+                        <a
+                          href={ref.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[var(--color-fg-subtle)] hover:text-[var(--color-accent-fg)] flex-shrink-0 p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <ExternalLink className="h-3.5 w-3.5" />
+                        </a>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Organic Results Section */}
+            {entry.organicResults.length > 0 && (
+              <div className="p-4">
+                <h4 className="text-xs font-semibold text-[var(--color-fg-muted)] uppercase tracking-wider mb-3 flex items-center gap-2">
+                  <span className="w-5 h-5 bg-[var(--color-accent-subtle)] rounded-md flex items-center justify-center text-[var(--color-accent-fg)] text-[10px] font-bold">#</span>
+                  Organic Results ({entry.organicResults.length})
+                </h4>
+                <div className="space-y-2">
+                  {entry.organicResults.map((result) => {
+                    const isBrand = brandDomain && result.domain.toLowerCase().includes(brandDomain.toLowerCase());
+
+                    return (
+                      <div
+                        key={result.rank}
+                        className={`
+                          group flex items-start gap-2.5 p-2.5 rounded-md text-xs
+                          transition-all duration-200
+                          hover:bg-[var(--color-canvas-default)] hover:shadow-[var(--color-shadow-small)]
+                          ${isBrand ? 'bg-[var(--color-warning-subtle)] border-l-2 border-[var(--color-warning-emphasis)]' : ''}
                         `}
                       >
-                        {ref.rank}
-                      </span>
-                      <div className="flex-1 min-w-0">
-                        <div className="font-medium text-[var(--color-fg-default)] truncate leading-tight">
-                          {ref.source || ref.domain}
+                        <span
+                          className={`
+                            w-6 h-6 flex items-center justify-center rounded-md text-xs font-bold flex-shrink-0 transition-colors
+                            ${isBrand
+                              ? 'bg-[var(--color-warning-emphasis)] text-[var(--color-canvas-default)]'
+                              : 'bg-[var(--color-neutral-muted)] text-[var(--color-fg-muted)] group-hover:bg-[var(--color-border-default)]'
+                            }
+                          `}
+                        >
+                          {result.rank}
+                        </span>
+                        <div className="flex-1 min-w-0">
+                          <div className="font-medium text-[var(--color-fg-default)] truncate leading-tight">
+                            {result.title || result.domain}
+                          </div>
+                          <div className="text-[var(--color-fg-muted)] truncate mt-0.5">
+                            {result.domain}
+                          </div>
+                          {isBrand && (
+                            <span className="inline-block mt-1 text-[10px] bg-[var(--color-warning-emphasis)] text-[var(--color-canvas-default)] px-1.5 py-0.5 rounded-md font-medium">
+                              Your Site
+                            </span>
+                          )}
                         </div>
-                        <div className="text-[var(--color-fg-muted)] truncate mt-0.5 flex items-center gap-1">
-                          {ref.domain}
-                        </div>
-                        {isBrand && (
-                          <span className="inline-block mt-1 text-[10px] bg-[var(--color-warning-emphasis)] text-[var(--color-canvas-default)] px-1.5 py-0.5 rounded-md font-medium">
-                            Your Brand
-                          </span>
-                        )}
+                        <a
+                          href={result.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[var(--color-fg-subtle)] hover:text-[var(--color-accent-fg)] flex-shrink-0 p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <ExternalLink className="h-3.5 w-3.5" />
+                        </a>
                       </div>
-                      <a
-                        href={ref.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-[var(--color-fg-subtle)] hover:text-[var(--color-accent-fg)] flex-shrink-0 p-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        <ExternalLink className="h-3.5 w-3.5" />
-                      </a>
-                    </div>
-                  );
-                })}
+                    );
+                  })}
+                </div>
               </div>
-            </div>
+            )}
           </div>
         )}
       </div>
@@ -316,6 +388,8 @@ export function KeywordComparisonPanel({
               references: keywordData.references,
               referenceCount: keywordData.referenceCount,
               brandRank: keywordData.brandRank,
+              organicResults: keywordData.organicResults || [],
+              organicBrandRank: keywordData.organicBrandRank ?? null,
             });
           }
         }
