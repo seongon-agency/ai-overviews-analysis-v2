@@ -1,4 +1,4 @@
-import { KeywordRow, Reference, KeywordRecord, CompetitorMetrics, AnalysisResult } from './types';
+import { KeywordRow, Reference, KeywordRecord, CompetitorMetrics, AnalysisResult, OrganicResult, SERPItem } from './types';
 
 /**
  * Escape special regex characters in a string
@@ -247,6 +247,51 @@ function parseReferences(refsJson: string | null): Reference[] {
 }
 
 /**
+ * Extract organic results from raw API response
+ */
+function extractOrganicResults(rawApiResult: string | null): OrganicResult[] {
+  if (!rawApiResult) return [];
+
+  try {
+    const apiResult = JSON.parse(rawApiResult);
+    const items: SERPItem[] = apiResult.items || [];
+
+    // Filter organic results and map to our format
+    const organicItems = items
+      .filter(item => item.type === 'organic')
+      .map((item, idx) => ({
+        rank: item.rank_group || idx + 1,
+        domain: item.domain || '',
+        title: item.title || '',
+        url: item.url || '',
+        description: item.description || ''
+      }))
+      .sort((a, b) => a.rank - b.rank)
+      .slice(0, 20); // Top 20 organic results
+
+    return organicItems;
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * Find brand position in organic results
+ */
+function findBrandInOrganicResults(
+  organicResults: OrganicResult[],
+  brandDomain: string
+): number | null {
+  if (!brandDomain || organicResults.length === 0) return null;
+
+  const matchIndex = organicResults.findIndex(result =>
+    brandMatchesDomain(brandDomain, result.domain, result.url)
+  );
+
+  return matchIndex >= 0 ? organicResults[matchIndex].rank : null;
+}
+
+/**
  * Convert database KeywordRow to UI KeywordRecord
  */
 export function processKeywordRow(
@@ -262,6 +307,10 @@ export function processKeywordRow(
   // Check if brand is mentioned in the AIO text content
   const brandMentioned = isBrandMentionedInText(row.aio_markdown, brandName);
 
+  // Extract organic results from raw API response
+  const organicResults = extractOrganicResults(row.raw_api_result);
+  const organicBrandRank = findBrandInOrganicResults(organicResults, brandDomain);
+
   return {
     id: row.id,
     keyword: row.keyword,
@@ -270,7 +319,9 @@ export function processKeywordRow(
     references,
     referenceCount: references.length,
     brandRank: brandMatch?.rank || null,
-    brandMentioned
+    brandMentioned,
+    organicResults,
+    organicBrandRank
   };
 }
 

@@ -695,3 +695,24 @@
 ::-webkit-scrollbar-thumb:hover {
   background: var(--color-fg-subtle);
 }
+
+/* ============================================
+   Recharts Custom Styling
+   ============================================ */
+
+/* Tone down the default bar chart cursor (hover highlight) */
+.recharts-tooltip-cursor {
+  fill: var(--color-neutral-muted) !important;
+  opacity: 0.5 !important;
+}
+
+/* Dark mode adjustment */
+[data-theme="dark"] .recharts-tooltip-cursor {
+  fill: var(--color-neutral-muted) !important;
+  opacity: 0.3 !important;
+}
+
+/* Improve legend text readability */
+.recharts-legend-item-text {
+  color: var(--color-fg-muted) !important;
+}
