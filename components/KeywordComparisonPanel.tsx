@@ -515,8 +515,8 @@ export function KeywordComparisonPanel({
   // Sort pinned entries by date (newest first) for consistent display
   pinnedEntries.sort((a, b) => new Date(b.sessionDate).getTime() - new Date(a.sessionDate).getTime());
 
-  // Sort unpinned entries chronologically (oldest first for left-to-right reading)
-  unpinnedEntries.sort((a, b) => new Date(a.sessionDate).getTime() - new Date(b.sessionDate).getTime());
+  // Sort unpinned entries reverse chronologically (newest first for left-to-right reading)
+  unpinnedEntries.sort((a, b) => new Date(b.sessionDate).getTime() - new Date(a.sessionDate).getTime());
 
   if (loadingHistory) {
     return (
