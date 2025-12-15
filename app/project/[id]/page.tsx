@@ -76,6 +76,11 @@ export default function ProjectPage() {
     brandCitationRate: number;
     avgBrandRank: number | null;
     topRanked: number;
+    // Organic metrics
+    organicRankings: number;
+    avgOrganicRank: number | null;
+    organicVisibilityRate: number;
+    topRankedOrganic: number;
   }[]>([]);
 
   // Fetch project data

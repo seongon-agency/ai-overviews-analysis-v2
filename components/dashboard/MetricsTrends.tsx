@@ -16,7 +16,7 @@ import {
 } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { CheckSessionWithStats } from '@/lib/types';
-import { TrendingUp, TrendingDown, Minus, Activity, Target, BarChart3, Zap } from 'lucide-react';
+import { TrendingUp, TrendingDown, Minus, Activity, Target, BarChart3, Zap, Search } from 'lucide-react';
 
 interface SessionMetrics {
   sessionId: number;
@@ -30,6 +30,11 @@ interface SessionMetrics {
   brandCitationRate: number;
   avgBrandRank: number | null;
   topRanked: number;
+  // Organic metrics
+  organicRankings: number;
+  avgOrganicRank: number | null;
+  organicVisibilityRate: number;
+  topRankedOrganic: number;
 }
 
 interface MetricsTrendsProps {
@@ -89,6 +94,10 @@ export function MetricsTrends({ sessions, sessionMetrics, brandName }: MetricsTr
   const rankTrend = latest.avgBrandRank && previous.avgBrandRank
     ? calculateTrend(previous.avgBrandRank, latest.avgBrandRank) // Inverted: lower rank is better
     : null;
+  const organicRankTrend = latest.avgOrganicRank && previous.avgOrganicRank
+    ? calculateTrend(previous.avgOrganicRank, latest.avgOrganicRank) // Inverted: lower rank is better
+    : null;
+  const organicVisibilityTrend = calculateTrend(latest.organicVisibilityRate, previous.organicVisibilityRate);
 
   const TrendIcon = ({ direction }: { direction: string }) => {
     switch (direction) {
@@ -149,57 +158,80 @@ export function MetricsTrends({ sessions, sessionMetrics, brandName }: MetricsTr
   return (
     <div className="space-y-6">
       {/* Trend Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <Card className="bg-gradient-to-br from-[var(--color-accent-subtle)] to-[var(--color-accent-subtle)] border-[var(--color-accent-subtle)]">
-          <CardContent className="p-5">
+          <CardContent className="p-4">
             <div className="flex items-start justify-between">
               <div>
-                <p className="text-sm font-medium text-[var(--color-accent-fg)]">AI Overview Rate</p>
-                <p className="text-3xl font-bold text-[var(--color-fg-default)] mt-1">{latest.aioRate.toFixed(1)}%</p>
+                <p className="text-xs font-medium text-[var(--color-accent-fg)]">AI Overview Rate</p>
+                <p className="text-2xl font-bold text-[var(--color-fg-default)] mt-1">{latest.aioRate.toFixed(1)}%</p>
               </div>
-              <div className="h-10 w-10 rounded-md bg-[var(--color-accent-subtle)] flex items-center justify-center">
-                <Zap className="h-5 w-5 text-[var(--color-accent-fg)]" />
+              <div className="h-8 w-8 rounded-md bg-[var(--color-accent-subtle)] flex items-center justify-center">
+                <Zap className="h-4 w-4 text-[var(--color-accent-fg)]" />
               </div>
             </div>
-            <div className="mt-3">
+            <div className="mt-2">
               <TrendBadge trend={aioTrend} label="vs last" />
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-[var(--color-purple-subtle)] to-[var(--color-purple-subtle)] border-[var(--color-purple-subtle)]">
-          <CardContent className="p-5">
+        <Card className="bg-gradient-to-br from-[var(--color-warning-subtle)] to-[var(--color-warning-subtle)] border-[var(--color-warning-subtle)]">
+          <CardContent className="p-4">
             <div className="flex items-start justify-between">
               <div>
-                <p className="text-sm font-medium text-[var(--color-purple-fg)]">Brand Citation Rate</p>
-                <p className="text-3xl font-bold text-[var(--color-fg-default)] mt-1">{latest.brandCitationRate.toFixed(1)}%</p>
+                <p className="text-xs font-medium text-[var(--color-warning-fg)]">Avg AIO Rank</p>
+                <p className="text-2xl font-bold text-[var(--color-fg-default)] mt-1">
+                  {latest.avgBrandRank ? `#${latest.avgBrandRank.toFixed(1)}` : '-'}
+                </p>
               </div>
-              <div className="h-10 w-10 rounded-md bg-[var(--color-purple-subtle)] flex items-center justify-center">
-                <Target className="h-5 w-5 text-[var(--color-purple-fg)]" />
+              <div className="h-8 w-8 rounded-md bg-[var(--color-warning-subtle)] flex items-center justify-center">
+                <Target className="h-4 w-4 text-[var(--color-warning-fg)]" />
               </div>
             </div>
-            <div className="mt-3">
-              <TrendBadge trend={citationTrend} label="vs last" />
+            <div className="mt-2">
+              {rankTrend ? (
+                <TrendBadge trend={rankTrend} label="vs last" inverted />
+              ) : (
+                <span className="text-xs text-[var(--color-fg-muted)]">No rank data</span>
+              )}
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-[var(--color-warning-subtle)] to-[var(--color-warning-subtle)] border-[var(--color-warning-subtle)]">
-          <CardContent className="p-5">
+        <Card className="bg-gradient-to-br from-[var(--color-success-subtle)] to-[var(--color-success-subtle)] border-[var(--color-success-subtle)]">
+          <CardContent className="p-4">
             <div className="flex items-start justify-between">
               <div>
-                <p className="text-sm font-medium text-[var(--color-warning-fg)]">Average Rank</p>
-                <p className="text-3xl font-bold text-[var(--color-fg-default)] mt-1">
-                  {latest.avgBrandRank ? `#${latest.avgBrandRank.toFixed(1)}` : '-'}
-                </p>
+                <p className="text-xs font-medium text-[var(--color-success-fg)]">Organic Visibility</p>
+                <p className="text-2xl font-bold text-[var(--color-fg-default)] mt-1">{latest.organicVisibilityRate.toFixed(1)}%</p>
               </div>
-              <div className="h-10 w-10 rounded-md bg-[var(--color-warning-subtle)] flex items-center justify-center">
-                <Activity className="h-5 w-5 text-[var(--color-warning-fg)]" />
+              <div className="h-8 w-8 rounded-md bg-[var(--color-success-subtle)] flex items-center justify-center">
+                <Search className="h-4 w-4 text-[var(--color-success-fg)]" />
               </div>
             </div>
-            <div className="mt-3">
-              {rankTrend ? (
-                <TrendBadge trend={rankTrend} label="vs last" inverted />
+            <div className="mt-2">
+              <TrendBadge trend={organicVisibilityTrend} label="vs last" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-gradient-to-br from-[var(--color-purple-subtle)] to-[var(--color-purple-subtle)] border-[var(--color-purple-subtle)]">
+          <CardContent className="p-4">
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-xs font-medium text-[var(--color-purple-fg)]">Avg Organic Rank</p>
+                <p className="text-2xl font-bold text-[var(--color-fg-default)] mt-1">
+                  {latest.avgOrganicRank ? `#${latest.avgOrganicRank.toFixed(1)}` : '-'}
+                </p>
+              </div>
+              <div className="h-8 w-8 rounded-md bg-[var(--color-purple-subtle)] flex items-center justify-center">
+                <Activity className="h-4 w-4 text-[var(--color-purple-fg)]" />
+              </div>
+            </div>
+            <div className="mt-2">
+              {organicRankTrend ? (
+                <TrendBadge trend={organicRankTrend} label="vs last" inverted />
               ) : (
                 <span className="text-xs text-[var(--color-fg-muted)]">No rank data</span>
               )}
@@ -276,14 +308,74 @@ export function MetricsTrends({ sessions, sessionMetrics, brandName }: MetricsTr
           </CardContent>
         </Card>
 
-        {/* Rank & Top 3 Trend */}
+        {/* AIO vs Organic Rank Comparison */}
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-base">Ranking Performance</CardTitle>
-            <CardDescription>Average rank position and top 3 placements</CardDescription>
+            <CardTitle className="text-base">AIO vs Organic Rank</CardTitle>
+            <CardDescription>Compare your ranking in AI Overviews vs organic search</CardDescription>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={280}>
+              <LineChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--chart-border))" vertical={false} />
+                <XAxis
+                  dataKey="shortDate"
+                  tick={{ fontSize: 11, fill: 'hsl(var(--chart-fg-muted))' }}
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <YAxis
+                  tick={{ fontSize: 11, fill: 'hsl(var(--chart-fg-muted))' }}
+                  axisLine={false}
+                  tickLine={false}
+                  reversed
+                  domain={[1, 10]}
+                  tickFormatter={(value) => `#${value}`}
+                />
+                <Tooltip content={<CustomTooltip />} />
+                <Legend
+                  verticalAlign="top"
+                  height={36}
+                  iconType="circle"
+                  iconSize={8}
+                  wrapperStyle={{ fontSize: '12px' }}
+                />
+                <ReferenceLine y={3} stroke="hsl(142 71% 45%)" strokeDasharray="5 5" label={{ value: 'Top 3', position: 'right', fontSize: 10, fill: 'hsl(142 71% 45%)' }} />
+                <Line
+                  type="monotone"
+                  dataKey="avgBrandRank"
+                  name="Avg AIO Rank"
+                  stroke="hsl(45 93% 47%)"
+                  strokeWidth={2.5}
+                  dot={{ fill: 'hsl(45 93% 47%)', strokeWidth: 0, r: 5 }}
+                  activeDot={{ r: 7, strokeWidth: 2, stroke: 'white' }}
+                  connectNulls
+                />
+                <Line
+                  type="monotone"
+                  dataKey="avgOrganicRank"
+                  name="Avg Organic Rank"
+                  stroke="hsl(280 65% 60%)"
+                  strokeWidth={2.5}
+                  dot={{ fill: 'hsl(280 65% 60%)', strokeWidth: 0, r: 5 }}
+                  activeDot={{ r: 7, strokeWidth: 2, stroke: 'white' }}
+                  connectNulls
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Organic Ranking Performance */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base">AIO Ranking Performance</CardTitle>
+            <CardDescription>Average AI Overview rank and top 3 placements</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={240}>
               <LineChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--chart-border))" vertical={false} />
                 <XAxis
@@ -317,27 +409,94 @@ export function MetricsTrends({ sessions, sessionMetrics, brandName }: MetricsTr
                   iconSize={8}
                   wrapperStyle={{ fontSize: '12px' }}
                 />
-                <ReferenceLine yAxisId="rank" y={3} stroke="hsl(45 93% 55%)" strokeDasharray="5 5" label={{ value: 'Top 3', position: 'right', fontSize: 10, fill: 'hsl(45 93% 47%)' }} />
+                <ReferenceLine yAxisId="rank" y={3} stroke="hsl(45 93% 55%)" strokeDasharray="5 5" />
                 <Line
                   yAxisId="rank"
                   type="monotone"
                   dataKey="avgBrandRank"
-                  name="Avg Rank"
+                  name="Avg AIO Rank"
                   stroke="hsl(45 93% 47%)"
                   strokeWidth={2.5}
-                  dot={{ fill: 'hsl(45 93% 47%)', strokeWidth: 0, r: 5 }}
-                  activeDot={{ r: 7, strokeWidth: 2, stroke: 'white' }}
+                  dot={{ fill: 'hsl(45 93% 47%)', strokeWidth: 0, r: 4 }}
+                  activeDot={{ r: 6, strokeWidth: 2, stroke: 'white' }}
                   connectNulls
                 />
                 <Line
                   yAxisId="count"
                   type="monotone"
                   dataKey="topRanked"
-                  name="Top 3 Count"
+                  name="Top 3 AIO"
                   stroke="hsl(142 71% 45%)"
                   strokeWidth={2}
-                  dot={{ fill: 'hsl(142 71% 45%)', strokeWidth: 0, r: 4 }}
+                  dot={{ fill: 'hsl(142 71% 45%)', strokeWidth: 0, r: 3 }}
+                  activeDot={{ r: 5, strokeWidth: 2, stroke: 'white' }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base">Organic Ranking Performance</CardTitle>
+            <CardDescription>Average organic rank and top 3 placements</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={240}>
+              <LineChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--chart-border))" vertical={false} />
+                <XAxis
+                  dataKey="shortDate"
+                  tick={{ fontSize: 11, fill: 'hsl(var(--chart-fg-muted))' }}
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <YAxis
+                  yAxisId="rank"
+                  orientation="left"
+                  tick={{ fontSize: 11, fill: 'hsl(var(--chart-fg-muted))' }}
+                  axisLine={false}
+                  tickLine={false}
+                  reversed
+                  domain={[1, 10]}
+                  tickFormatter={(value) => `#${value}`}
+                />
+                <YAxis
+                  yAxisId="count"
+                  orientation="right"
+                  tick={{ fontSize: 11, fill: 'hsl(var(--chart-fg-muted))' }}
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <Tooltip content={<CustomTooltip />} />
+                <Legend
+                  verticalAlign="top"
+                  height={36}
+                  iconType="circle"
+                  iconSize={8}
+                  wrapperStyle={{ fontSize: '12px' }}
+                />
+                <ReferenceLine yAxisId="rank" y={3} stroke="hsl(280 65% 60%)" strokeDasharray="5 5" />
+                <Line
+                  yAxisId="rank"
+                  type="monotone"
+                  dataKey="avgOrganicRank"
+                  name="Avg Organic Rank"
+                  stroke="hsl(280 65% 60%)"
+                  strokeWidth={2.5}
+                  dot={{ fill: 'hsl(280 65% 60%)', strokeWidth: 0, r: 4 }}
                   activeDot={{ r: 6, strokeWidth: 2, stroke: 'white' }}
+                  connectNulls
+                />
+                <Line
+                  yAxisId="count"
+                  type="monotone"
+                  dataKey="topRankedOrganic"
+                  name="Top 3 Organic"
+                  stroke="hsl(142 71% 45%)"
+                  strokeWidth={2}
+                  dot={{ fill: 'hsl(142 71% 45%)', strokeWidth: 0, r: 3 }}
+                  activeDot={{ r: 5, strokeWidth: 2, stroke: 'white' }}
                 />
               </LineChart>
             </ResponsiveContainer>

@@ -27,6 +27,11 @@ interface SessionMetrics {
   brandCitationRate: number;
   avgBrandRank: number | null;
   topRanked: number;
+  // Organic metrics
+  organicRankings: number;
+  avgOrganicRank: number | null;
+  organicVisibilityRate: number;
+  topRankedOrganic: number;
 }
 
 export default function DashboardPage() {
