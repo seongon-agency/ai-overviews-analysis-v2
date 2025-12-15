@@ -14,6 +14,7 @@ import { MetricsTrends } from '@/components/dashboard/MetricsTrends';
 import { InsightsPanel } from '@/components/dashboard/InsightsPanel';
 import { KeywordPerformanceGrid } from '@/components/dashboard/KeywordPerformanceGrid';
 import { RankDistributionChart } from '@/components/dashboard/RankDistributionChart';
+import { OrganicRankDistributionChart } from '@/components/dashboard/OrganicRankDistributionChart';
 
 // shadcn/ui components
 import { Button } from '@/components/ui/button';
@@ -931,13 +932,20 @@ export default function ProjectPage() {
                     />
                   )}
 
-                  {/* Rank Distribution Chart */}
+                  {/* Rank Distribution Charts - AIO and Organic side by side */}
                   {analysis.keywordsAnalysis.length > 0 && (
-                    <RankDistributionChart
-                      keywords={analysis.keywordsAnalysis}
-                      brandName={brandName}
-                      brandDomain={brandDomain}
-                    />
+                    <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                      <RankDistributionChart
+                        keywords={analysis.keywordsAnalysis}
+                        brandName={brandName}
+                        brandDomain={brandDomain}
+                      />
+                      <OrganicRankDistributionChart
+                        keywords={analysis.keywordsAnalysis}
+                        brandName={brandName}
+                        brandDomain={brandDomain}
+                      />
+                    </div>
                   )}
 
                   {/* Performance Trends Over Time */}

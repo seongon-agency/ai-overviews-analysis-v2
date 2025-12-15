@@ -297,8 +297,6 @@ export function MetricsTrends({ sessionMetrics, brandName }: MetricsTrendsProps)
                 iconSize={10}
                 wrapperStyle={{ fontSize: '12px' }}
               />
-              <ReferenceLine y={3} stroke="hsl(142 71% 45%)" strokeDasharray="5 5" label={{ value: 'Top 3', position: 'right', fontSize: 10, fill: 'hsl(142 71% 45%)' }} />
-              <ReferenceLine y={10} stroke="hsl(220 14% 70%)" strokeDasharray="3 3" label={{ value: 'Top 10', position: 'right', fontSize: 10, fill: 'hsl(220 14% 60%)' }} />
               <Line
                 type="monotone"
                 dataKey="avgBrandRank"
@@ -321,6 +319,12 @@ export function MetricsTrends({ sessionMetrics, brandName }: MetricsTrendsProps)
               />
             </LineChart>
           </ResponsiveContainer>
+          {/* Chart Legend Explanation */}
+          <div className="mt-3 pt-3 border-t border-[var(--color-border-muted)] text-xs text-[var(--color-fg-muted)]">
+            <span className="font-medium">How to read:</span> Lines closer to the top (#1) are better.
+            <span className="inline-flex items-center gap-1 mx-1 px-1.5 py-0.5 rounded bg-[var(--color-warning-subtle)] text-[var(--color-warning-fg)]">Yellow = AIO</span>
+            <span className="inline-flex items-center gap-1 mx-1 px-1.5 py-0.5 rounded bg-[var(--color-accent-subtle)] text-[var(--color-accent-fg)]">Blue = Organic</span>
+          </div>
         </CardContent>
       </Card>
 
@@ -363,7 +367,7 @@ export function MetricsTrends({ sessionMetrics, brandName }: MetricsTrendsProps)
                 <Bar
                   dataKey="withAIO"
                   name="Keywords with AIO"
-                  fill="hsl(220 14% 80%)"
+                  fill="hsl(220 14% 45%)"
                   radius={[4, 4, 0, 0]}
                 />
                 <Bar
@@ -420,7 +424,7 @@ export function MetricsTrends({ sessionMetrics, brandName }: MetricsTrendsProps)
                 <Bar
                   dataKey="totalKeywords"
                   name="Total Keywords"
-                  fill="hsl(220 14% 80%)"
+                  fill="hsl(220 14% 45%)"
                   radius={[4, 4, 0, 0]}
                 />
                 <Bar
